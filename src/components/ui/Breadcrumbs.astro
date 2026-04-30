@@ -1,0 +1,27 @@
+---
+import { breadcrumbSchema } from '../../lib/schema-org';
+
+interface Props {
+  items: { name: string; url?: string }[];
+  class?: string;
+}
+
+const { items, class: className = '' } = Astro.props;
+const schema = breadcrumbSchema(items);
+---
+
+<nav aria-label="Okruszki" class={`text-[0.78rem] ${className}`}>
+  <ol class="flex flex-wrap items-center gap-2 text-[var(--color-ink-4)]">
+    {items.map((item, i) => (
+      <li class="flex items-center gap-2">
+        {i > 0 && <span class="text-[var(--color-rule-strong)]" aria-hidden="true">/</span>}
+        {item.url && i < items.length - 1 ? (
+          <a href={item.url} class="hover:text-[var(--color-ink)] transition-colors">{item.name}</a>
+        ) : (
+          <span class="text-[var(--color-ink-2)]">{item.name}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

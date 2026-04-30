@@ -1,0 +1,157 @@
+---
+import { OPERATOR, SITE } from '../../lib/site';
+import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="surface-night mt-32" aria-labelledby="footer-heading">
+  <h2 id="footer-heading" class="sr-only">Stopka</h2>
+
+  <!-- Pre-footer CTA strip -->
+  <div class="border-b border-white/10">
+    <div class="container-edge py-14 md:py-20 grid gap-10 md:grid-cols-12 items-end">
+      <div class="md:col-span-7">
+        <div class="eyebrow !text-white/60">Następna edycja • 10.06.2026</div>
+        <h3 class="mt-4 text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.02] tracking-tight text-[var(--color-paper)]">
+          Naucz się <span class="display-italic !text-[var(--color-accent-soft)]">tego, co działa</span>.<br />
+          Bez teorii, bez hype'u.
+        </h3>
+      </div>
+      <div class="md:col-span-5 flex flex-col gap-3 md:items-end">
+        <a href="/terminy/" class="btn btn-accent btn-lg w-full md:w-auto">Zobacz najbliższe terminy</a>
+        <a href="/dofinansowanie/kalkulator/" class="btn btn-ghost btn-lg w-full md:w-auto !border-white/20 !text-[var(--color-paper)] hover:!bg-white/5">
+          Sprawdź swoje dofinansowanie
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main footer columns -->
+  <div class="container-edge py-16 md:py-20 grid gap-10 md:grid-cols-12">
+    <div class="md:col-span-4">
+      <Logo class="h-10 w-auto" variant="inverted" />
+      <p class="mt-5 text-sm leading-relaxed text-white/65 max-w-sm">
+        Akademia AI dla pracowników biurowych spoza IT. Praktycznie, kameralnie, z dofinansowaniem do 90% z KFS i PSF.
+      </p>
+
+      <div class="mt-8 flex flex-col gap-2 text-sm text-white/65">
+        <a href={`mailto:${SITE.email}`} class="text-[var(--color-paper)] hover:text-[var(--color-accent-soft)] transition-colors">
+          {SITE.email}
+        </a>
+      </div>
+
+      <!-- BUR badge -->
+      <a
+        href={OPERATOR.burProviderUrl}
+        target="_blank"
+        rel="noopener"
+        class="mt-8 inline-flex items-center gap-3 px-4 py-3 rounded-md border border-white/15 hover:border-white/30 transition-colors"
+      >
+        <div class="text-left">
+          <div class="text-[0.65rem] uppercase tracking-[0.18em] text-white/50 font-medium">Dostawca usług w</div>
+          <div class="font-display font-semibold text-lg text-[var(--color-accent-soft)] tracking-tight">Bazie Usług Rozwojowych</div>
+        </div>
+        <svg class="w-3 h-3 text-white/40" viewBox="0 0 12 12" fill="none">
+          <path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.2" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="md:col-span-2">
+      <div class="footer-heading">Szkolenia</div>
+      <ul class="footer-list">
+        <li><a href="/szkolenia/ai-w-pracy-biurowej-podstawy/">Basic 1-day</a></li>
+        <li><a href="/szkolenia/ai-w-pracy-biurowej-level-2/">Level 2 1-day</a></li>
+        <li><a href="/szkolenia/ai-w-pracy-biurowej-program-100h/">Program 100h</a></li>
+        <li><a href="/terminy/">Wszystkie terminy</a></li>
+        <li><a href="/firmy/">Dla firm</a></li>
+      </ul>
+    </div>
+
+    <div class="md:col-span-2">
+      <div class="footer-heading">Dofinansowanie</div>
+      <ul class="footer-list">
+        <li><a href="/dofinansowanie/bur-jak-zapisac/">BUR krok po kroku</a></li>
+        <li><a href="/dofinansowanie/kfs-priorytet-3/">KFS Priorytet 3</a></li>
+        <li><a href="/dofinansowanie/psf-podmiotowy-system-finansowania/">PSF — operatorzy</a></li>
+        <li><a href="/dofinansowanie/fers-akademia-hr/">FERS Akademia HR</a></li>
+        <li><a href="/dofinansowanie/kalkulator/">Kalkulator</a></li>
+      </ul>
+    </div>
+
+    <div class="md:col-span-2">
+      <div class="footer-heading">Akademia</div>
+      <ul class="footer-list">
+        <li><a href="/trener/">Trener</a></li>
+        <li><a href="/o-akademii/">O Expert-Sales</a></li>
+        <li><a href="/blog/">Blog</a></li>
+        <li><a href="/faq/">FAQ</a></li>
+        <li><a href="/kontakt/">Kontakt</a></li>
+      </ul>
+    </div>
+
+    <div class="md:col-span-2">
+      <div class="footer-heading">Prawne</div>
+      <ul class="footer-list">
+        <li><a href="/regulamin/">Regulamin</a></li>
+        <li><a href="/polityka-prywatnosci/">Polityka prywatności</a></li>
+        <li><a href="/polityka-cookies/">Polityka cookies</a></li>
+        <li><a href="/deklaracja-dostepnosci/">Deklaracja dostępności</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Legal strip -->
+  <div class="border-t border-white/10">
+    <div class="container-edge py-6 grid gap-4 md:grid-cols-12 text-[0.78rem] leading-relaxed text-white/55">
+      <div class="md:col-span-7">
+        <p>
+          Operator marki Next Mind Academy: <strong class="text-white/80 font-medium">{OPERATOR.legalName}</strong>,
+          {OPERATOR.street}, {OPERATOR.postal} {OPERATOR.city}.
+        </p>
+        <p class="mt-1.5 font-mono text-[0.72rem] tabular-nums tracking-wider text-white/45">
+          KRS {OPERATOR.krs} <span class="px-2 text-white/25">/</span>
+          NIP {OPERATOR.nip} <span class="px-2 text-white/25">/</span>
+          REGON {OPERATOR.regon}
+        </p>
+      </div>
+      <div class="md:col-span-5 md:text-right">
+        <p>© {year} Next Mind Academy. Wszelkie prawa zastrzeżone.</p>
+        <p class="mt-1 text-white/40">Zaprojektowane i wybudowane w Polsce.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-heading {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-accent-soft);
+    margin-bottom: 1.25rem;
+    font-family: var(--font-sans);
+  }
+
+  .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 0.875rem;
+  }
+
+  .footer-list a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-list a:hover {
+    color: var(--color-paper);
+  }
+</style>

@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import { OPERATOR } from '../lib/site';
+
+const values = [
+  { eyebrow: 'Wartość 01', title: 'Praktyk, nie YouTuber.', desc: 'Trener prowadzi realne wdrożenia, nie tylko opowiada o promptach. Każde ćwiczenie ma swój kontekst biznesowy.' },
+  { eyebrow: 'Wartość 02', title: 'Kameralna grupa zawsze.', desc: '4 do 10 osób. Każdy uczestnik dostaje uwagę i odpowiedź na swój przypadek. Bez 30-osobowych webinarów.' },
+  { eyebrow: 'Wartość 03', title: 'Brak hype\'u.', desc: 'AI to narzędzie, nie rewolucja. Mówimy uczciwie o tym, co działa, co nie i co się zmieni za miesiąc.' },
+  { eyebrow: 'Wartość 04', title: 'Walidacja, nie świstek.', desc: 'Test wiedzy + zadanie praktyczne, walidator inny niż prowadzący. Certyfikat coś znaczy.' },
+  { eyebrow: 'Wartość 05', title: 'Aktualność co kwartał.', desc: 'Modele zmieniają się co miesiąc. My aktualizujemy program co kwartał — i wysyłamy update absolwentom.' },
+  { eyebrow: 'Wartość 06', title: 'Społeczność po dniu zero.', desc: 'Po szkoleniu nie zostawiamy Cię. Slack absolwentów żyje codziennie. Pomagamy sobie nawzajem.' },
+];
+---
+
+<BaseLayout
+  title="O Next Mind Academy — operator Expert-Sales sp. z o.o. | Misja akademii"
+  description="Misja, wartości, zespół Next Mind Academy. Operator: Expert-Sales sp. z o.o. — KRS 0000549030, dostawca BUR. Standardy jakości i metodologia ADDIE."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'O akademii' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-9">
+        <div class="eyebrow">Manifest akademii</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[6rem] leading-[0.96] tracking-tight">
+          AI dla pracownika biurowego.<br />
+          <span class="display-italic">Nie</span> dla menedżera CIO.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-3xl">
+          Większość rynku szkoleń AI w Polsce w 2026 r. mówi językiem korporacji.
+          My zaczynamy od pracownika administracji, który ma 47 nieprzeczytanych maili i&nbsp;raport do napisania na popołudnie.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Sześć wartości">
+    <h2 class="mt-6 text-3xl md:text-4xl lg:text-[3rem] tracking-tight leading-tight">
+      Czym się <span class="display-italic">kierujemy</span>.
+    </h2>
+    <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--color-rule)] border border-[var(--color-rule)] rounded-lg overflow-hidden">
+      {values.map((v) => (
+        <article class="value-card">
+          <span class="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--color-accent)]">{v.eyebrow}</span>
+          <h3 class="mt-4 font-display text-2xl tracking-tight leading-tight">{v.title}</h3>
+          <p class="mt-3 text-sm text-[var(--color-ink-3)] leading-relaxed">{v.desc}</p>
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <Section padding="default" counter="02" eyebrow="Operator">
+    <div class="grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5">
+        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">
+          <span class="display-italic">Expert-Sales</span> sp. z&nbsp;o.o.
+        </h2>
+        <p class="mt-6 text-[var(--color-ink-3)] leading-relaxed">
+          Marka Next Mind Academy jest prowadzona przez Expert-Sales sp. z o.o.
+          — formalnego dostawcę usług rozwojowych wpisanego do Bazy Usług Rozwojowych PARP.
+        </p>
+        <p class="mt-4 text-[var(--color-ink-3)] leading-relaxed">
+          Spółka ma profil PKD 85.59.B (kursy i szkolenia w celu zdobycia wiedzy, umiejętności i kwalifikacji zawodowych) oraz 85.59.D — formalnie posiada uprawnienia do prowadzenia działalności szkoleniowej.
+        </p>
+        <a href={OPERATOR.burProviderUrl} target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-1.5 ink-link">
+          Karta dostawcy w BUR <svg class="w-3 h-3" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.2" /></svg>
+        </a>
+      </div>
+      <div class="lg:col-span-7">
+        <dl class="operator-card">
+          <div class="op-row">
+            <dt>Pełna nazwa</dt>
+            <dd>{OPERATOR.legalName}</dd>
+          </div>
+          <div class="op-row">
+            <dt>Adres</dt>
+            <dd>{OPERATOR.street}, {OPERATOR.postal} {OPERATOR.city}</dd>
+          </div>
+          <div class="op-row">
+            <dt>KRS</dt>
+            <dd class="font-mono tabular-nums">{OPERATOR.krs}</dd>
+          </div>
+          <div class="op-row">
+            <dt>NIP</dt>
+            <dd class="font-mono tabular-nums">{OPERATOR.nip}</dd>
+          </div>
+          <div class="op-row">
+            <dt>REGON</dt>
+            <dd class="font-mono tabular-nums">{OPERATOR.regon}</dd>
+          </div>
+          <div class="op-row">
+            <dt>VAT UE</dt>
+            <dd class="font-mono tabular-nums">{OPERATOR.vatID}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="03" eyebrow="Standardy">
+    <div class="grid md:grid-cols-2 gap-12">
+      <div>
+        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">
+          <span class="display-italic">Jakość</span> i&nbsp;walidacja.
+        </h2>
+        <p class="mt-6 text-[var(--color-ink-3)] leading-relaxed">
+          Pracujemy zgodnie ze Standardem Usług Szkoleniowych (SUZ-1, SUZ-3, SUZ-11) wynikającym z&nbsp;Regulaminu BUR.
+          Standard jakości: <strong class="text-[var(--color-ink)]">SUS 3.0</strong> (proces audytu w&nbsp;trakcie).
+        </p>
+      </div>
+      <div>
+        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">
+          Metodologia <span class="display-italic">ADDIE</span>.
+        </h2>
+        <p class="mt-6 text-[var(--color-ink-3)] leading-relaxed">
+          Każdy program przechodzi pełny cykl: <strong>A</strong>nalysis, <strong>D</strong>esign, <strong>D</strong>evelopment, <strong>I</strong>mplementation, <strong>E</strong>valuation.
+          To nie marketing — to wymóg formalny i&nbsp;zarazem rzemiosło.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section padding="default" counter="04" eyebrow="Zespół">
+    <h2 class="text-3xl md:text-4xl lg:text-[3rem] tracking-tight leading-tight max-w-3xl">
+      Trzy osoby. Trzy <span class="display-italic">funkcje</span>.
+    </h2>
+    <div class="mt-12 grid md:grid-cols-3 gap-5">
+      {[
+        { role: 'Trener wiodący', name: 'Przemek Nowak', desc: 'Autor programu, prowadzący wszystkie edycje. Praktyk wdrożeń AI.' },
+        { role: 'Walidator', name: 'Krzysztof Liszka', desc: 'Prezes Zarządu Expert-Sales. Niezależny walidator efektów uczenia się — zasada rozdzielności funkcji.' },
+        { role: 'Wsparcie operacyjne', name: 'Pomeblo', desc: 'Strona BUR, publikacja kart usług, dokumentacja PSF/KFS — partner operacyjny akademii.' },
+      ].map((p) => (
+        <article class="team-card">
+          <span class="font-mono text-xs uppercase tracking-[0.14em] text-[var(--color-accent)]">{p.role}</span>
+          <h3 class="mt-3 font-display text-2xl tracking-tight">{p.name}</h3>
+          <p class="mt-3 text-sm text-[var(--color-ink-3)] leading-relaxed">{p.desc}</p>
+        </article>
+      ))}
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .value-card { padding: 2rem; background: var(--color-card-raised); }
+  .operator-card {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .op-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-rule);
+    align-items: baseline;
+  }
+  .op-row:last-child { border-bottom: none; }
+  .op-row dt {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-4);
+    min-width: 6rem;
+  }
+  .op-row dd {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+  .team-card {
+    padding: 2rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    transition: all 0.25s ease;
+  }
+  .team-card:hover { border-color: var(--color-ink); transform: translateY(-2px); }
+</style>

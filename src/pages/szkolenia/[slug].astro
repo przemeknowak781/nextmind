@@ -1,0 +1,994 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import Accordion from '../../components/ui/Accordion.astro';
+import { formatPrice, formatDateLong, formatDateShort } from '../../lib/format';
+import { courseSchema, faqSchema, breadcrumbSchema } from '../../lib/schema-org';
+
+export async function getStaticPaths() {
+  const courses = await getCollection('courses');
+  return courses.map((course) => ({
+    params: { slug: course.data.slug },
+    props: { course },
+  }));
+}
+
+const { course } = Astro.props;
+const c = course.data;
+
+const editions = (await getCollection('editions'))
+  .filter((e) => e.data.courseSlug === c.slug)
+  .sort((a, b) => +a.data.date - +b.data.date);
+const upcomingEditions = editions.filter((e) => e.data.date >= new Date()).slice(0, 3);
+const nextEdition = upcomingEditions[0];
+
+const trainer = await getEntry('trainers', c.trainer);
+const validator = await getEntry('validators', c.validator);
+
+const allFaqs = (await getCollection('faqs')).sort((a, b) => a.data.order - b.data.order);
+const courseFaqs = allFaqs.filter((f) =>
+  ['szkolenia', 'walidacja', 'techniczne'].includes(f.data.category)
+).slice(0, 7);
+
+// Group learning outcomes by area
+const outcomesByArea = {
+  wiedza: c.learningOutcomes.filter((o) => o.area === 'wiedza'),
+  umiejetnosci: c.learningOutcomes.filter((o) => o.area === 'umiejetnosci'),
+  'kompetencje-spoleczne': c.learningOutcomes.filter((o) => o.area === 'kompetencje-spoleczne'),
+};
+
+const schemas = [
+  courseSchema({
+    slug: c.slug,
+    name: c.title,
+    description: c.metaDescription,
+    level: c.level === 'podstawowy' ? 'Beginner' : c.level === 'sredniozaawansowany' ? 'Intermediate' : 'Advanced',
+    durationHours: c.durationHours,
+    priceNet: c.priceNet,
+    startDate: nextEdition ? nextEdition.data.date.toISOString() : undefined,
+    trainerName: trainer?.data.name,
+    teaches: c.teaches,
+  }),
+  faqSchema(courseFaqs.map((f) => ({ question: f.data.question, answer: f.data.answer }))),
+  breadcrumbSchema([
+    { name: 'Strona główna', url: '/' },
+    { name: 'Szkolenia', url: '/szkolenia/' },
+    { name: c.title.split(':')[0] },
+  ]),
+];
+---
+
+<BaseLayout
+  title={c.titleSeo}
+  description={c.metaDescription}
+  schemas={schemas}
+>
+  <!-- Breadcrumbs -->
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Szkolenia', url: '/szkolenia/' },
+      { name: c.title.split(':')[0] },
+    ]} />
+  </div>
+
+  <!-- HERO with sticky price card -->
+  <section class="course-hero pt-10 pb-16 lg:pb-24">
+    <div class="container-edge">
+      <div class="grid lg:grid-cols-12 gap-12">
+        <div class="lg:col-span-7">
+          <div class="eyebrow">{c.eyebrow}</div>
+          <h1 class="course-h1 mt-5">
+            {c.title.split(':').map((part, i) => (
+              i === 0 ? <>{part}<span class="text-[var(--color-accent)]">:</span></> : <span class="display-italic block mt-2">{part.trim()}</span>
+            ))}
+          </h1>
+
+          <p class="lead mt-7 text-[var(--color-ink-2)] max-w-2xl">
+            {c.summary}
+          </p>
+
+          {c.longSummary && (
+            <p class="mt-4 text-[var(--color-ink-3)] leading-relaxed max-w-2xl">
+              {c.longSummary}
+            </p>
+          )}
+
+          <!-- Mini info bar -->
+          <dl class="course-info-bar mt-10">
+            <div>
+              <dt>Czas</dt>
+              <dd>{c.durationLabel}</dd>
+            </div>
+            <div>
+              <dt>Format</dt>
+              <dd>{c.formatLabel}</dd>
+            </div>
+            <div>
+              <dt>Grupa</dt>
+              <dd>{c.minParticipants}–{c.maxParticipants} osób</dd>
+            </div>
+            <div>
+              <dt>Język</dt>
+              <dd>polski</dd>
+            </div>
+            {nextEdition && (
+              <div>
+                <dt>Najbliższa edycja</dt>
+                <dd>{formatDateShort(nextEdition.data.date)}</dd>
+              </div>
+            )}
+          </dl>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            {nextEdition?.data.burEditionUrl ? (
+              <a href={nextEdition.data.burEditionUrl} target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+                Zapisz się przez BUR
+                <svg class="w-3.5 h-3.5" viewBox="0 0 12 12" fill="none">
+                  <path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.2" />
+                </svg>
+              </a>
+            ) : (
+              <a href="/kontakt/" class="btn btn-primary btn-lg">Zapytaj o najbliższą edycję</a>
+            )}
+            <a href="#dofinansowanie" class="btn btn-ghost btn-lg">Sprawdź dofinansowanie</a>
+          </div>
+        </div>
+
+        <!-- Sticky price card (desktop) -->
+        <aside class="lg:col-span-5">
+          <div class="course-price-card sticky top-32">
+            <div class="course-price-header">
+              <span class="eyebrow eyebrow--centered !text-[var(--color-accent)]">Cena</span>
+              {nextEdition && (
+                <span class="font-mono text-[0.7rem] tabular-nums text-[var(--color-ink-4)]">
+                  ed. {formatDateShort(nextEdition.data.date)}
+                </span>
+              )}
+            </div>
+            <div class="course-price-row">
+              <span>Cena katalogowa netto</span>
+              <span class="course-price-strike font-mono tabular-nums">{formatPrice(c.priceNet)}</span>
+            </div>
+            {c.priceWithPsf && (
+              <div class="course-price-row">
+                <span>Z dofinansowaniem PSF (80%)</span>
+                <span class="font-mono tabular-nums">{formatPrice(c.priceWithPsf)}</span>
+              </div>
+            )}
+            {c.priceWithKfs && (
+              <div class="course-price-row course-price-final">
+                <span class="display-italic text-[var(--color-ink)] text-lg">Z KFS (90%)</span>
+                <span class="course-price-final-num">{formatPrice(c.priceWithKfs)}</span>
+              </div>
+            )}
+
+            <p class="text-[0.72rem] text-[var(--color-ink-4)] leading-relaxed mt-4">
+              {c.vatExemptInfo}
+            </p>
+
+            <div class="rule-dotted my-5"></div>
+
+            {upcomingEditions.length > 0 ? (
+              <>
+                <span class="eyebrow eyebrow--centered mb-3">Najbliższe edycje</span>
+                <ul class="space-y-2">
+                  {upcomingEditions.map((ed) => (
+                    <li>
+                      <a href={`/terminy/${ed.id.replace('.json', '')}/`} class="course-edition-row group">
+                        <div>
+                          <div class="text-[var(--color-ink)] font-medium text-sm">{formatDateShort(ed.data.date)}</div>
+                          <div class="text-[0.72rem] text-[var(--color-ink-4)] mt-0.5">{ed.data.startTime}–{ed.data.endTime} · {ed.data.platform}</div>
+                        </div>
+                        <span class="course-edition-seats">
+                          {ed.data.seatsAvailable}/{ed.data.seatsTotal}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p class="text-sm text-[var(--color-ink-3)]">Następne terminy wkrótce — zostaw kontakt.</p>
+            )}
+
+            <a href="/kontakt/" class="mt-6 block text-center btn btn-secondary w-full">Zapytaj o szkolenie zamknięte</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- DLA KOGO -->
+  <Section surface="paper-soft" counter="01" eyebrow="Dla kogo to szkolenie" padding="default">
+    <div class="grid md:grid-cols-12 gap-12 mt-6">
+      <div class="md:col-span-5">
+        <h2 class="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.1] tracking-tight">
+          Pracujesz z mailami, dokumentami, prezentacjami albo&nbsp;<span class="display-italic">danymi</span>?
+          To dla&nbsp;Ciebie.
+        </h2>
+      </div>
+      <div class="md:col-span-7">
+        <ul class="grid sm:grid-cols-2 gap-3">
+          {c.targetAudience.map((target, i) => (
+            <li class="audience-item">
+              <span class="audience-dot">{String(i + 1).padStart(2, '0')}</span>
+              <span>{target}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div class="mt-10 p-5 bg-[var(--color-card-raised)] border border-[var(--color-rule)] rounded-md">
+          <div class="eyebrow eyebrow--centered mb-3">Wymagania wstępne</div>
+          <ul class="space-y-1.5 text-[0.95rem] text-[var(--color-ink-3)]">
+            {c.prerequisites.map((req) => (
+              <li class="flex items-start gap-2">
+                <span class="text-[var(--color-accent)] mt-1">—</span>
+                <span>{req}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- CZEGO SIĘ NAUCZYSZ — outcomes table -->
+  <Section surface="paper" counter="02" eyebrow="Efekty uczenia się" padding="default">
+    <div class="mt-6 grid md:grid-cols-12 gap-12 items-end mb-12">
+      <h2 class="md:col-span-7 text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.05] tracking-tight">
+        Konkretne <span class="display-italic">efekty</span>, mapowane na <span class="font-mono text-[0.7em] align-baseline tracking-[0.05em] text-[var(--color-accent)]">DigComp 2.2</span>.
+      </h2>
+      <p class="md:col-span-5 text-[var(--color-ink-3)] leading-relaxed">
+        Każdy efekt ma kryterium weryfikacji i sposób walidacji.
+        To wymóg BUR (SUZ-1), ale przede wszystkim — uczciwa obietnica wobec Ciebie.
+      </p>
+    </div>
+
+    <div class="outcomes-table-wrapper">
+      {Object.entries(outcomesByArea).map(([area, outcomes]) => outcomes.length > 0 && (
+        <div class="outcomes-group">
+          <h3 class="outcomes-group-title">
+            <span class="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--color-accent)] mr-3">
+              {area === 'wiedza' ? 'A' : area === 'umiejetnosci' ? 'B' : 'C'}
+            </span>
+            {area === 'wiedza' ? 'Wiedza' : area === 'umiejetnosci' ? 'Umiejętności' : 'Kompetencje społeczne'}
+          </h3>
+
+          <div class="outcomes-table">
+            <div class="outcomes-table-head">
+              <div>Efekt uczenia się</div>
+              <div>Kryterium weryfikacji</div>
+              <div>Metoda walidacji</div>
+              <div class="hidden lg:block">DigComp</div>
+            </div>
+            {outcomes.map((o, i) => (
+              <div class="outcomes-table-row">
+                <div>
+                  <span class="font-mono text-[0.7rem] tabular-nums text-[var(--color-ink-4)] mr-2">
+                    {area === 'wiedza' ? 'W' : area === 'umiejetnosci' ? 'U' : 'K'}{String(i + 1).padStart(2, '0')}
+                  </span>
+                  {o.outcome}
+                </div>
+                <div>{o.verificationCriterion}</div>
+                <div class="text-[var(--color-ink-3)]">{o.validationMethod}</div>
+                <div class="hidden lg:block font-mono text-[0.78rem] text-[var(--color-ink-4)]">{o.digcompMapping ?? '—'}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- PROGRAM (modules) -->
+  <Section surface="paper-soft" counter="03" eyebrow="Program — moduły" padding="default">
+    <div class="grid md:grid-cols-12 gap-12 items-end mb-12 mt-6">
+      <h2 class="md:col-span-7 text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.05] tracking-tight">
+        Cztery moduły. <span class="display-italic">Każdy</span> z konkretnym ćwiczeniem.
+      </h2>
+      <p class="md:col-span-5 text-[var(--color-ink-3)] leading-relaxed">
+        Moduły mają po 90 minut — z przerwą i ćwiczeniem praktycznym.
+        Wychodzisz z dnia z gotowymi materiałami do zastosowania w&nbsp;poniedziałek.
+      </p>
+    </div>
+
+    <div class="space-y-3">
+      {c.modules.map((mod, i) => (
+        <details class="module-card group">
+          <summary class="module-summary">
+            <div class="module-meta">
+              <span class="module-num">M{String(i + 1).padStart(2, '0')}</span>
+              <span class="module-time">{mod.durationMin} min</span>
+            </div>
+            <div class="module-title-block">
+              <h3 class="module-title">{mod.title}</h3>
+              <p class="module-summary-text">{mod.summary}</p>
+              <div class="flex flex-wrap gap-1.5 mt-3">
+                {mod.tools.slice(0, 5).map((tool) => <span class="tag tag-accent">{tool}</span>)}
+              </div>
+            </div>
+            <span class="module-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" class="w-4 h-4">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </summary>
+          <div class="module-content">
+            <div class="grid md:grid-cols-2 gap-8">
+              <div>
+                <div class="eyebrow eyebrow--centered mb-3">Zakres</div>
+                <ul class="space-y-2 text-[0.95rem] text-[var(--color-ink-2)]">
+                  {mod.content.map((item) => (
+                    <li class="flex items-start gap-2">
+                      <span class="text-[var(--color-accent)] mt-1">—</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <div class="eyebrow eyebrow--centered mb-3">Ćwiczenia praktyczne</div>
+                <ul class="space-y-2 text-[0.95rem] text-[var(--color-ink-2)]">
+                  {mod.exercises.map((ex) => (
+                    <li class="flex items-start gap-2">
+                      <span class="text-[var(--color-accent)] mt-1">→</span>
+                      <span>{ex}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </details>
+      ))}
+    </div>
+  </Section>
+
+  <!-- HARMONOGRAM (next edition's schedule) -->
+  {nextEdition && (
+    <Section surface="paper" counter="04" eyebrow="Harmonogram dnia" padding="default">
+      <div class="grid md:grid-cols-12 gap-12 items-end mb-12 mt-6">
+        <h2 class="md:col-span-7 text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.05] tracking-tight">
+          {formatDateLong(nextEdition.data.date)}
+        </h2>
+        <p class="md:col-span-5 text-[var(--color-ink-3)]">
+          {nextEdition.data.startTime}–{nextEdition.data.endTime} · {nextEdition.data.platform} · grupa {nextEdition.data.seatsTotal} osób
+        </p>
+      </div>
+
+      <div class="schedule-table-wrapper">
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th class="w-12">Nr</th>
+              <th class="w-32">Godzina</th>
+              <th class="w-20 text-right">Czas</th>
+              <th>Temat</th>
+              <th class="w-32">Forma</th>
+            </tr>
+          </thead>
+          <tbody>
+            {nextEdition.data.schedule.map((row) => (
+              <tr class={row.no === '—' ? 'schedule-break' : ''}>
+                <td class="font-mono text-xs">{row.no}</td>
+                <td class="font-mono tabular-nums text-sm">{row.timeFrom}–{row.timeTo}</td>
+                <td class="font-mono text-xs text-right text-[var(--color-ink-4)]">{row.duration} min</td>
+                <td>{row.topic}</td>
+                <td class="text-xs text-[var(--color-ink-3)]">{row.form}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Section>
+  )}
+
+  <!-- TRENER + WALIDATOR -->
+  <Section surface="card" counter="05" eyebrow="Kto prowadzi i kto waliduje" padding="default" class="border-y border-[var(--color-rule)]">
+    <div class="mt-6 grid md:grid-cols-2 gap-12">
+      {trainer && (
+        <div>
+          <div class="eyebrow eyebrow--centered mb-3 !text-[var(--color-accent)]">Trener</div>
+          <h3 class="text-3xl font-display tracking-tight leading-tight">{trainer.data.name}</h3>
+          <p class="text-sm text-[var(--color-ink-4)] mt-1">{trainer.data.title}</p>
+          <p class="mt-5 text-[var(--color-ink-3)] leading-relaxed">{trainer.data.shortBio}</p>
+          <dl class="mt-6 grid grid-cols-3 gap-3 text-sm">
+            <div>
+              <dt class="text-[var(--color-ink-4)] text-xs uppercase tracking-wider">Lat doświadczenia</dt>
+              <dd class="font-display italic text-3xl">{trainer.data.yearsOfExperience}</dd>
+            </div>
+            <div>
+              <dt class="text-[var(--color-ink-4)] text-xs uppercase tracking-wider">Godzin szkoleń</dt>
+              <dd class="font-display italic text-3xl">{trainer.data.hoursDelivered}</dd>
+            </div>
+            <div>
+              <dt class="text-[var(--color-ink-4)] text-xs uppercase tracking-wider">Uczestników</dt>
+              <dd class="font-display italic text-3xl">{trainer.data.participantsTrained}</dd>
+            </div>
+          </dl>
+          <a href="/trener/" class="mt-6 inline-flex items-center gap-1.5 ink-link text-sm">Pełen profil trenera →</a>
+        </div>
+      )}
+      {validator && (
+        <div>
+          <div class="eyebrow eyebrow--centered mb-3 !text-[var(--color-accent)]">Walidator (BUR)</div>
+          <h3 class="text-3xl font-display tracking-tight leading-tight">{validator.data.name}</h3>
+          <p class="text-sm text-[var(--color-ink-4)] mt-1">{validator.data.role} · {validator.data.affiliation}</p>
+          <p class="mt-5 text-[var(--color-ink-3)] leading-relaxed">
+            {validator.data.bio}
+          </p>
+          <ul class="mt-6 space-y-1.5 text-sm text-[var(--color-ink-2)]">
+            {validator.data.qualifications.map((q) => (
+              <li class="flex items-start gap-2">
+                <span class="text-[var(--color-accent)] mt-1">—</span>
+                <span>{q}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </Section>
+
+  <!-- WALIDACJA i certyfikat -->
+  <Section surface="paper-soft" counter="06" eyebrow="Walidacja i certyfikat" padding="default">
+    <div class="grid md:grid-cols-12 gap-12 mt-6">
+      <div class="md:col-span-5">
+        <h2 class="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.05] tracking-tight">
+          Jak <span class="display-italic">weryfikujemy</span>, czy się nauczyłeś.
+        </h2>
+        <p class="mt-6 text-[var(--color-ink-3)] leading-relaxed">
+          {c.validationMethod.summary}
+        </p>
+        <p class="mt-6 text-[var(--color-ink-2)] leading-relaxed">
+          Otrzymujesz <strong>imienny certyfikat</strong> ukończenia szkolenia z mapowaniem efektów na DigComp 2.2.
+          Certyfikat zawiera unikalny ID, możliwy do weryfikacji.
+        </p>
+      </div>
+      <div class="md:col-span-7 space-y-3">
+        {c.validationMethod.components.map((comp, i) => (
+          <div class="validation-component">
+            <span class="validation-num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="validation-text">{comp}</span>
+          </div>
+        ))}
+        <div class="mt-6 p-5 bg-[var(--color-accent-wash)] border border-[var(--color-accent-soft)]/40 rounded-md text-sm text-[var(--color-accent-deep)]">
+          <strong class="font-medium">Próg zaliczeniowy:</strong> {c.validationMethod.passingThreshold}
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- MATERIAŁY -->
+  <Section surface="paper" counter="07" eyebrow="Materiały dla uczestnika" padding="default">
+    <div class="mt-6 grid md:grid-cols-12 gap-12 items-end mb-10">
+      <h2 class="md:col-span-7 text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.05] tracking-tight">
+        Pakiet, który <span class="display-italic">jedzie z Tobą</span> do pracy.
+      </h2>
+      <p class="md:col-span-5 text-[var(--color-ink-3)]">
+        Wszystko, co przygotowaliśmy w trakcie szkolenia, dostajesz w plikach do pobrania razem z certyfikatem.
+      </p>
+    </div>
+
+    <ul class="materials-grid">
+      {c.materials.map((mat, i) => (
+        <li class="material-item">
+          <span class="material-num">{String(i + 1).padStart(2, '0')}</span>
+          <span>{mat}</span>
+        </li>
+      ))}
+    </ul>
+
+    <p class="mt-8 text-[0.78rem] text-[var(--color-ink-4)] max-w-3xl">
+      <strong class="text-[var(--color-ink-2)]">Licencja:</strong> {c.licenseInfo}
+    </p>
+  </Section>
+
+  <!-- CENA, DOFINANSOWANIE, VAT -->
+  <Section surface="paper-soft" id="dofinansowanie" counter="08" eyebrow="Cena i dofinansowanie" padding="default">
+    <div class="mt-6 grid md:grid-cols-12 gap-12">
+      <div class="md:col-span-5">
+        <h2 class="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.05] tracking-tight">
+          Po <span class="display-italic">10%</span>. Albo nawet <span class="display-italic">0%</span>.
+        </h2>
+        <p class="mt-6 text-[var(--color-ink-3)] leading-relaxed">
+          Mikroprzedsiębiorca w KFS Priorytet 3 może uzyskać do 100% pokrycia kosztów. MŚP standardowo 80%.
+          Sprawdź swój przypadek w kalkulatorze.
+        </p>
+        <a href="/dofinansowanie/kalkulator/" class="mt-7 btn btn-primary">Otwórz kalkulator</a>
+      </div>
+      <div class="md:col-span-7">
+        <div class="pricing-grid">
+          <div class="pricing-cell">
+            <span class="pricing-label">Cena katalogowa netto</span>
+            <span class="pricing-value font-mono tabular-nums">{formatPrice(c.priceNet)}</span>
+            <span class="pricing-desc">100% z własnej kieszeni</span>
+          </div>
+          {c.priceWithPsf && (
+            <div class="pricing-cell">
+              <span class="pricing-label">Z dofinansowaniem PSF (80%)</span>
+              <span class="pricing-value font-mono tabular-nums text-[var(--color-positive)]">{formatPrice(c.priceWithPsf)}</span>
+              <span class="pricing-desc">Pracownik MŚP, woj. dolnośląskie</span>
+            </div>
+          )}
+          {c.priceWithKfs && (
+            <div class="pricing-cell pricing-cell-highlight">
+              <span class="pricing-label">Z dofinansowaniem KFS (90%)</span>
+              <span class="pricing-value font-display italic text-[var(--color-accent-deep)]">{formatPrice(c.priceWithKfs)}</span>
+              <span class="pricing-desc">Mikroprzedsiębiorca, Priorytet 3</span>
+            </div>
+          )}
+        </div>
+
+        <p class="mt-6 text-[0.78rem] text-[var(--color-ink-4)] leading-relaxed">
+          <strong class="text-[var(--color-ink-2)]">VAT:</strong> {c.vatExemptInfo}
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <!-- WARUNKI TECHNICZNE -->
+  <Section surface="paper" counter="09" eyebrow="Warunki techniczne" padding="tight">
+    <h2 class="text-3xl md:text-[2.5rem] leading-tight tracking-tight mt-6 mb-8">
+      Co potrzebujesz <span class="display-italic">na start</span>.
+    </h2>
+    <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-5xl">
+      {c.technicalRequirements.map((req) => (
+        <li class="tech-req">
+          <svg class="w-4 h-4 text-[var(--color-accent)] shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8L7 12L13 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="text-[var(--color-ink-2)]">{req}</span>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <!-- FAQ -->
+  <Section surface="paper-soft" counter="10" eyebrow="FAQ — to szkolenie" padding="default">
+    <div class="grid md:grid-cols-12 gap-12 mt-6">
+      <div class="md:col-span-4">
+        <h2 class="text-3xl md:text-[2.5rem] leading-[1.05] tracking-tight">
+          Pytania, które padają <span class="display-italic">najczęściej</span>.
+        </h2>
+        <p class="mt-5 text-[var(--color-ink-3)] leading-relaxed">
+          Pełna lista 20+ pytań — w sekcji <a href="/faq/" class="ink-link">FAQ</a>.
+        </p>
+      </div>
+      <div class="md:col-span-8">
+        <Accordion items={courseFaqs.map((f) => ({ question: f.data.question, answer: f.data.answer }))} />
+      </div>
+    </div>
+  </Section>
+
+  <!-- FINAL CTA -->
+  <section class="surface-night relative overflow-hidden">
+    <div class="container-edge py-20 md:py-32">
+      <div class="grid md:grid-cols-12 gap-12 items-center">
+        <div class="md:col-span-7">
+          <div class="eyebrow !text-[var(--color-marker)] mb-4">Następna edycja</div>
+          <h2 class="text-4xl md:text-5xl lg:text-[4rem] leading-[1.02] tracking-tight text-[var(--color-paper)]">
+            {nextEdition ? formatDateLong(nextEdition.data.date) : 'Wkrótce'}.
+            <span class="display-italic text-[var(--color-marker)] block">
+              {nextEdition ? `${nextEdition.data.seatsAvailable} miejsc` : 'Zostaw kontakt'}.
+            </span>
+          </h2>
+          <p class="mt-6 text-xl text-white/70 leading-relaxed max-w-xl">
+            Każda edycja jest unikalna — kameralna, intensywna, bez nagrania publicznego.
+          </p>
+        </div>
+        <div class="md:col-span-5 flex flex-col gap-3">
+          {nextEdition?.data.burEditionUrl ? (
+            <a href={nextEdition.data.burEditionUrl} target="_blank" rel="noopener" class="btn btn-accent btn-lg">Zapisz się przez BUR</a>
+          ) : (
+            <a href="/kontakt/" class="btn btn-accent btn-lg">Zapytaj o termin</a>
+          )}
+          <a href="/firmy/" class="btn btn-ghost btn-lg !border-white/20 !text-[var(--color-paper)] hover:!bg-white/10">
+            Zapytaj o szkolenie zamknięte
+          </a>
+          <a href="/dofinansowanie/kalkulator/" class="text-sm text-white/60 hover:text-[var(--color-marker)] transition-colors mt-3">
+            Sprawdź swoje dofinansowanie →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .course-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+    font-weight: 400;
+  }
+
+  .course-info-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-rule);
+  }
+  @media (min-width: 768px) {
+    .course-info-bar { grid-template-columns: repeat(5, 1fr); }
+  }
+  .course-info-bar dt {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-4);
+    margin-bottom: 0.4rem;
+  }
+  .course-info-bar dd {
+    font-size: 0.95rem;
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+
+  /* ============== Price card ============== */
+  .course-price-card {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 1.75rem;
+    box-shadow: 0 24px 50px -32px rgba(21, 17, 13, 0.12);
+  }
+  .course-price-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+  }
+  .course-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-block: 0.65rem;
+    font-size: 0.875rem;
+    color: var(--color-ink-3);
+    border-bottom: 1px dotted var(--color-rule);
+  }
+  .course-price-row:last-of-type { border-bottom: none; }
+  .course-price-strike {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-accent);
+    color: var(--color-ink-4);
+  }
+  .course-price-final {
+    margin-top: 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-rule);
+    border-bottom: none;
+    align-items: center;
+  }
+  .course-price-final-num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 2.5rem;
+    color: var(--color-accent);
+    line-height: 1;
+    font-feature-settings: 'tnum';
+    letter-spacing: -0.05em;
+  }
+  .course-edition-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  .course-edition-row:hover { background: var(--color-paper-soft); }
+  .course-edition-seats {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: var(--color-positive-soft);
+    color: var(--color-positive);
+    tabular-nums: 1;
+  }
+
+  /* ============== Audience items ============== */
+  .audience-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--color-ink-2);
+    line-height: 1.4;
+  }
+  .audience-dot {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-accent);
+    align-self: center;
+  }
+
+  /* ============== Outcomes table ============== */
+  .outcomes-group { margin-bottom: 3rem; }
+  .outcomes-group-title {
+    display: flex;
+    align-items: baseline;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .outcomes-table {
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--color-card-raised);
+  }
+  .outcomes-table-head {
+    display: none;
+    grid-template-columns: 2.5fr 2fr 1.25fr 1fr;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    background: var(--color-paper-deep);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-3);
+    font-weight: 600;
+  }
+  @media (min-width: 768px) { .outcomes-table-head { display: grid; } }
+  .outcomes-table-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-rule);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  @media (min-width: 768px) {
+    .outcomes-table-row {
+      grid-template-columns: 2.5fr 2fr 1.25fr;
+      gap: 1rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .outcomes-table-row { grid-template-columns: 2.5fr 2fr 1.25fr 1fr; }
+  }
+  .outcomes-table-row:nth-child(odd) { background: var(--color-paper-soft); }
+
+  /* ============== Module accordion ============== */
+  .module-card {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  .module-card[open] {
+    border-color: var(--color-ink);
+    box-shadow: 0 24px 40px -28px rgba(21, 17, 13, 0.18);
+  }
+  .module-summary {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    align-items: start;
+    list-style: none;
+  }
+  @media (min-width: 768px) { .module-summary { padding: 2rem; } }
+  .module-summary::-webkit-details-marker { display: none; }
+  .module-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+  }
+  .module-num {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    font-weight: 500;
+    background: var(--color-accent-wash);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+  .module-time {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-ink-4);
+  }
+  .module-title-block { min-width: 0; }
+  .module-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    margin-bottom: 0.5rem;
+  }
+  .module-summary-text {
+    color: var(--color-ink-3);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .module-icon {
+    color: var(--color-ink-3);
+    transition: transform 0.3s ease;
+    align-self: center;
+  }
+  .module-card[open] .module-icon { transform: rotate(180deg); }
+  .module-content {
+    padding: 0 1.5rem 2rem;
+    border-top: 1px dashed var(--color-rule);
+    margin-top: 0;
+    padding-top: 1.5rem;
+  }
+  @media (min-width: 768px) { .module-content { padding: 1.5rem 2rem 2rem; } }
+
+  /* ============== Schedule table ============== */
+  .schedule-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    background: var(--color-card-raised);
+  }
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .schedule-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-3);
+    padding: 0.85rem 1rem;
+    background: var(--color-paper-deep);
+    border-bottom: 1px solid var(--color-rule);
+    font-weight: 600;
+  }
+  .schedule-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--color-rule-soft);
+    color: var(--color-ink-2);
+    font-size: 0.875rem;
+  }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .schedule-break td { background: var(--color-paper-soft); color: var(--color-ink-4); }
+
+  /* ============== Validation components ============== */
+  .validation-component {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    align-items: center;
+  }
+  .validation-num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--color-accent);
+    letter-spacing: -0.04em;
+  }
+  .validation-text {
+    color: var(--color-ink-2);
+    line-height: 1.5;
+  }
+
+  /* ============== Materials grid ============== */
+  .materials-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  @media (min-width: 768px) { .materials-grid { grid-template-columns: 1fr 1fr; } }
+  .material-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--color-card-raised);
+    color: var(--color-ink-2);
+    font-size: 0.92rem;
+    line-height: 1.4;
+    border-bottom: 1px solid var(--color-rule);
+    border-right: 1px solid var(--color-rule);
+  }
+  .material-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-ink-4);
+    align-self: flex-start;
+    padding-top: 0.15rem;
+  }
+
+  /* ============== Pricing grid ============== */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--color-rule);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  @media (min-width: 768px) { .pricing-grid { grid-template-columns: repeat(3, 1fr); } }
+  .pricing-cell {
+    background: var(--color-card-raised);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .pricing-cell-highlight {
+    background: var(--color-card-raised);
+    position: relative;
+  }
+  .pricing-cell-highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-accent);
+  }
+  .pricing-label {
+    font-size: 0.78rem;
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .pricing-value {
+    font-size: 2.25rem;
+    line-height: 1;
+    color: var(--color-ink);
+    font-weight: 500;
+    margin-block: 0.25rem;
+  }
+  .pricing-cell-highlight .pricing-value {
+    font-size: 3.5rem;
+    line-height: 1;
+  }
+  .pricing-desc {
+    font-size: 0.78rem;
+    color: var(--color-ink-4);
+  }
+
+  /* ============== Tech requirements ============== */
+  .tech-req {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.65rem 0.85rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+</style>

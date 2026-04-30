@@ -1,0 +1,154 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+
+const subPages = [
+  { slug: 'bur-jak-zapisac', title: 'BUR — krok po kroku', desc: 'Jak zarejestrować się w Bazie Usług Rozwojowych przez login.gov.pl i co dalej.', counter: '01' },
+  { slug: 'kfs-priorytet-3', title: 'KFS Priorytet 3', desc: 'Krajowy Fundusz Szkoleniowy w 2026 r. — dla pracodawców. Do 90% pokrycia.', counter: '02' },
+  { slug: 'psf-podmiotowy-system-finansowania', title: 'PSF — operatorzy regionalni', desc: 'Lista operatorów per województwo + pułapy dofinansowań w 2026 r.', counter: '03' },
+  { slug: 'fers-akademia-hr', title: 'FERS — Akademia HR', desc: 'Program PARP dla pracowników działów HR i kadr. Często pomijany — niesłusznie.', counter: '04' },
+];
+
+const compareRows = [
+  { label: 'Kto wnioskuje', kfs: 'Pracodawca przez PUP', psf: 'Pracownik / pracodawca przez Operatora regionalnego', fers: 'Pracownik HR przez PARP' },
+  { label: 'Pułap dofinansowania', kfs: '80% (do 100% mikro)', psf: '80–90%', fers: '80%' },
+  { label: 'Czas na decyzję', kfs: '4–8 tygodni', psf: '2–4 tygodnie', fers: '2–4 tygodnie' },
+  { label: 'Budżet', kfs: 'Z Funduszu Pracy', psf: 'Środki UE per region', fers: 'Środki UE — centralne' },
+  { label: 'Najlepsze dla', kfs: 'Pracodawcy zatrudniającego pracownika', psf: 'Pracownika MŚP, freelancera', fers: 'Działu HR/personalnego' },
+];
+---
+
+<BaseLayout
+  title="Szkolenia AI z dofinansowaniem 2026 — KFS, PSF, BUR | Pełen przewodnik"
+  description="Wszystko, co musisz wiedzieć o dofinansowaniu szkoleń AI w 2026 r. KFS Priorytet 3, PSF, FERS, BUR. Kalkulator + krok po kroku."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Dofinansowanie' },
+    ]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-8">
+        <div class="eyebrow">Hub edukacyjny</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight">
+          Szkolenia AI z <span class="display-italic">dofinansowaniem</span>.<br />
+          Wszystko, co musisz wiedzieć w&nbsp;2026.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Większość pracowników biurowych w Polsce ma prawo do dofinansowanej edukacji.
+          Ten hub zbiera w jednym miejscu wszystkie mechanizmy, dokumenty i&nbsp;przewodniki.
+        </p>
+      </div>
+      <div class="lg:col-span-4 text-sm">
+        <a href="/dofinansowanie/kalkulator/" class="block p-6 border border-[var(--color-ink)] rounded-md bg-[var(--color-card-raised)] hover:bg-[var(--color-paper-soft)] transition-colors">
+          <div class="eyebrow !text-[var(--color-accent)] mb-2">Najszybszy start</div>
+          <div class="font-display text-2xl tracking-tight leading-tight">Kalkulator dofinansowania →</div>
+          <p class="mt-2 text-[var(--color-ink-3)]">Trzy pytania, gotowy wynik. 30 sekund.</p>
+        </a>
+      </div>
+    </div>
+  </Section>
+
+  <!-- KFS vs PSF vs FERS comparison -->
+  <Section surface="paper-soft" padding="default" counter="00" eyebrow="Porównanie mechanizmów">
+    <h2 class="mt-6 text-3xl md:text-4xl lg:text-[2.75rem] tracking-tight leading-tight max-w-3xl">
+      <span class="display-italic">KFS</span>, <span class="display-italic">PSF</span>, <span class="display-italic">FERS</span> — który dla Ciebie?
+    </h2>
+
+    <div class="overflow-x-auto rounded-lg border border-[var(--color-rule)] mt-10 bg-[var(--color-card-raised)]">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-[var(--color-paper-deep)]">
+            <th class="text-left px-4 py-4 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold w-32"></th>
+            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">KFS</th>
+            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">PSF</th>
+            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">FERS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {compareRows.map((row) => (
+            <tr class="border-t border-[var(--color-rule)]">
+              <th class="text-left px-4 py-3 text-xs uppercase tracking-[0.12em] text-[var(--color-ink-4)] font-semibold align-top">{row.label}</th>
+              <td class="px-4 py-3 text-sm text-[var(--color-ink-2)]">{row.kfs}</td>
+              <td class="px-4 py-3 text-sm text-[var(--color-ink-2)]">{row.psf}</td>
+              <td class="px-4 py-3 text-sm text-[var(--color-ink-2)]">{row.fers}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <Section padding="default">
+    <div class="grid md:grid-cols-2 gap-5">
+      {subPages.map((p) => (
+        <a href={`/dofinansowanie/${p.slug}/`} class="hub-card group">
+          <span class="hub-counter">{p.counter}</span>
+          <h3 class="hub-title">{p.title}</h3>
+          <p class="hub-desc">{p.desc}</p>
+          <span class="hub-arrow">
+            Czytaj
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+        </a>
+      ))}
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .hub-card {
+    display: block;
+    padding: 2rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .hub-card:hover {
+    border-color: var(--color-ink);
+    transform: translateY(-2px);
+    box-shadow: 0 24px 40px -24px rgba(21, 17, 13, 0.18);
+  }
+  .hub-counter {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-ink-4);
+    letter-spacing: 0.14em;
+  }
+  .hub-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .hub-desc {
+    color: var(--color-ink-3);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+  .hub-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-ink);
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--color-accent);
+    padding-bottom: 0.2rem;
+  }
+</style>

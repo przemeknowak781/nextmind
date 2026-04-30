@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+---
+
+<BaseLayout
+  title="Polityka cookies | Next Mind Academy"
+  description="Polityka cookies Next Mind Academy. Korzystamy z analityki Plausible — bez cookies i PII. Pełna lista i zarządzanie zgodami."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Polityka cookies' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="container-prose !mx-0">
+      <div class="eyebrow">Cookies i analityka</div>
+      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5rem] leading-[0.98] tracking-tight">
+        Polityka <span class="display-italic">cookies</span>.
+      </h1>
+      <p class="text-sm text-[var(--color-ink-4)] mt-4 font-mono">Aktualizacja: 30.04.2026</p>
+
+      <div class="prose-editorial mt-12">
+        <p class="lead">
+          Mówiąc krótko: nie używamy cookies śledzących. Plausible, którego stosujemy do analityki, nie zostawia cookies ani identyfikatorów PII.
+        </p>
+
+        <h2>1. Czym są cookies</h2>
+        <p>
+          Cookies (ciasteczka) to niewielkie pliki tekstowe zapisywane przez przeglądarkę na Twoim urządzeniu.
+          Mogą służyć do różnych celów — od przechowywania preferencji użytkownika po śledzenie marketingowe.
+        </p>
+
+        <h2>2. Jakie cookies stosujemy</h2>
+
+        <h3>Niezbędne</h3>
+        <ul>
+          <li>
+            <strong>nma-cookie-consent</strong> — zapisywany w localStorage (nie cookie HTTP) po wyrażeniu zgody.
+            Cel: zapamiętanie Twojej decyzji o zgodzie. Czas: do czasu wyczyszczenia danych przeglądarki.
+          </li>
+        </ul>
+
+        <h3>Statystyczne</h3>
+        <p>
+          <strong>Plausible Analytics</strong> — narzędzie analityki webowej, które stosujemy.
+          <strong>Plausible nie stosuje cookies</strong>. Statystyki anonimowe, brak danych osobowych, brak fingerprintingu.
+          Plausible jest zgodne z RODO bez konieczności zgody (zgodnie z opinią CNIL i&nbsp;PUODO).
+        </p>
+
+        <h3>Marketingowe</h3>
+        <p>
+          <strong>Nie stosujemy</strong> cookies marketingowych ani remarketingowych.
+          Brak Google Tag Manager, brak Facebook Pixel, brak Hotjar.
+        </p>
+
+        <h2>3. Zarządzanie zgodami</h2>
+        <p>
+          Po pierwszej wizycie pojawia się banner z prośbą o akceptację. Możesz wybrać:
+        </p>
+        <ul>
+          <li><strong>Akceptuję wszystkie</strong> — zgoda na pełen zakres (obecnie i&nbsp;tak ograniczony do niezbędnych).</li>
+          <li><strong>Tylko niezbędne</strong> — bez analityki.</li>
+        </ul>
+        <p>
+          Decyzję możesz zmienić w&nbsp;dowolnym momencie — wyczyść localStorage przeglądarki dla domeny <code>nextmindacademy.pl</code>.
+        </p>
+
+        <h2>4. Ustawienia w przeglądarce</h2>
+        <p>
+          Przeglądarki internetowe pozwalają zarządzać cookies. Linki do instrukcji:
+        </p>
+        <ul>
+          <li>Chrome: <a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">support.google.com/chrome/answer/95647</a></li>
+          <li>Firefox: <a href="https://support.mozilla.org/pl/kb/ciasteczka" target="_blank" rel="noopener">support.mozilla.org/pl/kb/ciasteczka</a></li>
+          <li>Safari: <a href="https://support.apple.com/pl-pl/HT201265" target="_blank" rel="noopener">support.apple.com/pl-pl/HT201265</a></li>
+          <li>Edge: <a href="https://support.microsoft.com/pl-pl/microsoft-edge" target="_blank" rel="noopener">support.microsoft.com/pl-pl/microsoft-edge</a></li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

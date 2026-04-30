@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Dziękujemy za zapis | Next Mind Academy"
+  description="Twój e-mail jest na liście. Sprawdź skrzynkę i potwierdź zapis."
+  noindex={true}
+>
+  <section class="container-edge py-24 md:py-32">
+    <div class="max-w-3xl">
+      <span class="eyebrow !text-[var(--color-accent)]">Świetnie</span>
+      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight">
+        E-mail <span class="display-italic">w drodze</span>.
+      </h1>
+      <p class="lead mt-8 text-[var(--color-ink-3)] max-w-2xl">
+        Wysłaliśmy potwierdzenie na Twoją skrzynkę. Sprawdź folder „Oferty" i&nbsp;„Spam" — czasami tam ląduje pierwszy mail.
+        Po potwierdzeniu — wpadasz na listę i&nbsp;dostajesz powiadomienia o&nbsp;nowych terminach.
+      </p>
+
+      <div class="mt-12 flex flex-wrap gap-3">
+        <a href="/szkolenia/" class="btn btn-primary">Zobacz szkolenia</a>
+        <a href="/blog/" class="btn btn-ghost">Czytaj blog</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

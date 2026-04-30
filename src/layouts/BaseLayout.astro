@@ -1,0 +1,146 @@
+---
+import '../styles/global.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import CookieBanner from '../components/layout/CookieBanner.astro';
+import FormHandler from '../components/layout/FormHandler.astro';
+import { SITE } from '../lib/site';
+import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '../lib/schema-org';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  schemas?: object[];
+  hideHeaderBorder?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonicalPath = Astro.url.pathname,
+  ogImage = SITE.ogImage,
+  ogType = 'website',
+  noindex = false,
+  schemas = [],
+  hideHeaderBorder = false,
+} = Astro.props;
+
+const fullTitle = title.includes('Next Mind Academy')
+  ? title
+  : `${title} | Next Mind Academy`;
+// Astro.url.pathname already includes the base prefix when `base` is configured,
+// so canonical = origin (no base) + pathname (with base).
+const canonicalUrl = `${SITE.origin}${canonicalPath}`;
+// og:image needs an absolute URL with base — use SITE.url (origin + base).
+const fullOgImage = ogImage.startsWith('http') ? ogImage : `${SITE.url}${ogImage}`;
+
+const baseSchemas = [ORGANIZATION_SCHEMA, WEBSITE_SCHEMA, ...schemas];
+---
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Modern sans typography stack — single Geist family -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap"
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={fullOgImage} />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:site_name" content={SITE.name} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={fullOgImage} />
+
+    <!-- Schema.org graph -->
+    {
+      baseSchemas.map((schema) => (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(schema)}
+        />
+      ))
+    }
+
+    <!-- Sitemap -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Plausible analytics (privacy-first, opt-in via cookie banner) -->
+    <script
+      is:inline
+      defer
+      data-domain="nextmindacademy.pl"
+      src="https://plausible.io/js/script.js"></script>
+
+    <slot name="head" />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Przejdź do głównej treści</a>
+
+    <Header hideBorder={hideHeaderBorder} />
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <CookieBanner />
+    <FormHandler />
+
+    <style is:global>
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 1rem;
+        background: var(--color-ink);
+        color: var(--color-paper);
+        padding: 0.6rem 1rem;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 100;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      .skip-link:focus {
+        top: 1rem;
+      }
+    </style>
+  </body>
+</html>

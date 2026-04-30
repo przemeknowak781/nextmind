@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Strony nie ma | Next Mind Academy"
+  description="Tej strony już nie ma — zajrzyj do katalogu szkoleń lub bloga."
+  noindex={true}
+>
+  <section class="container-edge py-32 md:py-48 text-center">
+    <span class="font-mono text-xs tracking-[0.18em] uppercase text-[var(--color-ink-4)]">Error 404</span>
+    <h1 class="mt-6 text-7xl md:text-9xl lg:text-[12rem] leading-[0.9] tracking-tight">
+      Tej strony <span class="display-italic">już nie&nbsp;ma</span>.
+    </h1>
+    <p class="lead mt-10 text-[var(--color-ink-3)] max-w-xl mx-auto">
+      Mogliśmy ją usunąć, mogłeś literówkę zrobić — wracaj do strony głównej albo zajrzyj poniżej.
+    </p>
+    <div class="mt-12 flex flex-wrap gap-3 justify-center">
+      <a href="/" class="btn btn-primary">Strona główna</a>
+      <a href="/szkolenia/" class="btn btn-ghost">Katalog szkoleń</a>
+      <a href="/blog/" class="btn btn-ghost">Blog</a>
+    </div>
+  </section>
+</BaseLayout>

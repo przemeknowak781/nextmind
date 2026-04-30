@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+
+const operators = [
+  { region: 'dolnośląskie', name: 'DARR / DAWG', cap: '80%', notes: 'Standardowy pułap dla MŚP.' },
+  { region: 'małopolskie', name: 'Enterprise Advisors', cap: 'do 90%', notes: 'Jedne z najwyższych pułapów w Polsce.' },
+  { region: 'śląskie', name: 'WUP Katowice + operatorzy', cap: '80%', notes: 'Lista operatorów na stronie WUP.' },
+  { region: 'mazowieckie', name: 'Mazowiecki BFKK', cap: '80%', notes: 'Duża dostępność, ale wysoki popyt — zapis wcześnie.' },
+  { region: 'lubuskie', name: 'WUP Zielona Góra', cap: '80%', notes: 'Mniejszy budżet — szybkie wyczerpanie naborów.' },
+  { region: 'pomorskie', name: 'ARP Gdańsk', cap: '80–90%', notes: 'Premie dla mikroprzedsiębiorstw.' },
+  { region: 'wielkopolskie', name: 'Wielkopolska Agencja Rozwoju', cap: '80%', notes: 'Standardowy pułap.' },
+  { region: 'kujawsko-pomorskie', name: 'TARR Toruń', cap: '80%', notes: 'Standardowy pułap.' },
+];
+---
+
+<BaseLayout
+  title="PSF 2026 — Podmiotowy System Finansowania | Operatorzy regionalni"
+  description="Lista operatorów PSF per województwo, średnie poziomy dofinansowań i pułapy cenowe w 2026 r. Najszybsza ścieżka dla pracowników MŚP."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Dofinansowanie', url: '/dofinansowanie/' },
+      { name: 'PSF — operatorzy regionalni' },
+    ]} />
+  </div>
+
+  <Section padding="default">
+    <div class="eyebrow">Podmiotowy System Finansowania</div>
+    <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight max-w-5xl">
+      PSF — operatorzy <span class="display-italic">regionalni</span>.
+    </h1>
+    <p class="lead mt-7 text-[var(--color-ink-3)] max-w-3xl">
+      Najszybsza ścieżka dla pracownika MŚP lub freelancera. Środki UE rozdzielane przez operatorów regionalnych — różnice w pułapach i tempie obsługi między województwami są realne.
+    </p>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Operatorzy per województwo">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl mb-10">
+      Wybierz <span class="display-italic">swoje</span>.
+    </h2>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {operators.map((op) => (
+        <article class="op-card">
+          <div class="flex items-baseline justify-between mb-2">
+            <span class="font-mono text-xs uppercase tracking-[0.14em] text-[var(--color-ink-4)]">{op.region}</span>
+            <span class="font-display italic text-2xl text-[var(--color-accent)]">{op.cap}</span>
+          </div>
+          <h3 class="font-display text-2xl tracking-tight text-[var(--color-ink)]">{op.name}</h3>
+          <p class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">{op.notes}</p>
+        </article>
+      ))}
+    </div>
+    <p class="mt-8 text-[0.78rem] text-[var(--color-ink-4)]">
+      Pełna lista wszystkich 16 województw w naszej prywatnej bazie — napisz, podpowiemy operatora dla Twojego konkretnego przypadku.
+    </p>
+  </Section>
+
+  <Section padding="default" counter="02" eyebrow="Jak działa PSF">
+    <div class="grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5">
+        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">
+          Mechanizm w <span class="display-italic">trzech krokach</span>.
+        </h2>
+      </div>
+      <div class="lg:col-span-7">
+        <ol class="space-y-6">
+          <li class="flex gap-5">
+            <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0">01</span>
+            <div>
+              <h3 class="font-display text-xl tracking-tight">Składasz wniosek u operatora</h3>
+              <p class="mt-1 text-[var(--color-ink-3)]">Operator regionalny w województwie siedziby Twojej firmy. 2–4 tygodnie na decyzję.</p>
+            </div>
+          </li>
+          <li class="flex gap-5">
+            <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0">02</span>
+            <div>
+              <h3 class="font-display text-xl tracking-tight">Otrzymujesz ID wsparcia</h3>
+              <p class="mt-1 text-[var(--color-ink-3)]">ID wpisujesz w BUR przy zapisie na konkretną edycję. Bez ID nie ma dofinansowania.</p>
+            </div>
+          </li>
+          <li class="flex gap-5">
+            <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0">03</span>
+            <div>
+              <h3 class="font-display text-xl tracking-tight">Bierzesz udział i płacisz wkład</h3>
+              <p class="mt-1 text-[var(--color-ink-3)]">Operator wypłaca dofinansowanie bezpośrednio do dostawcy. Ty pokrywasz tylko 10–20% (wkład własny).</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .op-card {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.25s ease;
+  }
+  .op-card:hover {
+    border-color: var(--color-ink);
+    transform: translateY(-2px);
+  }
+</style>

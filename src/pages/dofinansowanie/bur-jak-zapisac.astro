@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+
+const steps = [
+  { title: 'Załóż profil w BUR przez login.gov.pl', desc: 'Jednorazowa rejestracja (2–3 min). Profil Zaufany, e-dowód lub bankowość elektroniczna — każda z opcji wystarczy.', time: '~3 min' },
+  { title: 'Znajdź szkolenie w wyszukiwarce', desc: 'uslugirozwojowe.parp.gov.pl — filtruj po frazie, województwie, dofinansowaniu. Każde szkolenie ma kartę usługi (SUZ-1).', time: '~10 min' },
+  { title: 'Skontaktuj się z operatorem PSF', desc: 'Operator regionalny w Twoim województwie. Zwykle przez stronę WWW operatora — formularz kontaktowy.', time: '~15 min' },
+  { title: 'Złóż wniosek (z naszą pomocą)', desc: 'Pomożemy wypełnić wniosek tak, żeby przeszedł bez zwrotu do uzupełnienia. Większość pól dotyczy profilu rozwojowego.', time: '~30 min' },
+  { title: 'Dostań ID wsparcia od operatora', desc: '2–4 tygodnie na decyzję. Po akceptacji otrzymasz unikalne ID, które wpiszesz przy zapisie na konkretną edycję.', time: '2–4 tyg.' },
+  { title: 'Zapisz się na konkretną edycję', desc: 'Wracasz do BUR, wybierasz datę szkolenia, wpisujesz ID wsparcia. Dostawca dostaje powiadomienie i wysyła materiały onboardingowe.', time: '~5 min' },
+  { title: 'Bierzesz udział i otrzymujesz fakturę', desc: 'Po szkoleniu wypełniasz ankietę uczestnika w BUR. Otrzymujesz fakturę z rozbiciem na dofinansowanie i Twój wkład (10–20%).', time: 'Wkład 10–20%' },
+];
+---
+
+<BaseLayout
+  title="BUR krok po kroku — jak zapisać się na szkolenie z dofinansowaniem 2026"
+  description="Pełny przewodnik: jak zarejestrować się w Bazie Usług Rozwojowych przez login.gov.pl, znaleźć szkolenie i otrzymać dofinansowanie do 90% w 2026 r."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Dofinansowanie', url: '/dofinansowanie/' },
+      { name: 'BUR krok po kroku' },
+    ]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-9">
+        <div class="eyebrow">Przewodnik 7-stopniowy</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight">
+          BUR <span class="display-italic">krok po kroku</span>.<br />
+          Bez urzędowego bełkotu.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Większość pracowników biurowych w Polsce ma prawo do dofinansowanej edukacji — ale nie wie, jak je odebrać.
+          Ten przewodnik rozkłada Bazę Usług Rozwojowych na czynniki pierwsze.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default">
+    <ol class="bur-steps">
+      {steps.map((step, i) => (
+        <li class="bur-step">
+          <div class="bur-step-marker">
+            <span class="bur-step-num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="bur-step-time">{step.time}</span>
+          </div>
+          <div>
+            <h2 class="bur-step-title">{step.title}</h2>
+            <p class="bur-step-desc">{step.desc}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5">
+        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">Najczęstsze <span class="display-italic">pułapki</span>.</h2>
+      </div>
+      <div class="lg:col-span-7 space-y-3">
+        {[
+          { t: 'Zapis bez decyzji operatora', d: 'Klikasz „zapisz się" w BUR od razu — bez wniosku do operatora. Płacisz 100% z własnej kieszeni.' },
+          { t: 'Brak ID wsparcia w zapisie', d: 'Bez ID wsparcia od operatora — nie ma dofinansowania. ID dostajesz po pozytywnej decyzji.' },
+          { t: 'Wybór dostawcy bez statusu BUR', d: 'Niektóre firmy szkoleniowe nie są w BUR. Ich szkolenia nie podlegają dofinansowaniu.' },
+          { t: 'Zapomniana ankieta po szkoleniu', d: 'Jeśli nie wypełnisz ankiety w BUR — operator wstrzyma wypłatę i obciąży Cię całą kwotą.' },
+        ].map((p) => (
+          <div class="pitfall">
+            <span class="pitfall-icon">!</span>
+            <div>
+              <h3 class="pitfall-title">{p.t}</h3>
+              <p class="pitfall-desc">{p.d}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  <section class="surface-night">
+    <div class="container-edge py-20 md:py-28">
+      <h2 class="text-4xl md:text-5xl text-[var(--color-paper)] tracking-tight leading-tight max-w-3xl">
+        Pomożemy <span class="display-italic text-[var(--color-marker)]">wypełnić wniosek</span>.
+      </h2>
+      <p class="mt-5 text-lg text-white/70 max-w-xl">
+        Wypełniamy wniosek razem przez 30 minut na zoom-callu. Bezpłatnie — to inwestycja w Ciebie jako uczestnika.
+      </p>
+      <a href="/kontakt/" class="mt-8 btn btn-accent btn-lg">Umów rozmowę</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .bur-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0;
+    border-left: 1px dashed var(--color-rule-strong);
+    margin-left: 1.75rem;
+  }
+  .bur-step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    padding-block: 2rem;
+    margin-left: -1.75rem;
+  }
+  .bur-step-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding-top: 0.2rem;
+  }
+  .bur-step-num {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: white;
+    font-feature-settings: 'tnum';
+    box-shadow: 0 4px 12px rgba(45, 91, 255, 0.25);
+  }
+  .bur-step-time {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+  .bur-step-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    margin-bottom: 0.5rem;
+  }
+  .bur-step-desc {
+    color: var(--color-ink-3);
+    line-height: 1.6;
+    max-width: 56rem;
+  }
+  .pitfall {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-left: 3px solid var(--color-danger);
+    border-radius: 6px;
+  }
+  .pitfall-icon {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.75rem;
+    color: var(--color-danger);
+    line-height: 1;
+  }
+  .pitfall-title { font-weight: 500; color: var(--color-ink); margin-bottom: 0.3rem; }
+  .pitfall-desc { font-size: 0.92rem; color: var(--color-ink-3); line-height: 1.5; }
+</style>

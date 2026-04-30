@@ -1,0 +1,362 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import { ENTITIES, VOIVODESHIPS, VOIV_LABELS } from '../../lib/funding-calculator';
+---
+
+<BaseLayout
+  title="Kalkulator dofinansowania szkoleń AI 2026 | KFS, PSF, FERS"
+  description="Sprawdź w 30 sekund, ile zapłacisz za szkolenie AI z dofinansowaniem KFS, PSF lub FERS. Trzy pytania, gotowy wynik."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Dofinansowanie', url: '/dofinansowanie/' },
+      { name: 'Kalkulator' },
+    ]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-8">
+        <div class="eyebrow">Kalkulator</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5rem] leading-[0.96] tracking-tight">
+          Trzy pytania.<br />
+          <span class="display-italic">Twoja</span> cena za szkolenie.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Trochę uproszczony — bo realne pułapy zależą też od kalendarza naborów i decyzji operatora.
+          Ale w 90% przypadków wynik jest blisko prawdy.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section padding="default" surface="paper-soft">
+    <div class="grid lg:grid-cols-12 gap-10">
+      <form class="lg:col-span-7 calc-form" id="calc-form" novalidate>
+        <fieldset class="calc-step">
+          <legend class="calc-step-legend">
+            <span class="calc-step-num">01</span>
+            <span class="calc-step-title">Kim jesteś?</span>
+          </legend>
+          <div class="calc-options">
+            {ENTITIES.map((e, i) => (
+              <label class="calc-option">
+                <input type="radio" name="entity" value={e.value} required={i === 0} checked={i === 0} />
+                <span class="calc-option-label">{e.label}</span>
+                <span class="calc-option-hint">{e.hint}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="calc-step">
+          <legend class="calc-step-legend">
+            <span class="calc-step-num">02</span>
+            <span class="calc-step-title">Z którego mechanizmu chcesz skorzystać?</span>
+          </legend>
+          <div class="calc-options" id="calc-mechanisms">
+            <!-- populated by JS based on entity -->
+          </div>
+        </fieldset>
+
+        <fieldset class="calc-step">
+          <legend class="calc-step-legend">
+            <span class="calc-step-num">03</span>
+            <span class="calc-step-title">Województwo siedziby firmy lub Twojej rejestracji</span>
+          </legend>
+          <select name="voivodeship" class="field-select" required>
+            {VOIVODESHIPS.map((v) => (
+              <option value={v} selected={v === 'dolnoslaskie'}>{VOIV_LABELS[v]}</option>
+            ))}
+          </select>
+        </fieldset>
+
+        <fieldset class="calc-step">
+          <legend class="calc-step-legend">
+            <span class="calc-step-num">04</span>
+            <span class="calc-step-title">Cena katalogowa szkolenia</span>
+          </legend>
+          <div class="flex gap-3">
+            <button type="button" data-price="1490" class="btn btn-ghost btn-sm">Basic — 1 490 zł</button>
+            <button type="button" data-price="1990" class="btn btn-ghost btn-sm">Level 2 — 1 990 zł</button>
+            <button type="button" data-price="0" class="btn btn-ghost btn-sm">Inna kwota</button>
+          </div>
+          <input type="number" name="basePrice" min="100" max="50000" step="10" value="1490" class="field-input mt-3" />
+        </fieldset>
+      </form>
+
+      <aside class="lg:col-span-5">
+        <div class="calc-result" id="calc-result" aria-live="polite">
+          <span class="eyebrow !text-[var(--color-accent)]">Wynik</span>
+          <h2 class="mt-4 text-3xl font-display tracking-tight leading-tight">
+            Z <span class="font-mono tabular-nums" id="r-base">1 490 zł</span>
+          </h2>
+          <div class="my-6 rule-dotted"></div>
+          <div class="calc-result-row">
+            <span>Pokrycie</span>
+            <span class="font-mono tabular-nums" id="r-coverage">90%</span>
+          </div>
+          <div class="calc-result-row">
+            <span>Dofinansowanie</span>
+            <span class="font-mono tabular-nums text-[var(--color-positive)]" id="r-subsidy">−1 341 zł</span>
+          </div>
+          <div class="calc-result-final">
+            <span>Twoja faktura netto</span>
+            <span class="font-display italic text-5xl text-[var(--color-accent-deep)]" id="r-pocket">149 zł</span>
+          </div>
+          <p class="text-[0.78rem] text-[var(--color-ink-2)] mt-1" id="r-mechanism">KFS Priorytet 3</p>
+
+          <div class="calc-notes" id="r-notes"></div>
+
+          <a href="/kontakt/" class="mt-6 btn btn-primary w-full">Pomożemy złożyć wniosek</a>
+          <p class="text-[0.7rem] text-[var(--color-ink-4)] mt-3 leading-relaxed">
+            Wynik szacunkowy. Faktyczna kwota zależy od decyzji operatora.
+            Stan prawny: 30.04.2026.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </Section>
+</BaseLayout>
+
+<script>
+  import {
+    calculateFunding,
+    type EntityType,
+    type Mechanism,
+    MECHANISMS_FOR_ENTITY,
+  } from '../../lib/funding-calculator';
+
+  const MECH_LABELS: Record<Mechanism, { label: string; hint: string }> = {
+    'kfs-prio-3': { label: 'KFS Priorytet 3', hint: 'Umiejętności cyfrowe i AI — najwyższy pułap' },
+    'kfs-inny': { label: 'KFS — inny priorytet', hint: 'Ogólny krajowy fundusz szkoleniowy' },
+    'psf': { label: 'PSF — operator regionalny', hint: 'Najszybsza ścieżka dla pracowników MŚP' },
+    'fers': { label: 'FERS — Akademia HR', hint: 'Dla działów personalnych i HR' },
+  };
+
+  const PLN = new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+  const form = document.getElementById('calc-form') as HTMLFormElement;
+  const mechContainer = document.getElementById('calc-mechanisms') as HTMLDivElement;
+
+  function renderMechanisms(entity: EntityType, currentMech?: Mechanism) {
+    const allowed = MECHANISMS_FOR_ENTITY[entity];
+    while (mechContainer.firstChild) mechContainer.removeChild(mechContainer.firstChild);
+    allowed.forEach((m, i) => {
+      const isCurrent = currentMech ? m === currentMech : i === 0;
+      const label = document.createElement('label');
+      label.className = 'calc-option';
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'mechanism';
+      input.value = m;
+      input.required = true;
+      input.checked = isCurrent;
+      label.appendChild(input);
+
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'calc-option-label';
+      labelSpan.textContent = MECH_LABELS[m].label;
+      label.appendChild(labelSpan);
+
+      const hintSpan = document.createElement('span');
+      hintSpan.className = 'calc-option-hint';
+      hintSpan.textContent = MECH_LABELS[m].hint;
+      label.appendChild(hintSpan);
+
+      mechContainer.appendChild(label);
+    });
+  }
+
+  function update() {
+    const fd = new FormData(form);
+    const entity = (fd.get('entity') as EntityType) ?? 'mikro-jdg';
+    let mechanism = fd.get('mechanism') as Mechanism | null;
+    const allowed = MECHANISMS_FOR_ENTITY[entity];
+    if (!mechanism || !allowed.includes(mechanism)) {
+      mechanism = allowed[0];
+      renderMechanisms(entity, mechanism);
+    }
+    const voivodeship = (fd.get('voivodeship') as string) ?? 'dolnoslaskie';
+    const basePrice = Number(fd.get('basePrice')) || 1490;
+
+    const result = calculateFunding({ entity, mechanism, voivodeship, basePrice });
+
+    const setText = (id: string, val: string) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+
+    setText('r-base', PLN.format(result.base));
+    setText('r-coverage', `${Math.round(result.coverage * 100)}%`);
+    setText('r-subsidy', `−${PLN.format(result.subsidy)}`);
+    setText('r-pocket', PLN.format(result.outOfPocket));
+    setText('r-mechanism', result.mechanismLabel);
+
+    const notesEl = document.getElementById('r-notes');
+    if (notesEl) {
+      while (notesEl.firstChild) notesEl.removeChild(notesEl.firstChild);
+      result.notes.forEach((n) => {
+        const p = document.createElement('p');
+        p.className = 'calc-note';
+        p.textContent = n;
+        notesEl.appendChild(p);
+      });
+    }
+  }
+
+  form?.addEventListener('change', (ev) => {
+    const target = ev.target as HTMLInputElement;
+    if (target.name === 'entity') {
+      renderMechanisms(target.value as EntityType);
+    }
+    update();
+  });
+
+  form?.addEventListener('input', update);
+
+  // Quick-set price buttons
+  form?.querySelectorAll('[data-price]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const price = (e.currentTarget as HTMLButtonElement).dataset.price;
+      const input = form.querySelector('[name="basePrice"]') as HTMLInputElement;
+      if (input && price && Number(price) > 0) {
+        input.value = price;
+        update();
+      } else if (input && price === '0') {
+        input.focus();
+      }
+    });
+  });
+
+  // initialize mechanisms for default entity
+  const defaultEntity = (form?.querySelector('[name="entity"]:checked') as HTMLInputElement)?.value as EntityType;
+  if (defaultEntity) renderMechanisms(defaultEntity);
+  update();
+</script>
+
+<style>
+  .calc-form { display: flex; flex-direction: column; gap: 2.5rem; }
+
+  .calc-step {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: var(--color-card-raised);
+    padding: 1.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-rule);
+  }
+  .calc-step-legend {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+  .calc-step-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-accent);
+    background: var(--color-accent-wash);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+  .calc-step-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+  .calc-options {
+    display: grid;
+    gap: 0.5rem;
+  }
+  @media (min-width: 768px) {
+    .calc-options { grid-template-columns: 1fr 1fr; }
+  }
+  .calc-option {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 0.75rem;
+    align-items: baseline;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--color-paper-soft);
+    transition: all 0.2s ease;
+  }
+  .calc-option:has(input:checked) {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+  .calc-option:has(input:checked) .calc-option-hint {
+    color: rgba(242, 238, 227, 0.7);
+  }
+  .calc-option:hover { border-color: var(--color-ink-3); }
+  .calc-option input { grid-row: 1 / 3; align-self: center; accent-color: var(--color-accent); }
+  .calc-option-label {
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+  .calc-option-hint {
+    font-size: 0.78rem;
+    color: var(--color-ink-4);
+    line-height: 1.3;
+  }
+
+  .calc-result {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 1.75rem;
+    box-shadow: 0 24px 50px -32px rgba(21, 17, 13, 0.15);
+    position: sticky;
+    top: 6rem;
+  }
+  .calc-result::before {
+    content: '';
+    display: block;
+    width: 3rem;
+    height: 3px;
+    background: var(--color-accent);
+    margin-bottom: 1.25rem;
+  }
+  .calc-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-block: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-ink-2);
+  }
+  .calc-result-final {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-rule);
+  }
+  .calc-result-final span:first-child {
+    font-size: 0.85rem;
+    color: var(--color-ink-2);
+  }
+  .calc-notes { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .calc-note {
+    font-size: 0.78rem;
+    color: var(--color-ink-3);
+    line-height: 1.4;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-paper-soft);
+    border-left: 2px solid var(--color-accent);
+    border-radius: 0 4px 4px 0;
+    margin: 0;
+  }
+</style>

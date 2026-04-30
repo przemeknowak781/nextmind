@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#ffffff" />
+  <rect x="0" y="0" width="1200" height="6" fill="#2D5BFF" />
+
+  <!-- Monogram tile -->
+  <rect x="80" y="80" width="80" height="80" rx="16" fill="#2D5BFF" />
+  <text x="120" y="142" text-anchor="middle" font-family="Geist, system-ui, sans-serif" font-size="52" font-weight="700" fill="#ffffff" letter-spacing="-3">n</text>
+
+  <!-- Headline -->
+  <text x="80" y="280" font-family="Geist, system-ui, sans-serif" font-size="84" font-weight="700" fill="#0A1530" letter-spacing="-3">Next Mind Academy</text>
+  <text x="80" y="380" font-family="Geist, system-ui, sans-serif" font-size="44" font-weight="500" fill="#0A1530" letter-spacing="-1">Szkolenia AI dla pracownikow biurowych.</text>
+  <text x="80" y="438" font-family="Geist, system-ui, sans-serif" font-size="44" font-weight="500" fill="#2D5BFF" letter-spacing="-1">Z dofinansowaniem do 90%.</text>
+
+  <!-- Footer line -->
+  <line x1="80" y1="540" x2="1120" y2="540" stroke="#DCE3ED" stroke-width="1" />
+  <text x="80" y="580" font-family="Geist Mono, monospace" font-size="20" fill="#3A4A6B" letter-spacing="3">NEXTMINDACADEMY.PL</text>
+  <text x="1120" y="580" text-anchor="end" font-family="Geist Mono, monospace" font-size="20" fill="#3A4A6B" letter-spacing="3">2026</text>
+</svg>

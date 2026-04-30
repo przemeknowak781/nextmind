@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import { formatPrice } from '../../lib/format';
+
+const tableRows = [
+  { status: 'Mikroprzedsiębiorca (do 9 osób)', cap: '100% kosztów', net: 0, label: 'Mikro' },
+  { status: 'Mała firma (10–49 osób)', cap: '80% kosztów', net: 298, label: 'Małe MŚP' },
+  { status: 'Średnia firma (50–249 osób)', cap: '80% kosztów', net: 298, label: 'Średnie MŚP' },
+  { status: 'Duża firma (250+ osób)', cap: '80% kosztów', net: 298, label: 'Duże' },
+];
+---
+
+<BaseLayout
+  title="KFS Priorytet 3 — szkolenia AI i cyfrowe 2026 | Dofinansowanie do 90%"
+  description="Co to jest KFS Priorytet 3 w 2026 r., dla kogo jest i jak złożyć wniosek o dofinansowanie szkoleń AI do 90%. Przewodnik dla pracodawców."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Dofinansowanie', url: '/dofinansowanie/' },
+      { name: 'KFS Priorytet 3' },
+    ]} />
+  </div>
+
+  <Section padding="default">
+    <div class="eyebrow">Krajowy Fundusz Szkoleniowy</div>
+    <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight max-w-5xl">
+      KFS Priorytet 3 — <span class="display-italic">umiejętności cyfrowe</span> i AI w 2026.
+    </h1>
+    <p class="lead mt-7 text-[var(--color-ink-3)] max-w-3xl">
+      Co najważniejsze: priorytet 3 jest <strong class="text-[var(--color-ink)] font-medium">dla pracodawców</strong>, którzy zatrudniają minimum jednego pracownika.
+      Mikroprzedsiębiorcy mogą uzyskać do 100% pokrycia kosztów.
+    </p>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Pułapy dofinansowania">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Ile <span class="display-italic">możesz</span> dostać.
+    </h2>
+
+    <div class="overflow-x-auto rounded-lg border border-[var(--color-rule)] mt-10 bg-[var(--color-card-raised)]">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-[var(--color-paper-deep)]">
+            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Status</th>
+            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Pułap KFS</th>
+            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Wkład Twój — szkolenie 1 490 zł</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tableRows.map((row) => (
+            <tr class="border-t border-[var(--color-rule)]">
+              <td class="px-5 py-4 text-[var(--color-ink-2)]">{row.status}</td>
+              <td class="px-5 py-4 font-display italic text-2xl text-[var(--color-accent-deep)]">{row.cap}</td>
+              <td class="px-5 py-4 font-mono tabular-nums text-[var(--color-ink)]">{row.net === 0 ? '0 zł' : formatPrice(row.net)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-[0.78rem] text-[var(--color-ink-4)] mt-4 max-w-3xl">
+      Uwaga: w niektórych priorytetach (m.in. Priorytet 3) urzędy pracy stosują pułapy nawet 90% dla MŚP.
+      Sprawdzaj zawsze indywidualnie u swojego PUP.
+    </p>
+  </Section>
+
+  <Section padding="default" counter="02" eyebrow="Jak złożyć wniosek">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Pięć kroków do <span class="display-italic">decyzji</span> PUP.
+    </h2>
+    <ol class="mt-10 space-y-4 max-w-4xl">
+      {[
+        'Wybierz szkolenie z BUR — to warunek formalny.',
+        'Pobierz wzór wniosku z PUP (każde miasto ma własny, ale konstrukcja jest taka sama).',
+        'Wypełnij wniosek z konkretnym uzasadnieniem potrzeby szkolenia.',
+        'Załącz dokumenty: kartę usługi BUR, kosztorys, oświadczenie de minimis (jeśli dotyczy).',
+        'Złóż wniosek w PUP osobiście, listownie lub przez ePUAP.',
+      ].map((step, i) => (
+        <li class="flex items-start gap-4">
+          <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none">{String(i + 1).padStart(2, '0')}</span>
+          <span class="text-lg text-[var(--color-ink-2)] leading-relaxed pt-2">{step}</span>
+        </li>
+      ))}
+    </ol>
+    <p class="mt-8 text-[var(--color-ink-3)]">
+      Czas oczekiwania na decyzję: <strong class="text-[var(--color-ink)]">2–4 tygodnie</strong>.
+    </p>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="03" eyebrow="Najczęstsze błędy">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Czego <span class="display-italic">unikać</span> w wniosku.
+    </h2>
+    <ul class="mt-10 grid md:grid-cols-2 gap-4 max-w-5xl">
+      {[
+        { e: 'Ogólnikowe uzasadnienie', d: '„Pracownik chce się rozwijać" — to za mało. PUP odrzuci.' },
+        { e: 'Brak związku ze stanowiskiem', d: 'Szkolenie SQL dla recepcjonistki — bez uzasadnienia odrzucone.' },
+        { e: 'Zła kategoria pracownika', d: 'Pomyłka w PESEL/wieku — automatyczny zwrot do uzupełnienia.' },
+        { e: 'Brak załączników', d: 'Karta usługi BUR i kosztorys — to nie dodatek. To wymóg.' },
+      ].map((m) => (
+        <li class="bg-[var(--color-card-raised)] border border-[var(--color-rule)] border-l-4 border-l-[var(--color-warn)] rounded-md p-5">
+          <h3 class="font-display text-xl tracking-tight text-[var(--color-ink)]">{m.e}</h3>
+          <p class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">{m.d}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <section class="surface-night">
+    <div class="container-edge py-20 md:py-28">
+      <h2 class="text-4xl md:text-5xl text-[var(--color-paper)] tracking-tight leading-tight max-w-3xl">
+        Najlepszy moment na wniosek?<br />
+        <span class="display-italic text-[var(--color-marker)]">Luty / marzec</span>.
+      </h2>
+      <p class="mt-5 text-lg text-white/70 max-w-2xl">
+        Nabory KFS otwierają się zwykle w I i II kwartale. Później budżet się szybko wyczerpuje. Pomagamy klientom uniknąć zwrotu wniosku — wpisujemy treść już na etapie pisania.
+      </p>
+      <a href="/kontakt/" class="mt-8 btn btn-accent btn-lg">Pomożemy z wnioskiem</a>
+    </div>
+  </section>
+</BaseLayout>

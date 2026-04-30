@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /nextmind/api/
+Disallow: /nextmind/thank-you/
+Disallow: /nextmind/materialy/
+
+Sitemap: https://przemeknowak781.github.io/nextmind/sitemap-index.xml

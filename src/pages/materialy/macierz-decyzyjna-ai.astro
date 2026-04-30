@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+---
+
+<BaseLayout
+  title="Macierz decyzyjna AI dla pracownika biurowego — bezpłatny PDF"
+  description="Jednostronicowa macierz decyzyjna: które narzędzie AI do jakiego zadania. Zostaw e-mail i pobierz PDF do druku."
+  noindex={true}
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Materiały' }, { name: 'Macierz decyzyjna' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-7">
+        <div class="eyebrow !text-[var(--color-accent)]">Bezpłatny PDF</div>
+        <h1 class="mt-5 text-4xl md:text-5xl lg:text-[4.5rem] leading-[0.98] tracking-tight">
+          <span class="display-italic">Macierz decyzyjna</span> AI dla&nbsp;pracownika biurowego.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Jednostronicowa tabela: zadanie × najlepsze narzędzie (ChatGPT, Claude, Gemini, Perplexity, NotebookLM).
+          Drukujesz, kładziesz na biurku — i przestajesz się zastanawiać, „którego dziś użyć".
+        </p>
+
+        <ul class="mt-8 space-y-2">
+          {[
+            'Format A4, 1 strona, do druku',
+            'Zaktualizowana na 30.04.2026',
+            '38 zadań × 5 narzędzi = 190 rekomendacji',
+            'Zawiera linki do trybów (Code Interpreter, Deep Research, …)',
+          ].map((p) => (
+            <li class="flex items-start gap-2.5 text-[0.95rem]">
+              <span class="text-[var(--color-accent)] mt-1">▸</span>
+              <span class="text-[var(--color-ink-2)]">{p}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="lg:col-span-5">
+        <div class="lead-magnet-form">
+          <span class="eyebrow !text-[var(--color-accent)]">Zostaw e-mail — wyślemy PDF</span>
+          <form method="POST" action="/api/material/" class="mt-5 space-y-3" data-form="lead-magnet">
+            <input type="hidden" name="material" value="macierz-decyzyjna-ai" />
+            <label class="sr-only" for="lm-email">E-mail</label>
+            <input id="lm-email" name="email" type="email" required placeholder="twój@e-mail.pl" class="field-input" autocomplete="email" />
+            <label class="flex items-start gap-2 text-[0.78rem] text-[var(--color-ink-4)] leading-relaxed">
+              <input type="checkbox" name="newsletter" class="mt-0.5 accent-[var(--color-accent)]" />
+              <span>Chcę dostawać newsletter NMA — nowe materiały i&nbsp;terminy szkoleń (opcjonalnie).</span>
+            </label>
+            <label class="flex items-start gap-2 text-[0.78rem] text-[var(--color-ink-4)] leading-relaxed">
+              <input type="checkbox" name="rodo" required class="mt-0.5 accent-[var(--color-accent)]" />
+              <span>Zgoda na przetwarzanie e-maila zgodnie z RODO. <a href="/polityka-prywatnosci/" class="ink-link">Polityka prywatności</a>.</span>
+            </label>
+            <button type="submit" class="btn btn-accent w-full">Pobierz macierz</button>
+          </form>
+          <p class="mt-3 text-[0.7rem] text-[var(--color-ink-4)]">PDF wysyłamy linkiem do pobrania (~150 KB).</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .lead-magnet-form {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 24px 50px -28px rgba(21, 17, 13, 0.18);
+    position: relative;
+  }
+  .lead-magnet-form::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 1.5rem; right: 1.5rem;
+    height: 4px;
+    background: linear-gradient(to right, var(--color-accent), var(--color-marker));
+  }
+</style>

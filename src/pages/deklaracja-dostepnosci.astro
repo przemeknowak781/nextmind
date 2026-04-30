@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import { OPERATOR, SITE } from '../lib/site';
+---
+
+<BaseLayout
+  title="Deklaracja dostępności | Next Mind Academy"
+  description="Deklaracja dostępności cyfrowej Next Mind Academy zgodna z WCAG 2.1 AA i Ustawą z 4 kwietnia 2019 r."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Deklaracja dostępności' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="container-prose !mx-0">
+      <div class="eyebrow">Dostępność cyfrowa</div>
+      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5rem] leading-[0.98] tracking-tight">
+        Deklaracja <span class="display-italic">dostępności</span>.
+      </h1>
+      <p class="text-sm text-[var(--color-ink-4)] mt-4 font-mono">Data publikacji: 30.04.2026 · Aktualizacja: 30.04.2026</p>
+
+      <div class="prose-editorial mt-12">
+        <p class="lead">
+          {OPERATOR.legalName} zobowiązuje się zapewnić dostępność strony internetowej {SITE.url} zgodnie z&nbsp;ustawą
+          z&nbsp;4 kwietnia 2019 r. o&nbsp;dostępności cyfrowej stron internetowych i&nbsp;aplikacji mobilnych podmiotów publicznych
+          oraz wytycznymi WCAG 2.1 na poziomie AA.
+        </p>
+
+        <h2>Status zgodności</h2>
+        <p>
+          Strona internetowa jest <strong>zgodna</strong> z&nbsp;ustawą o&nbsp;dostępności cyfrowej.
+        </p>
+
+        <h2>Stosowane rozwiązania</h2>
+        <ul>
+          <li>Semantyczna struktura HTML (hierarchia nagłówków H1 → H2 → H3).</li>
+          <li>Skip-link „Przejdź do głównej treści" jako pierwszy element po&nbsp;<code>&lt;body&gt;</code>.</li>
+          <li>Pełna nawigacja klawiaturą (Tab, Shift+Tab, Enter, Escape).</li>
+          <li>Widoczne wskaźniki fokusu na każdym interaktywnym elemencie.</li>
+          <li>Odpowiedni kontrast tekstu (≥ 4.5:1 dla regular, ≥ 3:1 dla large).</li>
+          <li>Wszystkie obrazy informacyjne mają opisowy <code>alt</code>; dekoracyjne — <code>aria-hidden</code>.</li>
+          <li>Formularze z&nbsp;<code>&lt;label&gt;</code> i&nbsp;<code>aria-required</code> dla pól wymaganych.</li>
+          <li>Komunikaty błędów ogłaszane przez <code>role="alert"</code> / <code>aria-live="polite"</code>.</li>
+          <li>Strona działa przy zoomie 200% bez utraty funkcjonalności.</li>
+          <li>Animacje respektują <code>prefers-reduced-motion</code>.</li>
+          <li>Atrybut <code>lang="pl"</code> na każdej stronie.</li>
+        </ul>
+
+        <h2>Treści niedostępne</h2>
+        <p>
+          Na chwilę publikacji deklaracji nie zidentyfikowano elementów niezgodnych z&nbsp;WCAG 2.1 AA.
+          W&nbsp;przypadku zidentyfikowania nowych problemów aktualizujemy niniejszą deklarację.
+        </p>
+
+        <h2>Procedura zgłaszania problemów</h2>
+        <p>
+          W&nbsp;przypadku problemów z&nbsp;dostępnością strony prosimy o&nbsp;kontakt:
+        </p>
+        <ul>
+          <li>Email: <a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+          <li>Adres: {OPERATOR.legalName}, {OPERATOR.street}, {OPERATOR.postal} {OPERATOR.city}</li>
+        </ul>
+        <p>
+          Każdy ma prawo do wystąpienia z&nbsp;żądaniem zapewnienia dostępności cyfrowej strony lub jej elementu.
+          Można także zażądać udostępnienia informacji w&nbsp;formie alternatywnej (np. odczytania treści dokumentu).
+          <strong>Termin realizacji żądania: 7 dni</strong> (w&nbsp;szczególnie skomplikowanych przypadkach — do 2 miesięcy z&nbsp;zawiadomieniem).
+        </p>
+
+        <h2>Skarga do RPO</h2>
+        <p>
+          W&nbsp;przypadku odmowy realizacji żądania można złożyć skargę do organu nadzorującego, a&nbsp;także do
+          <a href="https://bip.brpo.gov.pl/" target="_blank" rel="noopener">Rzecznika Praw Obywatelskich</a>.
+        </p>
+
+        <h2>Dostępność architektoniczna</h2>
+        <p>
+          Działalność prowadzona jest wyłącznie online — nie posiadamy biur otwartych dla klientów.
+          Siedziba rejestrowa Usługodawcy jest miejscem prowadzenia spraw administracyjnych i&nbsp;nie jest dostępna do publicznych spotkań.
+        </p>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

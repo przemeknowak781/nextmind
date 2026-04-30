@@ -1,0 +1,22 @@
+{
+  "courseSlug": "ai-w-pracy-biurowej-level-2",
+  "date": "2026-07-22",
+  "startTime": "09:00",
+  "endTime": "16:00",
+  "timezone": "Europe/Warsaw",
+  "platform": "Zoom",
+  "seatsTotal": 8,
+  "seatsAvailable": 8,
+  "burEditionUrl": "https://uslugirozwojowe.parp.gov.pl/wyszukiwarka/uslugi/podglad?id=DO_UZUPELNIENIA",
+  "status": "planned",
+  "schedule": [
+    { "no": "1", "timeFrom": "09:00", "timeTo": "10:30", "duration": 90, "topic": "M1. Custom GPT", "form": "warsztat" },
+    { "no": "—", "timeFrom": "10:30", "timeTo": "10:45", "duration": 15, "topic": "Przerwa", "form": "—" },
+    { "no": "2", "timeFrom": "10:45", "timeTo": "12:15", "duration": 90, "topic": "M2. Gemini Gem + AI Studio", "form": "warsztat" },
+    { "no": "—", "timeFrom": "12:15", "timeTo": "13:00", "duration": 45, "topic": "Przerwa obiadowa", "form": "—" },
+    { "no": "3", "timeFrom": "13:00", "timeTo": "14:30", "duration": 90, "topic": "M3. Claude Projects + Zapier", "form": "warsztat" },
+    { "no": "—", "timeFrom": "14:30", "timeTo": "14:45", "duration": 15, "topic": "Przerwa", "form": "—" },
+    { "no": "4", "timeFrom": "14:45", "timeTo": "15:45", "duration": 60, "topic": "M4. Wdrażanie i skalowanie. Q&A.", "form": "warsztat" },
+    { "no": "W", "timeFrom": "15:45", "timeTo": "16:00", "duration": 15, "topic": "Walidacja końcowa", "form": "walidacja" }
+  ]
+}

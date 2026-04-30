@@ -1,0 +1,184 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import { formatDateShort } from '../../lib/format';
+
+const articles = (await getCollection('articles')).sort(
+  (a, b) => +b.data.publishDate - +a.data.publishDate
+);
+const featured = articles.find((a) => a.data.featured) ?? articles[0];
+const rest = articles.filter((a) => a.id !== featured?.id);
+---
+
+<BaseLayout
+  title="Blog Next Mind Academy — szkolenia AI, dofinansowanie, narzędzia"
+  description="Praktyczne artykuły o AI dla pracowników biurowych, dofinansowaniach BUR/KFS/PSF, porównania narzędzi i przewodniki krok po kroku."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Blog' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-9">
+        <div class="eyebrow">Blog redakcyjny</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[6rem] leading-[0.96] tracking-tight">
+          Praktyka, nie <span class="display-italic">hype</span>.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Pillarowe artykuły o dofinansowaniu, narzędziach, bezpieczeństwie pracy z AI i&nbsp;codziennej praktyce w&nbsp;biurze.
+          Pisane przez praktyka, weryfikowane co kwartał.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Featured -->
+  {featured && (
+    <Section surface="paper-soft" padding="default">
+      <div class="eyebrow !text-[var(--color-accent)] mb-3">Wyróżnione</div>
+      <a href={`/blog/${featured.data.slug}/`} class="featured-card group">
+        <div class="featured-meta">
+          <span class="tag tag-accent">{featured.data.categoryLabel}</span>
+          <span class="font-mono text-xs text-[var(--color-ink-4)]">
+            {formatDateShort(featured.data.publishDate)} · {featured.data.readingTime} min
+          </span>
+        </div>
+        <h2 class="featured-title">{featured.data.title}</h2>
+        <p class="featured-excerpt">{featured.data.excerpt}</p>
+        <span class="featured-arrow">
+          <span class="border-b border-[var(--color-accent)] pb-0.5">Czytaj artykuł</span>
+          <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </a>
+    </Section>
+  )}
+
+  <!-- Rest -->
+  <Section padding="default">
+    <h2 class="text-3xl md:text-4xl tracking-tight leading-tight mb-10">Wszystkie artykuły.</h2>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {rest.map((article, i) => (
+        <a href={`/blog/${article.data.slug}/`} class="article-card group">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <span class="tag">{article.data.categoryLabel}</span>
+            <span class="font-mono text-xs text-[var(--color-ink-4)]">{String(i + 1).padStart(2, '0')}</span>
+          </div>
+          <h3 class="article-title">{article.data.title}</h3>
+          <p class="article-excerpt">{article.data.excerpt}</p>
+          <div class="article-footer">
+            <span class="text-xs text-[var(--color-ink-4)] tabular-nums font-mono">
+              {formatDateShort(article.data.publishDate)} · {article.data.readingTime} min
+            </span>
+            <svg class="w-4 h-4 text-[var(--color-ink-3)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-accent)]" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </a>
+      ))}
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .featured-card {
+    display: block;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 12px;
+    padding: 2.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (min-width: 768px) { .featured-card { padding: 3rem; } }
+  .featured-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, var(--color-accent), var(--color-marker));
+  }
+  .featured-card:hover {
+    border-color: var(--color-ink);
+    transform: translateY(-2px);
+    box-shadow: 0 24px 50px -28px rgba(21, 17, 13, 0.18);
+  }
+  .featured-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .featured-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+    margin-bottom: 1.25rem;
+  }
+  .featured-excerpt {
+    font-size: 1.125rem;
+    color: var(--color-ink-2);
+    line-height: 1.5;
+    max-width: 56rem;
+    margin-bottom: 2rem;
+  }
+  .featured-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-ink);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 1.75rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+    height: 100%;
+  }
+  .article-card:hover {
+    border-color: var(--color-ink);
+    transform: translateY(-2px);
+  }
+  .article-title {
+    font-family: var(--font-display);
+    font-size: 1.625rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    margin-bottom: 0.85rem;
+  }
+  .article-excerpt {
+    font-size: 0.9rem;
+    color: var(--color-ink-3);
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+    flex: 1;
+  }
+  .article-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px dotted var(--color-rule);
+  }
+</style>

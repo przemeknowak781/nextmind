@@ -1,0 +1,51 @@
+---
+type Variant = 'primary' | 'accent' | 'secondary' | 'ghost';
+type Size = 'sm' | 'md' | 'lg';
+
+interface Props {
+  variant?: Variant;
+  size?: Size;
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  class?: string;
+  disabled?: boolean;
+  ariaLabel?: string;
+  external?: boolean;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  class: className = '',
+  disabled,
+  ariaLabel,
+  external,
+} = Astro.props;
+
+const variantClass = {
+  primary: 'btn-primary',
+  accent: 'btn-accent',
+  secondary: 'btn-secondary',
+  ghost: 'btn-ghost',
+}[variant];
+
+const sizeClass = size === 'md' ? '' : `btn-${size}`;
+
+const classes = `btn ${variantClass} ${sizeClass} ${className}`.trim();
+
+const Tag = href ? 'a' : 'button';
+const externalAttrs = external ? { target: '_blank', rel: 'noopener' } : {};
+---
+
+<Tag
+  class={classes}
+  href={href}
+  type={!href ? type : undefined}
+  disabled={disabled}
+  aria-label={ariaLabel}
+  {...externalAttrs}
+>
+  <slot />
+</Tag>

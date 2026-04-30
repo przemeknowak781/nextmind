@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import { OPERATOR } from '../lib/site';
+---
+
+<BaseLayout
+  title="Regulamin świadczenia usług | Next Mind Academy"
+  description="Regulamin świadczenia usług szkoleniowych przez Expert-Sales sp. z o.o. — Next Mind Academy. Zasady, ceny, reklamacje, RODO."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Regulamin' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="container-prose !mx-0">
+      <div class="eyebrow">Regulamin świadczenia usług</div>
+      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5rem] leading-[0.98] tracking-tight">
+        <span class="display-italic">Regulamin</span>.
+      </h1>
+      <p class="text-sm text-[var(--color-ink-4)] mt-4 font-mono">Wersja 1.0 — 30.04.2026</p>
+
+      <div class="prose-editorial mt-12">
+        <h2>§ 1. Definicje</h2>
+        <ul>
+          <li><strong>Usługodawca</strong> — {OPERATOR.legalName}, KRS {OPERATOR.krs}, NIP {OPERATOR.nip}, REGON {OPERATOR.regon}, z siedzibą {OPERATOR.street}, {OPERATOR.postal} {OPERATOR.city}.</li>
+          <li><strong>Klient</strong> — osoba fizyczna, osoba prawna lub jednostka organizacyjna, która zawiera umowę o świadczenie Usług.</li>
+          <li><strong>Usługa</strong> — usługa szkoleniowa świadczona w&nbsp;ramach marki Next Mind Academy.</li>
+          <li><strong>BUR</strong> — Baza Usług Rozwojowych prowadzona przez PARP.</li>
+        </ul>
+
+        <h2>§ 2. Zasady świadczenia usług</h2>
+        <ol>
+          <li>Usługodawca świadczy usługi szkoleniowe w&nbsp;formule online live (Zoom / Microsoft Teams / Google Meet).</li>
+          <li>Szkolenia prowadzone są w&nbsp;języku polskim.</li>
+          <li>Każde szkolenie ma kartę usługi w&nbsp;BUR — z&nbsp;pełnym programem, efektami uczenia się, ceną i&nbsp;harmonogramem.</li>
+          <li>Klient otrzymuje materiały, nagranie (30 dni dostępu) i&nbsp;imienny certyfikat po pozytywnej walidacji.</li>
+        </ol>
+
+        <h2>§ 3. Warunki zawarcia umowy</h2>
+        <ol>
+          <li>Umowa zawierana jest poprzez zapis przez kartę BUR i&nbsp;akceptację niniejszego Regulaminu.</li>
+          <li>Klient korzystający z&nbsp;dofinansowania zawiera trójstronną umowę z&nbsp;Operatorem PSF/KFS i&nbsp;Usługodawcą.</li>
+          <li>Klient korzystający z&nbsp;własnych środków dokonuje płatności przed lub po szkoleniu zgodnie z&nbsp;fakturą.</li>
+        </ol>
+
+        <h2>§ 4. Cena, VAT, formy płatności</h2>
+        <ol>
+          <li>Aktualne ceny szkoleń są wskazane na stronie internetowej i&nbsp;w&nbsp;karcie BUR.</li>
+          <li>Szkolenia z dofinansowaniem ≥70% są zwolnione z&nbsp;VAT na podstawie art. 43 ust. 1 pkt 29 ustawy o&nbsp;VAT.</li>
+          <li>Płatność: przelew na konto wskazane na fakturze, termin 14 dni od daty wystawienia.</li>
+        </ol>
+
+        <h2>§ 5. Prawo odstąpienia (konsumenci)</h2>
+        <p>
+          Klientowi będącemu konsumentem przysługuje prawo odstąpienia od umowy w&nbsp;terminie 14 dni od jej zawarcia,
+          bez podania przyczyny — zgodnie z&nbsp;ustawą o&nbsp;prawach konsumenta (art. 27).
+          Prawo odstąpienia nie przysługuje po rozpoczęciu świadczenia usługi (art. 38 pkt 1).
+        </p>
+
+        <h2>§ 6. Reklamacje</h2>
+        <ol>
+          <li>Reklamacje należy składać mailem na adres <a href="mailto:kontakt@nextmindacademy.pl">kontakt@nextmindacademy.pl</a>.</li>
+          <li>Termin rozpatrzenia reklamacji — 14 dni od daty otrzymania.</li>
+          <li>Klient ma prawo skorzystania z&nbsp;pozasądowego rozwiązywania sporów (np. UOKiK).</li>
+        </ol>
+
+        <h2>§ 7. Prawa autorskie</h2>
+        <p>
+          Materiały szkoleniowe są chronione prawem autorskim. Klient otrzymuje licencję niewyłączną do&nbsp;użytku własnego.
+          Dystrybucja, reprodukcja lub publikacja materiałów wymaga pisemnej zgody Usługodawcy (zgodnie z&nbsp;wymogami SUZ-3 BUR).
+        </p>
+
+        <h2>§ 8. Ochrona danych osobowych</h2>
+        <p>
+          Szczegółowe zasady przetwarzania danych osobowych regulują postanowienia
+          <a href="/polityka-prywatnosci/">Polityki prywatności</a>.
+        </p>
+
+        <h2>§ 9. Postanowienia końcowe</h2>
+        <ol>
+          <li>W sprawach nieuregulowanych Regulaminem stosuje się przepisy prawa polskiego.</li>
+          <li>Sądem właściwym dla rozstrzygania sporów jest sąd właściwy dla siedziby Usługodawcy.</li>
+          <li>Regulamin może być zmieniony — o&nbsp;zmianach informujemy z&nbsp;30-dniowym wyprzedzeniem.</li>
+        </ol>
+
+        <hr />
+        <p class="text-sm text-[var(--color-ink-4)]">
+          <em>Niniejszy regulamin stanowi podstawową wersję. Finalne brzmienie powinno zostać zatwierdzone
+          przez prawnika z&nbsp;doświadczeniem w&nbsp;e-commerce i&nbsp;BUR przed publikacją.</em>
+        </p>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

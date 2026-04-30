@@ -1,0 +1,60 @@
+---
+interface Props {
+  /** Visual surface */
+  surface?: 'paper' | 'paper-soft' | 'card' | 'night' | 'transparent';
+  /** Vertical padding scale */
+  padding?: 'tight' | 'default' | 'loose' | 'none';
+  /** Editorial counter (e.g. "01") */
+  counter?: string;
+  /** Eyebrow / kicker */
+  eyebrow?: string;
+  id?: string;
+  class?: string;
+  /** Removes default container; for full-bleed inner content */
+  bleed?: boolean;
+}
+
+const {
+  surface = 'paper',
+  padding = 'default',
+  counter,
+  eyebrow,
+  id,
+  class: className = '',
+  bleed = false,
+} = Astro.props;
+
+const surfaceMap = {
+  paper: 'bg-[var(--color-paper)]',
+  'paper-soft': 'bg-[var(--color-paper-soft)]',
+  card: 'bg-[var(--color-card)]',
+  night: 'surface-night',
+  transparent: '',
+};
+
+const paddingMap = {
+  tight: 'section-tight',
+  default: 'section',
+  loose: 'section pt-16 md:pt-32',
+  none: '',
+};
+
+const cls = `${surfaceMap[surface]} ${paddingMap[padding]} ${className} relative`.trim();
+---
+
+<section class={cls} id={id}>
+  {!bleed ? (
+    <div class="container-edge">
+      {(counter || eyebrow) && (
+        <div class="flex items-center gap-3 mb-3">
+          {counter && <span class="section-counter">{counter}</span>}
+          {counter && eyebrow && <span class="rule-dotted flex-1 max-w-[3rem]" aria-hidden="true"></span>}
+          {eyebrow && <span class="eyebrow eyebrow--centered">{eyebrow}</span>}
+        </div>
+      )}
+      <slot />
+    </div>
+  ) : (
+    <slot />
+  )}
+</section>

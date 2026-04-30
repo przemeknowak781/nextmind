@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+
+const offerings = [
+  { title: '1-day Basic dla zespołu', subtitle: 'Wprowadzenie do AI dla całego działu.', desc: 'Idealne dla zespołów, które dotąd nie używały AI systematycznie. Program dostosowany do branży klienta.', count: '8h × 1 dzień', size: '6–24 osoby' },
+  { title: '1-day Level 2 dla zespołu', subtitle: 'Custom GPT, Gem, Claude Project — własne asystenty firmowe.', desc: 'Dla zespołów z bazową znajomością AI. Wychodzicie z dnia z 3+ asystentami zbudowanymi pod Wasze procesy.', count: '8h × 1 dzień', size: '6–18 osób' },
+  { title: '24h corporate', subtitle: 'Trzy dni pełnej immersji + projekt wdrożeniowy.', desc: 'Najgłębszy format dla firm, które chcą zrobić AI standardem operacyjnym. Zawiera mentoring po szkoleniu i analizę procesów.', count: '24h × 3 dni', size: '8–16 osób' },
+];
+---
+
+<BaseLayout
+  title="Szkolenia AI zamknięte dla zespołów | Next Mind Academy dla firm"
+  description="Dedykowane szkolenia AI dla zespołów: 1-day, 24h corporate, mentoring. Dostosowanie do branży, certyfikat DigComp 2.2, dofinansowanie z KFS."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Dla firm' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-8">
+        <div class="eyebrow">Dla firm — szkolenia zamknięte</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight">
+          Szkolenia AI <span class="display-italic">dla zespołów</span>.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Dedykowane edycje dla 6–24 osób. Program dostosowany do Twojej branży, narzędzi które już używacie i procesów, które chcecie usprawnić.
+        </p>
+      </div>
+      <div class="lg:col-span-4 text-sm text-[var(--color-ink-3)]">
+        <ul class="space-y-2.5">
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)] mt-1">●</span> Trener prowadzi w polskim biurze, online lub stacjonarnie</li>
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)] mt-1">●</span> Materiały adaptujemy do branży</li>
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)] mt-1">●</span> Faktura na firmę — możliwe rozliczenie z KFS</li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default">
+    <div class="eyebrow mb-3">Trzy formaty</div>
+    <h2 class="text-3xl md:text-4xl lg:text-[3rem] tracking-tight leading-tight max-w-3xl">
+      Wybierz <span class="display-italic">głębokość</span>.
+    </h2>
+    <div class="mt-12 grid md:grid-cols-3 gap-5">
+      {offerings.map((o, i) => (
+        <article class="firma-card">
+          <span class="font-mono text-xs text-[var(--color-accent)]">F{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="font-display text-3xl tracking-tight leading-tight mt-4 mb-2">{o.title}</h3>
+          <p class="display-italic text-lg text-[var(--color-ink-3)] mb-4">{o.subtitle}</p>
+          <p class="text-[0.95rem] text-[var(--color-ink-3)] leading-relaxed mb-6">{o.desc}</p>
+          <div class="rule-dotted my-4"></div>
+          <dl class="text-sm">
+            <div class="flex justify-between py-1">
+              <dt class="text-[var(--color-ink-4)]">Czas</dt>
+              <dd class="text-[var(--color-ink)] font-medium">{o.count}</dd>
+            </div>
+            <div class="flex justify-between py-1">
+              <dt class="text-[var(--color-ink-4)]">Grupa</dt>
+              <dd class="text-[var(--color-ink)] font-medium">{o.size}</dd>
+            </div>
+          </dl>
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5">
+        <div class="eyebrow">Zapytanie ofertowe</div>
+        <h2 class="mt-3 text-4xl md:text-5xl tracking-tight leading-tight">
+          Powiedz nam, czego <span class="display-italic">potrzebujesz</span>.
+        </h2>
+        <p class="mt-6 text-[var(--color-ink-3)] leading-relaxed">
+          Odpowiadamy w&nbsp;24h. Pierwszy etap to bezpłatna konsultacja z&nbsp;trenerem (45 min) — dopasowujemy program do Waszych procesów.
+        </p>
+
+        <ul class="mt-8 space-y-2 text-sm text-[var(--color-ink-3)]">
+          <li class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-[var(--color-accent)] mt-0.5 shrink-0" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8L7 12L13 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span>Bezpłatna 45-minutowa konsultacja</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-[var(--color-accent)] mt-0.5 shrink-0" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8L7 12L13 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span>Indywidualna oferta w 48h</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-[var(--color-accent)] mt-0.5 shrink-0" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8L7 12L13 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span>Możliwość rozliczenia przez KFS / FERS</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="lg:col-span-7">
+        <form method="POST" action="/api/firma/" class="firma-form" data-form="firma">
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="firma-field">
+              <label for="f-company" class="field-label">Firma <span class="text-[var(--color-accent)]">*</span></label>
+              <input id="f-company" name="company" type="text" required class="field-input" />
+            </div>
+            <div class="firma-field">
+              <label for="f-nip" class="field-label">NIP (opcjonalnie)</label>
+              <input id="f-nip" name="nip" type="text" class="field-input" />
+            </div>
+            <div class="firma-field">
+              <label for="f-name" class="field-label">Imię i nazwisko <span class="text-[var(--color-accent)]">*</span></label>
+              <input id="f-name" name="name" type="text" required class="field-input" />
+            </div>
+            <div class="firma-field">
+              <label for="f-role" class="field-label">Stanowisko</label>
+              <input id="f-role" name="role" type="text" class="field-input" />
+            </div>
+            <div class="firma-field">
+              <label for="f-email" class="field-label">E-mail służbowy <span class="text-[var(--color-accent)]">*</span></label>
+              <input id="f-email" name="email" type="email" required class="field-input" />
+            </div>
+            <div class="firma-field">
+              <label for="f-phone" class="field-label">Telefon</label>
+              <input id="f-phone" name="phone" type="tel" class="field-input" />
+            </div>
+            <div class="firma-field">
+              <label for="f-people" class="field-label">Liczba osób do przeszkolenia</label>
+              <input id="f-people" name="people" type="number" min="2" max="100" class="field-input" />
+            </div>
+            <div class="firma-field">
+              <label for="f-format" class="field-label">Preferowany format</label>
+              <select id="f-format" name="format" class="field-select">
+                <option value="">Wybierz —</option>
+                <option value="basic-1d">1-day Basic dla zespołu</option>
+                <option value="l2-1d">1-day Level 2 dla zespołu</option>
+                <option value="24h">24h corporate</option>
+                <option value="other">Indywidualnie — opowiem w mailu</option>
+              </select>
+            </div>
+          </div>
+          <div class="firma-field mt-4">
+            <label for="f-msg" class="field-label">Dodatkowe wymagania / kontekst</label>
+            <textarea id="f-msg" name="message" rows="4" class="field-textarea" placeholder="Jakie zadania wykonuje Twój zespół? Co chcecie usprawnić? W jakiej branży działacie?"></textarea>
+          </div>
+          <label class="mt-4 flex items-start gap-2 text-[0.78rem] text-[var(--color-ink-4)] leading-relaxed">
+            <input type="checkbox" name="rodo" required class="mt-0.5 accent-[var(--color-accent)]" />
+            <span>Zgoda na przetwarzanie danych w celu przygotowania oferty (RODO).</span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-lg mt-6 w-full sm:w-auto">Wyślij zapytanie</button>
+        </form>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .firma-card {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .firma-card:hover { border-color: var(--color-ink); transform: translateY(-2px); }
+
+  .firma-form {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 2rem;
+  }
+</style>

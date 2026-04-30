@@ -1,0 +1,98 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import Accordion from '../components/ui/Accordion.astro';
+import { faqSchema } from '../lib/schema-org';
+
+const faqs = (await getCollection('faqs')).sort((a, b) => a.data.order - b.data.order);
+const categories = ['szkolenia', 'dofinansowanie', 'walidacja', 'techniczne'] as const;
+const grouped = Object.fromEntries(
+  categories.map((cat) => [cat, faqs.filter((f) => f.data.category === cat)])
+);
+const labels = {
+  szkolenia: 'Szkolenia',
+  dofinansowanie: 'Dofinansowanie',
+  walidacja: 'Walidacja i certyfikat',
+  techniczne: 'Techniczne',
+};
+
+const schemas = [faqSchema(faqs.map((f) => ({ question: f.data.question, answer: f.data.answer })))];
+---
+
+<BaseLayout
+  title="FAQ — najczęściej zadawane pytania | Next Mind Academy"
+  description="20+ pytań o szkolenia, dofinansowanie, walidację i wymagania techniczne. Wszystko, co warto wiedzieć przed zapisem."
+  schemas={schemas}
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'FAQ' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-9">
+        <div class="eyebrow">Pytania i odpowiedzi</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight">
+          {faqs.length} pytań,<br />
+          {faqs.length} <span class="display-italic">odpowiedzi</span>.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Cztery kategorie. Większość pytań pojawia się przed zapisem — niektóre po szkoleniu.
+          Czegoś brakuje? Napisz na <a href="mailto:kontakt@nextmindacademy.pl" class="ink-link">kontakt@nextmindacademy.pl</a>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Anchor nav -->
+    <nav class="faq-anchor-nav mt-12">
+      {categories.map((cat) => (
+        <a href={`#${cat}`} class="faq-anchor">
+          <span class="font-mono text-xs">{String(categories.indexOf(cat) + 1).padStart(2, '0')}</span>
+          <span>{labels[cat]}</span>
+          <span class="text-xs text-[var(--color-ink-4)] tabular-nums">{grouped[cat].length}</span>
+        </a>
+      ))}
+    </nav>
+  </Section>
+
+  {categories.map((cat) => (
+    <Section
+      surface={categories.indexOf(cat) % 2 === 0 ? 'paper-soft' : 'paper'}
+      padding="default"
+      id={cat}
+      counter={String(categories.indexOf(cat) + 1).padStart(2, '0')}
+      eyebrow={labels[cat]}
+    >
+      <h2 class="mt-6 text-3xl md:text-4xl lg:text-[2.75rem] tracking-tight leading-tight max-w-3xl mb-10">
+        {labels[cat]}.
+      </h2>
+      <Accordion items={grouped[cat].map((f) => ({ question: f.data.question, answer: f.data.answer }))} />
+    </Section>
+  ))}
+</BaseLayout>
+
+<style>
+  .faq-anchor-nav {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  @media (min-width: 768px) { .faq-anchor-nav { grid-template-columns: repeat(4, 1fr); } }
+  .faq-anchor {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 1rem 1.25rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--color-ink);
+    transition: all 0.2s ease;
+  }
+  .faq-anchor:hover { border-color: var(--color-ink); transform: translateY(-1px); }
+  .faq-anchor span:nth-child(2) { font-family: var(--font-display); font-size: 1.1rem; }
+</style>

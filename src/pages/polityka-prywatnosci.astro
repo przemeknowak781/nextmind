@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import { OPERATOR, SITE } from '../lib/site';
+---
+
+<BaseLayout
+  title="Polityka prywatności | Next Mind Academy"
+  description="Polityka prywatności Next Mind Academy zgodna z RODO. Administrator: Expert-Sales sp. z o.o."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Polityka prywatności' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="container-prose !mx-0">
+      <div class="eyebrow">RODO compliant</div>
+      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5rem] leading-[0.98] tracking-tight">
+        Polityka <span class="display-italic">prywatności</span>.
+      </h1>
+      <p class="text-sm text-[var(--color-ink-4)] mt-4 font-mono">Aktualizacja: 30.04.2026 · Wersja 1.0</p>
+
+      <div class="prose-editorial mt-12">
+        <p class="lead">
+          Zgodnie z art. 13 Rozporządzenia Parlamentu Europejskiego i Rady (UE) 2016/679 (RODO) z dnia 27 kwietnia 2016 r.
+          informujemy o zasadach przetwarzania Twoich danych osobowych.
+        </p>
+
+        <h2>1. Administrator danych</h2>
+        <p>
+          Administratorem Twoich danych osobowych jest <strong>{OPERATOR.legalName}</strong> z siedzibą w&nbsp;{OPERATOR.city},
+          {OPERATOR.street}, {OPERATOR.postal} {OPERATOR.city}, wpisana do KRS pod numerem {OPERATOR.krs},
+          NIP {OPERATOR.nip}, REGON {OPERATOR.regon}.
+        </p>
+        <p>
+          Kontakt z Administratorem: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+        </p>
+
+        <h2>2. Cele i podstawy prawne przetwarzania</h2>
+        <p>Twoje dane osobowe przetwarzamy w następujących celach:</p>
+        <ul>
+          <li><strong>Odpowiedź na zapytanie kontaktowe</strong> — art. 6 ust. 1 lit. f RODO (uzasadniony interes administratora).</li>
+          <li><strong>Wysyłka newslettera</strong> — art. 6 ust. 1 lit. a RODO (zgoda osoby, której dane dotyczą).</li>
+          <li><strong>Realizacja umowy o szkolenie</strong> — art. 6 ust. 1 lit. b RODO (wykonanie umowy).</li>
+          <li><strong>Wystawienie faktury i prowadzenie księgowości</strong> — art. 6 ust. 1 lit. c RODO (obowiązek prawny).</li>
+          <li><strong>Obrona przed roszczeniami</strong> — art. 6 ust. 1 lit. f RODO (uzasadniony interes).</li>
+        </ul>
+
+        <h2>3. Kategorie odbiorców danych</h2>
+        <p>Twoje dane mogą być przekazywane:</p>
+        <ul>
+          <li>Operatorowi BUR/PARP — przy rozliczeniu szkolenia z dofinansowaniem.</li>
+          <li>Dostawcom hostingu (Cloudflare Inc., USA — na podstawie standardowych klauzul umownych).</li>
+          <li>Dostawcom usług e-mail (Resend Inc., USA).</li>
+          <li>Dostawcom analityki webowej (Plausible Insights OÜ, Estonia — bez cookies, bez PII).</li>
+          <li>Operatorom PSF, FERS, KFS — przy procesowaniu wniosków o dofinansowanie.</li>
+        </ul>
+
+        <h2>4. Okres przechowywania danych</h2>
+        <p>Twoje dane przechowujemy:</p>
+        <ul>
+          <li>Newsletter — do czasu wycofania zgody.</li>
+          <li>Korespondencja — 3 lata od ostatniego kontaktu.</li>
+          <li>Dokumenty księgowe (faktury) — 5 lat zgodnie z ustawą o rachunkowości.</li>
+          <li>Dokumentacja szkoleniowa BUR — 10 lat zgodnie z wymogami PARP.</li>
+        </ul>
+
+        <h2>5. Twoje prawa</h2>
+        <p>Przysługują Ci następujące prawa:</p>
+        <ul>
+          <li>dostępu do Twoich danych (art. 15 RODO);</li>
+          <li>sprostowania Twoich danych (art. 16 RODO);</li>
+          <li>usunięcia Twoich danych (art. 17 RODO);</li>
+          <li>ograniczenia przetwarzania (art. 18 RODO);</li>
+          <li>przenoszenia danych (art. 20 RODO);</li>
+          <li>sprzeciwu wobec przetwarzania (art. 21 RODO);</li>
+          <li>cofnięcia zgody w dowolnym momencie (jeśli przetwarzanie odbywa się na podstawie zgody);</li>
+          <li>wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych.</li>
+        </ul>
+
+        <h2>6. Przekazywanie danych poza EOG</h2>
+        <p>
+          Część naszych dostawców (Cloudflare, Resend) ma siedzibę w USA. Przekazywanie danych odbywa się
+          na podstawie <strong>standardowych klauzul umownych</strong> zatwierdzonych przez Komisję Europejską,
+          zgodnie z art. 46 RODO.
+        </p>
+
+        <h2>7. Profilowanie</h2>
+        <p>
+          Nie podejmujemy decyzji w sposób zautomatyzowany, w tym profilowania.
+          Plausible — narzędzie analityczne, które stosujemy — nie używa cookies i nie identyfikuje użytkownika.
+        </p>
+
+        <h2>8. Zmiany polityki prywatności</h2>
+        <p>
+          O zmianach Polityki Prywatności poinformujemy w newsletterze i na tej stronie.
+          Najnowsza wersja jest zawsze dostępna pod adresem
+          <a href="https://nextmindacademy.pl/polityka-prywatnosci/">nextmindacademy.pl/polityka-prywatnosci</a>.
+        </p>
+
+        <hr />
+        <p class="text-sm text-[var(--color-ink-4)]">
+          <em>Powyższy dokument stanowi podstawową wersję polityki. Zawiera wszystkie wymagania art. 13 RODO,
+          ale finalne brzmienie powinno zostać zatwierdzone przez prawnika specjalizującego się w&nbsp;ochronie danych osobowych.</em>
+        </p>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

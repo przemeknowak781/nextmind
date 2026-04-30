@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import { OPERATOR, SITE } from '../lib/site';
+---
+
+<BaseLayout
+  title="Kontakt | Next Mind Academy"
+  description="Skontaktuj się z Next Mind Academy. E-mail, formularz kontaktowy, dane operatora Expert-Sales sp. z o.o."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Kontakt' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end mb-16">
+      <div class="lg:col-span-9">
+        <div class="eyebrow">Napisz / zadzwoń / odwiedź</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[6rem] leading-[0.96] tracking-tight">
+          <span class="display-italic">Porozmawiajmy.</span>
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          Odpowiadamy na każdy mail w ciągu 24h roboczych.
+          Najszybciej odpowiada się na konkretne pytania — kontekst i liczbę osób w grupie zgadnij od razu.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-12">
+      <!-- Contact details -->
+      <div class="lg:col-span-5 space-y-8">
+        <div>
+          <div class="eyebrow eyebrow--centered">E-mail</div>
+          <a href={`mailto:${SITE.email}`} class="block mt-2 text-3xl font-display tracking-tight ink-link">
+            {SITE.email}
+          </a>
+        </div>
+
+        <div>
+          <div class="eyebrow eyebrow--centered">Operator marki</div>
+          <div class="mt-2 p-5 bg-[var(--color-card-raised)] border border-[var(--color-rule)] rounded-md">
+            <h2 class="font-display text-2xl tracking-tight">{OPERATOR.legalName}</h2>
+            <p class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">
+              {OPERATOR.street}<br />
+              {OPERATOR.postal} {OPERATOR.city}, Polska
+            </p>
+            <p class="mt-3 font-mono text-[0.72rem] tabular-nums text-[var(--color-ink-4)]">
+              KRS {OPERATOR.krs} · NIP {OPERATOR.nip} · REGON {OPERATOR.regon}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="eyebrow eyebrow--centered">Godziny obsługi</div>
+          <p class="mt-3 text-[var(--color-ink-2)]">
+            Poniedziałek — piątek, <strong class="text-[var(--color-ink)]">9:00 — 17:00</strong>.
+          </p>
+          <p class="mt-1.5 text-sm text-[var(--color-ink-4)]">
+            Maile odpowiadamy też wieczorami i&nbsp;w weekendy. Zwykle.
+          </p>
+        </div>
+
+        <div>
+          <div class="eyebrow eyebrow--centered">Najszybsze ścieżki</div>
+          <ul class="mt-3 space-y-1.5 text-sm">
+            <li><a href="/firmy/" class="ink-link">Szkolenie zamknięte dla firmy →</a></li>
+            <li><a href="/dofinansowanie/kalkulator/" class="ink-link">Kalkulator dofinansowania →</a></li>
+            <li><a href="/szkolenia/" class="ink-link">Katalog szkoleń →</a></li>
+            <li><a href="/faq/" class="ink-link">FAQ — może masz odpowiedź →</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Contact form -->
+      <div class="lg:col-span-7">
+        <form method="POST" action="/api/kontakt/" class="contact-form" data-form="kontakt">
+          <h2 class="font-display text-3xl tracking-tight leading-tight mb-6">Lub napisz tutaj.</h2>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="k-name" class="field-label">Imię <span class="text-[var(--color-accent)]">*</span></label>
+              <input id="k-name" name="name" type="text" required class="field-input" autocomplete="name" />
+            </div>
+            <div>
+              <label for="k-email" class="field-label">E-mail <span class="text-[var(--color-accent)]">*</span></label>
+              <input id="k-email" name="email" type="email" required class="field-input" autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="k-subject" class="field-label">Temat</label>
+            <select id="k-subject" name="subject" class="field-select">
+              <option value="general">Ogólne pytanie</option>
+              <option value="course">Pytanie o konkretne szkolenie</option>
+              <option value="funding">Pytanie o dofinansowanie</option>
+              <option value="b2b">Szkolenie zamknięte dla firmy</option>
+              <option value="press">Współpraca / media</option>
+            </select>
+          </div>
+
+          <div class="mt-4">
+            <label for="k-message" class="field-label">Wiadomość <span class="text-[var(--color-accent)]">*</span></label>
+            <textarea id="k-message" name="message" rows="6" required class="field-textarea" placeholder="O co chcesz zapytać?"></textarea>
+          </div>
+
+          <label class="mt-4 flex items-start gap-2 text-[0.78rem] text-[var(--color-ink-4)] leading-relaxed">
+            <input type="checkbox" name="rodo" required class="mt-0.5 accent-[var(--color-accent)]" />
+            <span>Zgoda na przetwarzanie danych w celu odpowiedzi na zapytanie (RODO).</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-lg mt-6 w-full sm:w-auto">Wyślij wiadomość</button>
+          <p class="mt-3 text-[0.72rem] text-[var(--color-ink-4)]">
+            Polityka prywatności w stopce.
+          </p>
+        </form>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .contact-form {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 2rem;
+  }
+</style>

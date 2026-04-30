@@ -1,0 +1,188 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import { formatDateLong, formatPrice } from '../../lib/format';
+import { eventSchema } from '../../lib/schema-org';
+
+export async function getStaticPaths() {
+  const editions = await getCollection('editions');
+  return editions.map((ed) => ({
+    params: { slug: ed.id.replace('.json', '') },
+    props: { edition: ed },
+  }));
+}
+
+const { edition } = Astro.props;
+const e = edition.data;
+const course = await getEntry('courses', e.courseSlug);
+if (!course) throw new Error('Missing course for edition: ' + edition.id);
+const c = course.data;
+
+const startISO = `${e.date.toISOString().slice(0, 10)}T${e.startTime}:00+02:00`;
+const endISO = `${e.date.toISOString().slice(0, 10)}T${e.endTime}:00+02:00`;
+const eventUrl = `/terminy/${edition.id.replace('.json', '')}/`;
+
+const schema = eventSchema({
+  name: `${c.title} — ${formatDateLong(e.date)}`,
+  description: c.metaDescription,
+  startDate: startISO,
+  endDate: endISO,
+  url: eventUrl,
+  priceNet: c.priceNet,
+});
+
+const onboardingChecklist = [
+  'Pobierz Zoom (lub upewnij się, że masz aktualną wersję).',
+  'Załóż konto OpenAI (darmowe) na chat.openai.com.',
+  'Załóż konto Google (jeśli jeszcze nie masz) — potrzebne do Gemini i NotebookLM.',
+  'Sprawdź mikrofon i kamerę.',
+  'Przygotuj 2–3 realne zadania z Twojej pracy do warsztatów.',
+  'Przeczytaj checklistę „zanim wkleisz do AI" (wysyłamy mailem na 7 dni przed).',
+  'W kalendarzu zablokuj cały dzień — szkolenie wymaga skupienia.',
+  'Przygotuj słuchawki — komfortuje to całodzienne sesje.',
+];
+---
+
+<BaseLayout
+  title={`${c.title.split(':')[0]} — ${formatDateLong(e.date)}`}
+  description={`Edycja szkolenia ${c.title.split(':')[0]} — ${formatDateLong(e.date)}, ${e.startTime}–${e.endTime}, ${e.platform}. ${e.seatsAvailable} z ${e.seatsTotal} miejsc.`}
+  schemas={[schema]}
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Terminy', url: '/terminy/' },
+      { name: formatDateLong(e.date) },
+    ]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-8">
+        <div class="eyebrow">{c.eyebrow}</div>
+        <h1 class="mt-5 text-4xl md:text-5xl lg:text-[4.5rem] leading-[1.02] tracking-tight">
+          <span class="display-italic">{formatDateLong(e.date)}</span>
+        </h1>
+        <p class="lead mt-6 text-[var(--color-ink-2)] max-w-2xl">
+          {c.summary}
+        </p>
+
+        <dl class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10 pt-6 border-t border-[var(--color-rule)]">
+          <div>
+            <dt class="text-[0.65rem] uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono">Godziny</dt>
+            <dd class="mt-1 font-display text-2xl">{e.startTime}–{e.endTime}</dd>
+          </div>
+          <div>
+            <dt class="text-[0.65rem] uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono">Platforma</dt>
+            <dd class="mt-1 font-display text-2xl">{e.platform}</dd>
+          </div>
+          <div>
+            <dt class="text-[0.65rem] uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono">Język</dt>
+            <dd class="mt-1 font-display text-2xl">polski</dd>
+          </div>
+          <div>
+            <dt class="text-[0.65rem] uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono">Miejsc dostępnych</dt>
+            <dd class="mt-1 font-display italic text-2xl text-[var(--color-accent)]">{e.seatsAvailable}/{e.seatsTotal}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <aside class="lg:col-span-4">
+        <div class="edition-action">
+          <span class="eyebrow !text-[var(--color-accent)]">Cena za udział</span>
+          <div class="flex items-baseline gap-3 mt-2">
+            <span class="text-4xl font-display tabular-nums">{formatPrice(c.priceNet)}</span>
+            <span class="text-sm text-[var(--color-ink-4)]">netto</span>
+          </div>
+          <p class="text-[0.78rem] text-[var(--color-ink-4)] mt-2 leading-relaxed">
+            Z dofinansowaniem KFS 90% — zapłacisz <strong class="text-[var(--color-accent-deep)]">{formatPrice(c.priceWithKfs ?? 0)}</strong>.
+          </p>
+
+          <div class="rule-dotted my-5"></div>
+
+          {e.burEditionUrl ? (
+            <a href={e.burEditionUrl} target="_blank" rel="noopener" class="btn btn-primary w-full mb-2">
+              Zapisz się przez BUR
+            </a>
+          ) : (
+            <a href="/kontakt/" class="btn btn-primary w-full mb-2">Zapytaj o termin</a>
+          )}
+          <a href="/dofinansowanie/kalkulator/" class="btn btn-ghost w-full">Sprawdź dofinansowanie</a>
+        </div>
+      </aside>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Harmonogram dnia">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight">
+      Pełna agenda <span class="display-italic">tej edycji</span>.
+    </h2>
+    <div class="overflow-x-auto rounded-lg border border-[var(--color-rule)] mt-8 bg-[var(--color-card-raised)]">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-[var(--color-paper-deep)]">
+            <th class="text-left px-4 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[var(--color-ink-3)] w-12">Nr</th>
+            <th class="text-left px-4 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[var(--color-ink-3)]">Czas</th>
+            <th class="text-left px-4 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[var(--color-ink-3)]">Temat</th>
+            <th class="text-left px-4 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[var(--color-ink-3)] w-32">Forma</th>
+          </tr>
+        </thead>
+        <tbody>
+          {e.schedule.map((row) => (
+            <tr class={`border-t border-[var(--color-rule-soft)] ${row.no === '—' ? 'bg-[var(--color-paper-soft)]' : ''}`}>
+              <td class="px-4 py-3 font-mono text-xs">{row.no}</td>
+              <td class="px-4 py-3 font-mono tabular-nums text-sm">{row.timeFrom}–{row.timeTo}</td>
+              <td class="px-4 py-3 text-sm text-[var(--color-ink-2)]">{row.topic}</td>
+              <td class="px-4 py-3 text-xs text-[var(--color-ink-3)]">{row.form}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <Section padding="default" counter="02" eyebrow="Zanim zaczniemy">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight">
+      Co przygotować <span class="display-italic">przed</span> szkoleniem.
+    </h2>
+    <ul class="mt-10 grid md:grid-cols-2 gap-3">
+      {onboardingChecklist.map((item, i) => (
+        <li class="flex items-start gap-3 p-4 bg-[var(--color-card-raised)] border border-[var(--color-rule)] rounded-md">
+          <span class="font-mono text-[0.7rem] tabular-nums text-[var(--color-accent)] mt-1">{String(i + 1).padStart(2, '0')}</span>
+          <span class="text-[var(--color-ink-2)]">{item}</span>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <section class="surface-night relative">
+    <div class="container-edge py-20 md:py-32">
+      <h2 class="text-4xl md:text-5xl lg:text-[4rem] leading-[1.02] tracking-tight text-[var(--color-paper)]">
+        Gotowy?<br />
+        <span class="display-italic text-[var(--color-marker)]">Zarezerwuj swoje miejsce</span>.
+      </h2>
+      <div class="mt-10 flex flex-wrap gap-3">
+        {e.burEditionUrl ? (
+          <a href={e.burEditionUrl} target="_blank" rel="noopener" class="btn btn-accent btn-lg">Zapisz się przez BUR</a>
+        ) : (
+          <a href="/kontakt/" class="btn btn-accent btn-lg">Zapytaj o termin</a>
+        )}
+        <a href={`/szkolenia/${c.slug}/`} class="btn btn-ghost btn-lg !border-white/20 !text-[var(--color-paper)] hover:!bg-white/10">
+          Wróć do programu
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .edition-action {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 24px 50px -32px rgba(21, 17, 13, 0.12);
+  }
+</style>

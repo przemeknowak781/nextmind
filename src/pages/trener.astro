@@ -1,0 +1,173 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+
+const trainer = await getEntry('trainers', 'przemek-nowak');
+if (!trainer) throw new Error('Missing trainer');
+const t = trainer.data;
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: t.name,
+  jobTitle: t.title,
+  url: 'https://nextmindacademy.pl/trener/',
+  sameAs: t.linkedin ? [t.linkedin] : [],
+};
+---
+
+<BaseLayout
+  title={`${t.name} — trener AI Next Mind Academy`}
+  description={`${t.name}, trener wiodący Next Mind Academy. ${t.hoursDelivered}h szkoleń, ${t.participantsTrained} uczestników, ${t.yearsOfExperience} lat doświadczenia.`}
+  schemas={[personSchema]}
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Trener' }]} />
+  </div>
+
+  <Section padding="default">
+    <div class="grid lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-7">
+        <div class="eyebrow">{t.title}</div>
+        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[6rem] leading-[0.94] tracking-tight">
+          <span class="display-italic">{t.name.split(' ')[0]}</span><br />
+          {t.name.split(' ').slice(1).join(' ')}.
+        </h1>
+        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
+          {t.shortBio}
+        </p>
+      </div>
+
+      <div class="lg:col-span-5">
+        <div class="trainer-stats">
+          <div>
+            <div class="big-number">{t.yearsOfExperience}</div>
+            <div class="text-xs uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono mt-1">lat doświadczenia</div>
+          </div>
+          <div>
+            <div class="big-number">{t.hoursDelivered}</div>
+            <div class="text-xs uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono mt-1">godzin szkoleń</div>
+          </div>
+          <div>
+            <div class="big-number">{t.participantsTrained}</div>
+            <div class="text-xs uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono mt-1">uczestników</div>
+          </div>
+          <div>
+            <div class="big-number">{t.projectsDelivered}</div>
+            <div class="text-xs uppercase tracking-[0.16em] text-[var(--color-ink-4)] font-mono mt-1">projektów wdroż.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default">
+    <div class="grid lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5">
+        <div class="trainer-portrait-large">
+          <svg viewBox="0 0 480 600" class="w-full h-auto" aria-hidden="true">
+            <rect width="480" height="600" fill="#ECF0F7" />
+            <rect x="0" y="0" width="480" height="6" fill="#2D5BFF" />
+            <circle cx="240" cy="220" r="100" fill="#0A1530" />
+            <circle cx="240" cy="220" r="100" fill="url(#large-grain)" opacity="0.5" />
+            <path d="M80 600 Q80 380 240 380 Q400 380 400 600 Z" fill="#0A1530" />
+            <text x="40" y="585" font-family="Geist Mono, monospace" font-size="11" fill="#0A1530" opacity="0.45">PRZEMEK NOWAK · NMA · 2026</text>
+            <defs>
+              <pattern id="large-grain" patternUnits="userSpaceOnUse" width="4" height="4">
+                <circle cx="2" cy="2" r="0.4" fill="#2D5BFF" opacity="0.4" />
+              </pattern>
+            </defs>
+          </svg>
+        </div>
+      </div>
+      <div class="lg:col-span-7 prose-editorial">
+        <div class="eyebrow mb-3">Bio</div>
+        <h2 class="text-3xl md:text-4xl font-display tracking-tight leading-tight mb-6">
+          „Najlepszy prompt napisał ktoś, kto rozumie <span class="display-italic">problem</span>."
+        </h2>
+
+        <div class="space-y-5 text-[var(--color-ink-2)] leading-relaxed">
+          <p>
+            Prowadzę szkolenia z praktycznego zastosowania AI od 2023 r. Wcześniej, przez 5 lat, projektowałem i wdrażałem automatyzacje procesów biurowych w średnich i dużych firmach — od kancelarii prawnych po działy HR w międzynarodowych korporacjach.
+          </p>
+          <p>
+            Moje podejście do nauczania jest pochodną tego doświadczenia: zaczynamy od konkretnego zadania uczestnika, kończymy na działającym narzędziu, które pojechało z nim do pracy. Bez teorii, której nie da się od razu użyć w&nbsp;poniedziałek.
+          </p>
+          <p>
+            Uczyłem pracowników HR, sprzedaży, marketingu, finansów i administracji — w grupach od 4 do 30 osób. Specjalizuję się w bezpiecznym wdrożeniu AI tam, gdzie pracuje się z danymi osobowymi i poufnymi informacjami biznesowymi.
+          </p>
+          <blockquote>
+            Najlepszy prompt to ten, który napisał ktoś, kto rozumie problem — nie ten, kto rozumie modele.
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section padding="default" counter="01" eyebrow="Kwalifikacje">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Certyfikaty i <span class="display-italic">specjalizacje</span>.
+    </h2>
+    <ul class="mt-10 grid md:grid-cols-2 gap-4">
+      {t.certifications.map((cert) => (
+        <li class="cert-card">
+          <div class="font-mono text-xs text-[var(--color-ink-4)] mb-1">{cert.year}</div>
+          <h3 class="font-display text-xl tracking-tight leading-tight text-[var(--color-ink)]">{cert.name}</h3>
+          <p class="text-sm text-[var(--color-ink-3)] mt-1">{cert.issuer}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <section class="surface-night">
+    <div class="container-edge py-20 md:py-28 grid md:grid-cols-12 gap-10 items-end">
+      <div class="md:col-span-7">
+        <h2 class="text-4xl md:text-5xl text-[var(--color-paper)] tracking-tight leading-tight">
+          Pracujmy <span class="display-italic text-[var(--color-marker)]">razem</span>.
+        </h2>
+        <p class="mt-5 text-lg text-white/70 max-w-xl">
+          Otwarte szkolenia w&nbsp;BUR, dedykowane edycje dla firm, mentoring 1:1 dla osób w&nbsp;trakcie wdrożeń AI.
+        </p>
+      </div>
+      <div class="md:col-span-5 flex flex-col gap-3">
+        <a href="/szkolenia/" class="btn btn-accent btn-lg">Zobacz najbliższe szkolenia</a>
+        <a href="/firmy/" class="btn btn-ghost btn-lg !border-white/20 !text-[var(--color-paper)] hover:!bg-white/10">Zapytaj o szkolenie zamknięte</a>
+        {t.linkedin && (
+          <a href={t.linkedin} target="_blank" rel="noopener" class="text-sm text-white/60 hover:text-[var(--color-marker)] transition-colors mt-2">LinkedIn →</a>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .trainer-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    padding: 2rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    box-shadow: 0 24px 50px -32px rgba(21, 17, 13, 0.12);
+  }
+  .trainer-portrait-large {
+    border: 1px solid var(--color-rule);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--color-card-raised);
+    position: relative;
+    max-width: 460px;
+    box-shadow: 0 24px 50px -28px rgba(10, 21, 48, 0.2);
+  }
+  .cert-card {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    padding: 1.5rem;
+    transition: border-color 0.2s ease;
+  }
+  .cert-card:hover { border-color: var(--color-ink); }
+</style>
