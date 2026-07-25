@@ -52,8 +52,8 @@
     "category": "dofinansowanie",
     "categoryLabel": "Dofinansowanie",
     "order": 7,
-    "question": "Ile wynosi dofinansowanie z PSF w moim województwie?",
-    "answer": "Standardowo 80% dla małych firm i pracowników MŚP, do 90% w wybranych priorytetach (np. dla osób 50+, mikroprzedsiębiorców). Dokładne pułapy zależą od operatora regionalnego. Sprawdź w naszym kalkulatorze."
+    "question": "Ile wynosi dofinansowanie w moim województwie?",
+    "answer": "Nie ma jednej stawki. Ścieżkę regionalną wdraża każde województwo osobno, w ramach własnego programu Fundusze Europejskie, a poziom wsparcia ustala operator w regulaminie konkretnego naboru — dlatego różni się między regionami, a bywa też, że między podregionami tego samego województwa. Sprawdź swój region w zestawieniu na stronie „Dofinansowanie wg województw\". Stały i wynikający z ustawy jest natomiast pułap KFS: do 90% dla podmiotów zatrudniających maksymalnie 9 osób i do 70% dla pozostałych."
   },
   {
     "id": "faq-8",
@@ -77,7 +77,7 @@
     "categoryLabel": "Dofinansowanie",
     "order": 10,
     "question": "Co, jeśli moje województwo nie ma już budżetu?",
-    "answer": "Środki PSF są refinansowane co rok (kalendarzowo). Jeśli budżet się skończył — czekasz na nowy nabór lub przechodzisz na KFS przez urząd pracy (osobny budżet). Pisz — podpowiemy najszybszą drogę."
+    "answer": "Budżety są odnawiane w kolejnych naborach, a KFS i ścieżka regionalna mają odrębne źródła finansowania — KFS pochodzi z Funduszu Pracy, wsparcie regionalne ze środków europejskich. Jeśli w jednej ścieżce środki się wyczerpały, druga może być nadal dostępna. Napisz — podpowiemy, gdzie sprawdzić najbliższy nabór."
   },
   {
     "id": "faq-11",
@@ -101,7 +101,7 @@
     "categoryLabel": "Walidacja i certyfikat",
     "order": 13,
     "question": "Czy certyfikat jest uznawany na rynku?",
-    "answer": "Certyfikat zawiera mapowanie efektów uczenia się na DigComp 2.2 — europejską ramę kompetencji cyfrowych. Jest akceptowany przez pracodawców i operatorów PSF jako dowód zdobycia kompetencji w obszarze AI/cyfrowym."
+    "answer": "Certyfikat zawiera mapowanie efektów uczenia się na DigComp 2.2 — europejską ramę kompetencji cyfrowych. Dokumentuje zakres szkolenia i zweryfikowane efekty uczenia się — wykorzystasz go w rozliczeniu usługi u operatora lub w urzędzie pracy."
   },
   {
     "id": "faq-14",

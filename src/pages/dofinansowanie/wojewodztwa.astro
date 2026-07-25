@@ -1,0 +1,219 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import { REGIONS_SORTED, STATUS_LABELS, PARP_OPERATORS_URL, BUR_URL } from '../../lib/regions';
+
+const active = REGIONS_SORTED.filter((r) => r.status === 'aktywny');
+const other = REGIONS_SORTED.filter((r) => r.status !== 'aktywny');
+
+const steps = [
+  { t: 'Załóż konto w Bazie Usług Rozwojowych', d: 'Rejestracja przez login.gov.pl — profil zaufany, e-dowód albo bankowość elektroniczna.' },
+  { t: 'Znajdź operatora dla swojego województwa', d: 'Operator jest przypisany do regionu, a czasem do konkretnego podregionu. Jego regulamin określa warunki.' },
+  { t: 'Złóż wniosek u operatora', d: 'Nie w Bazie Usług Rozwojowych — to katalog usług, a nie system wniosków. Nabory bywają zamykane w ciągu godzin od otwarcia.' },
+  { t: 'Odbierz ID wsparcia', d: 'Operator nadaje je po podpisaniu umowy. Bez niego zapis na szkolenie jest zwykłym zakupem komercyjnym.' },
+  { t: 'Zapisz się na szkolenie, wpisując ID wsparcia', d: 'Dopiero wtedy usługa jest objęta dofinansowaniem.' },
+  { t: 'Zrealizuj i rozlicz', d: 'Model rozliczenia zależy od regionu: refundacja, płatność operatora do dostawcy albo system bonowy. Na koniec obowiązkowa ocena usługi.' },
+];
+---
+
+<BaseLayout
+  title="Dofinansowanie szkoleń według województw — gdzie złożyć wniosek"
+  description="Programy dofinansowania szkoleń dla osób dorosłych i firm w podziale na województwa: operator, poziom wsparcia i status naborów. Dane ze źródeł urzędowych."
+>
+  <div class="container-edge pt-8">
+    <Breadcrumbs items={[
+      { name: 'Strona główna', url: '/' },
+      { name: 'Dofinansowanie', url: '/dofinansowanie/' },
+      { name: 'Województwa' },
+    ]} />
+  </div>
+
+  <Section padding="default">
+    <div class="max-w-3xl">
+      <div class="eyebrow">Ścieżka regionalna</div>
+      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[4.75rem] leading-[0.98] tracking-tight">
+        Dofinansowanie <span class="display-italic">województwo po województwie</span>.
+      </h1>
+      <p class="lead mt-6 text-[var(--color-ink-3)]">
+        Poza Krajowym Funduszem Szkoleniowym działa druga, niezależna ścieżka: środki europejskie
+        rozdzielane regionalnie. Nie ma tu jednego ogólnopolskiego programu — każde województwo ma
+        własnego operatora, własny regulamin i własny kalendarz naborów.
+      </p>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Nabory prowadzone">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Województwa z <span class="display-italic">potwierdzonym</span> programem.
+    </h2>
+    <p class="mt-5 text-[var(--color-ink-3)] max-w-3xl">
+      Poniższe dane potwierdziliśmy u operatorów 25 lipca 2026 r. Wiążący pozostaje regulamin
+      konkretnego naboru — pułapy i limity zmieniają się między rundami.
+    </p>
+
+    <div class="mt-10 grid md:grid-cols-2 gap-4">
+      {active.map((r) => (
+        <article class="reg">
+          <header class="reg-head">
+            <h3 class="reg-name">{r.name}</h3>
+            <span class={`badge badge-${STATUS_LABELS[r.status].tone}`}>{STATUS_LABELS[r.status].label}</span>
+          </header>
+          {r.program && <p class="reg-prog">{r.program}</p>}
+          {r.operator && <p class="reg-op">{r.operator}</p>}
+          {r.scope && (
+            <p class="reg-scope">
+              <strong>Tylko część województwa:</strong> {r.scope}
+            </p>
+          )}
+          <dl class="reg-dl">
+            {r.coverage && (
+              <div><dt>Dofinansowanie</dt><dd>{r.coverage}</dd></div>
+            )}
+            {r.limit && (
+              <div><dt>Limit</dt><dd>{r.limit}</dd></div>
+            )}
+          </dl>
+          {r.note && <p class="reg-note">{r.note}</p>}
+          {r.url && (
+            <a class="reg-link" href={r.url} target="_blank" rel="noopener">Strona operatora →</a>
+          )}
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <Section padding="default" counter="02" eyebrow="Pozostałe województwa">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Tu sprawdź <span class="display-italic">bezpośrednio</span> u operatora.
+    </h2>
+    <p class="mt-5 text-[var(--color-ink-3)] max-w-3xl">
+      Dla tych regionów nie potwierdziliśmy aktualnego programu dla osób dorosłych albo nabór jest
+      wstrzymany. Nie zgadujemy — zamiast podawać niepewne liczby, kierujemy do wykazu operatorów PARP.
+    </p>
+
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {other.map((r) => (
+        <article class="reg reg-slim">
+          <header class="reg-head">
+            <h3 class="reg-name">{r.name}</h3>
+            <span class={`badge badge-${STATUS_LABELS[r.status].tone}`}>{STATUS_LABELS[r.status].label}</span>
+          </header>
+          {r.program && <p class="reg-prog reg-prog-sm">{r.program}</p>}
+          {r.note && <p class="reg-note">{r.note}</p>}
+          <a class="reg-link" href={r.url ?? PARP_OPERATORS_URL} target="_blank" rel="noopener">
+            {r.url ? 'Sprawdź u operatora →' : 'Wykaz operatorów PARP →'}
+          </a>
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="03" eyebrow="Jak to działa">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Kolejność ma <span class="display-italic">znaczenie</span>.
+    </h2>
+    <p class="mt-5 text-[var(--color-ink-3)] max-w-3xl">
+      Najczęstszy błąd to zapisanie się na szkolenie przed uzyskaniem ID wsparcia. Wtedy usługa jest
+      zwykłym zakupem i dofinansowanie przepada.
+    </p>
+    <ol class="mt-10 space-y-6 max-w-4xl">
+      {steps.map((s, i) => (
+        <li class="flex items-start gap-5">
+          <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0 pt-1">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h3 class="font-display text-xl tracking-tight text-[var(--color-ink)]">{s.t}</h3>
+            <p class="mt-1.5 text-[var(--color-ink-3)] leading-relaxed">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-10 flex flex-wrap gap-3">
+      <a href="/dofinansowanie/kalkulator/" class="btn btn-primary">Sprawdź swoją ścieżkę</a>
+      <a href="/pomoc-z-wnioskiem/" class="btn btn-ghost">Pomożemy z wnioskiem</a>
+    </div>
+  </Section>
+
+  <Section padding="tight">
+    <div class="max-w-4xl">
+      <div class="eyebrow">Źródła</div>
+      <ul class="mt-4 space-y-1.5 text-sm">
+        <li><a class="src" href={PARP_OPERATORS_URL} target="_blank" rel="noopener">PARP — dofinansowania w BUR i wykaz operatorów</a></li>
+        <li><a class="src" href={BUR_URL} target="_blank" rel="noopener">Baza Usług Rozwojowych</a></li>
+      </ul>
+      <p class="mt-4 text-xs text-[var(--color-ink-4)]">Dane operatorów zweryfikowane 25.07.2026.</p>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .reg {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  .reg-slim { padding: 1.15rem 1.25rem; }
+  .reg-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+  .reg-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    text-transform: capitalize;
+  }
+  .reg-slim .reg-name { font-size: 1.15rem; }
+  .reg-prog { font-weight: 500; color: var(--color-ink-2); }
+  .reg-prog-sm { font-size: 0.9rem; }
+  .reg-op { font-size: 0.85rem; color: var(--color-ink-4); margin-top: 0.15rem; }
+  .reg-scope {
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--color-ink-3);
+    border-left: 3px solid var(--color-warn);
+    padding-left: 0.7rem;
+  }
+  .reg-scope strong { color: var(--color-ink); font-weight: 500; }
+  .reg-dl { margin-top: 0.9rem; display: grid; gap: 0.5rem; }
+  .reg-dl > div { display: grid; gap: 0.1rem; }
+  .reg-dl dt {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--color-ink-4);
+  }
+  .reg-dl dd { margin: 0; font-size: 0.88rem; color: var(--color-ink-2); line-height: 1.5; }
+  .reg-note { margin-top: 0.8rem; font-size: 0.82rem; color: var(--color-ink-3); line-height: 1.55; }
+  .reg-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .badge {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .badge-ok { background: var(--color-positive-soft); color: var(--color-positive); }
+  .badge-warn { background: var(--color-warn-soft); color: var(--color-warn); }
+  .badge-muted { background: var(--color-paper-deep); color: var(--color-ink-4); }
+  .src { color: var(--color-accent-deep); text-decoration: underline; text-underline-offset: 3px; }
+</style>

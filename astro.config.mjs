@@ -8,6 +8,11 @@ export default defineConfig({
   site: 'https://przemeknowak781.github.io',
   base: '/nextmind',
   trailingSlash: 'always',
+  // Podstrona "PSF" została zastąpiona podziałem na województwa. Przekierowanie
+  // utrzymuje działanie starych linków (Astro generuje statyczną stronę z meta refresh).
+  redirects: {
+    '/dofinansowanie/psf-podmiotowy-system-finansowania/': '/dofinansowanie/wojewodztwa/',
+  },
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'viewport',

@@ -7,11 +7,14 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build && node scripts/rewrite-base.mjs",
-    "build:nocheck": "astro build && node scripts/rewrite-base.mjs",
+    "build": "node scripts/check-placeholders.mjs && node scripts/fetch-bur.mjs && astro check && astro build && node scripts/rewrite-base.mjs",
+    "build:nocheck": "node scripts/fetch-bur.mjs && astro build && node scripts/rewrite-base.mjs",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "check:content": "node scripts/check-placeholders.mjs",
+    "bur:sync": "node scripts/fetch-bur.mjs",
+    "bur:probe": "node scripts/fetch-bur.mjs --probe"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

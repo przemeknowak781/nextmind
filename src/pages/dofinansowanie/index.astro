@@ -6,7 +6,7 @@ import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 const subPages = [
   { slug: 'bur-jak-zapisac', title: 'BUR — krok po kroku', desc: 'Jak zarejestrować się w Bazie Usług Rozwojowych przez login.gov.pl i co dalej.', counter: '01' },
   { slug: 'kfs-priorytet-3', title: 'KFS Priorytet 3', desc: 'Krajowy Fundusz Szkoleniowy na zasadach z 2026 r. Do 90% dla podmiotów do 9 osób, do 70% dla pozostałych.', counter: '02' },
-  { slug: 'psf-podmiotowy-system-finansowania', title: 'PSF — ścieżka regionalna', desc: 'Jak działa dofinansowanie przez operatora regionalnego i gdzie znaleźć właściwego dla swojego województwa.', counter: '03' },
+  { slug: 'wojewodztwa', title: 'Dofinansowanie wg województw', desc: 'Operator, poziom wsparcia i status naborów w każdym z 16 województw.', counter: '03' },
 ];
 
 const compareRows = [
@@ -39,7 +39,7 @@ const compareRows = [
 ---
 
 <BaseLayout
-  title="Szkolenia AI z dofinansowaniem 2026 — KFS, PSF, BUR | Pełen przewodnik"
+  title="Szkolenia AI z dofinansowaniem 2026 — KFS i programy regionalne"
   description="Dofinansowanie szkoleń AI w 2026 r.: KFS Priorytet 3, ścieżka regionalna przez operatorów, BUR. Sprawdź, gdzie złożyć wniosek."
 >
   <div class="container-edge pt-8">
@@ -72,7 +72,7 @@ const compareRows = [
     </div>
   </Section>
 
-  <!-- KFS vs regional (PSF) comparison -->
+  <!-- KFS vs regional path comparison -->
   <Section surface="paper-soft" padding="default" counter="00" eyebrow="Porównanie mechanizmów">
     <h2 class="mt-6 text-3xl md:text-4xl lg:text-[2.75rem] tracking-tight leading-tight max-w-3xl">
       <span class="display-italic">KFS</span> czy <span class="display-italic">ścieżka regionalna</span> — który dla Ciebie?
@@ -84,7 +84,7 @@ const compareRows = [
           <tr class="bg-[var(--color-paper-deep)]">
             <th class="text-left px-4 py-4 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold w-32"></th>
             <th class="text-left px-4 py-4 font-display text-xl tracking-tight">KFS</th>
-            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">Ścieżka regionalna (PSF)</th>
+            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">Ścieżka regionalna</th>
           </tr>
         </thead>
         <tbody>

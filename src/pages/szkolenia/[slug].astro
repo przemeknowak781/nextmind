@@ -154,13 +154,13 @@ const schemas = [
             </div>
             {c.priceWithPsf && (
               <div class="course-price-row">
-                <span>Z dofinansowaniem PSF (80%)</span>
+                <span>Z dofinansowaniem regionalnym</span>
                 <span class="font-mono tabular-nums">{formatPrice(c.priceWithPsf)}</span>
               </div>
             )}
             {c.priceWithKfs && (
               <div class="course-price-row course-price-final">
-                <span class="display-italic text-[var(--color-ink)] text-lg">Z KFS (90%)</span>
+                <span class="display-italic text-[var(--color-ink)] text-lg">Z KFS, firma do 9 osób (90%)</span>
                 <span class="course-price-final-num">{formatPrice(c.priceWithKfs)}</span>
               </div>
             )}
@@ -509,14 +509,14 @@ const schemas = [
           </div>
           {c.priceWithPsf && (
             <div class="pricing-cell">
-              <span class="pricing-label">Z dofinansowaniem PSF (80%)</span>
+              <span class="pricing-label">Z dofinansowaniem regionalnym</span>
               <span class="pricing-value font-mono tabular-nums text-[var(--color-positive)]">{formatPrice(c.priceWithPsf)}</span>
               <span class="pricing-desc">Pracownik MŚP, woj. dolnośląskie</span>
             </div>
           )}
           {c.priceWithKfs && (
             <div class="pricing-cell pricing-cell-highlight">
-              <span class="pricing-label">Z dofinansowaniem KFS (90%)</span>
+              <span class="pricing-label">Z KFS — firma do 9 osób (90%)</span>
               <span class="pricing-value font-display italic text-[var(--color-accent-deep)]">{formatPrice(c.priceWithKfs)}</span>
               <span class="pricing-desc">Mikroprzedsiębiorca, Priorytet 3</span>
             </div>

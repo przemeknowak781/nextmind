@@ -9,9 +9,8 @@ export const SITE = {
   url: 'https://przemeknowak781.github.io/nextmind',
   defaultLocale: 'pl-PL',
   description:
-    'Praktyczne szkolenia z ChatGPT, Gemini, Claude i NotebookLM dla pracowników biurowych spoza IT. Online live, kameralna grupa 4–10 osób, certyfikat zgodny z DigComp 2.2. Dofinansowanie KFS, PSF, BUR.',
+    'Praktyczne szkolenia z ChatGPT, Gemini, Claude i NotebookLM dla pracowników biurowych spoza IT. Online live, kameralna grupa 4–10 osób, zaświadczenie z mapowaniem na DigComp 2.2. Dofinansowanie z KFS i programów regionalnych.',
   email: 'kontakt@nextmindacademy.pl',
-  phone: '+48 000 000 000',
   ogImage: '/og/default.svg',
 } as const;
 
@@ -62,7 +61,7 @@ export const NAV: {
       children: [
         { label: 'BUR krok po kroku', href: '/dofinansowanie/bur-jak-zapisac/', summary: 'Jak zapisać się przez BUR' },
         { label: 'KFS Priorytet 3', href: '/dofinansowanie/kfs-priorytet-3/', summary: 'Dofinansowanie do 90%' },
-        { label: 'PSF — operatorzy regionalni', href: '/dofinansowanie/psf-podmiotowy-system-finansowania/', summary: 'Lista per województwo' },
+        { label: 'Dofinansowanie wg województw', href: '/dofinansowanie/wojewodztwa/', summary: 'Operator i warunki w Twoim regionie' },
         { label: 'Kalkulator', href: '/dofinansowanie/kalkulator/', summary: 'Sprawdź, ile zapłacisz' },
       ],
     },

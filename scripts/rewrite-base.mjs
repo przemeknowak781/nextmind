@@ -34,8 +34,25 @@ function rewriteHtml(file) {
     });
   }
 
-  // Handle JSON-LD canonical URLs that use the bare domain
-  // (already covered by SITE.url constant in source, but be safe)
+  // Strony przekierowań generowane przez Astro (`redirects` w astro.config)
+  // zawierają adres w `content="0;url=/sciezka/"`, którego pętla wyżej nie łapie,
+  // bo wartość atrybutu nie zaczyna się od "/". Bez tego meta refresh i canonical
+  // prowadzą poza katalog bazowy i kończą się 404 na GitHub Pages.
+  html = html.replace(/content="(\d+\s*;\s*url=)(\/[^"]*)"/gi, (match, prefix, url) => {
+    if (!shouldRewrite(url)) return match;
+    changed++;
+    return `content="${prefix}${BASE}${url}"`;
+  });
+
+  // Canonical na stronie przekierowania budowany jest z origin bez bazy.
+  html = html.replace(
+    /(<link\s+rel="canonical"\s+href="https?:\/\/[^/"]+)(\/[^"]*)"/gi,
+    (match, origin, pathname) => {
+      if (!shouldRewrite(pathname)) return match;
+      changed++;
+      return `${origin}${BASE}${pathname}"`;
+    }
+  );
 
   fs.writeFileSync(file, html);
   return changed;

@@ -7,20 +7,103 @@
   "platform": "Zoom",
   "seatsTotal": 8,
   "seatsAvailable": 7,
-  "burEditionUrl": "https://uslugirozwojowe.parp.gov.pl/wyszukiwarka/uslugi/podglad?id=DO_UZUPELNIENIA",
   "status": "open-for-signup",
   "schedule": [
-    { "no": "1", "timeFrom": "09:00", "timeTo": "09:45", "duration": 45, "topic": "T1. Fundamenty AI — przegląd narzędzi generatywnych w 2026", "form": "wykład + demo" },
-    { "no": "2", "timeFrom": "09:45", "timeTo": "10:30", "duration": 45, "topic": "T2. Bezpieczeństwo, RODO i klasyfikacja danych w pracy z AI", "form": "wykład + ćwiczenie" },
-    { "no": "—", "timeFrom": "10:30", "timeTo": "10:45", "duration": 15, "topic": "Przerwa", "form": "—" },
-    { "no": "3", "timeFrom": "10:45", "timeTo": "11:30", "duration": 45, "topic": "T3. Framework promptowania: Rola + Kontekst + Zadanie + Format", "form": "warsztat" },
-    { "no": "4", "timeFrom": "11:30", "timeTo": "12:15", "duration": 45, "topic": "T4. Zaawansowane techniki promptowania", "form": "warsztat" },
-    { "no": "—", "timeFrom": "12:15", "timeTo": "12:30", "duration": 15, "topic": "Przerwa", "form": "—" },
-    { "no": "5", "timeFrom": "12:30", "timeTo": "13:15", "duration": 45, "topic": "T5. Praca z dokumentami", "form": "warsztat" },
-    { "no": "6", "timeFrom": "13:15", "timeTo": "14:00", "duration": 45, "topic": "T6. NotebookLM — firmowa baza wiedzy", "form": "warsztat" },
-    { "no": "—", "timeFrom": "14:00", "timeTo": "14:15", "duration": 15, "topic": "Przerwa", "form": "—" },
-    { "no": "7", "timeFrom": "14:15", "timeTo": "15:00", "duration": 45, "topic": "T7. Research i analiza z AI", "form": "warsztat" },
-    { "no": "8", "timeFrom": "15:00", "timeTo": "15:45", "duration": 45, "topic": "T8. Prezentacje, wizualizacje, plan wdrożenia", "form": "warsztat" },
-    { "no": "W", "timeFrom": "15:45", "timeTo": "16:00", "duration": 15, "topic": "Walidacja końcowa", "form": "walidacja" }
+    {
+      "no": "1",
+      "timeFrom": "09:00",
+      "timeTo": "09:45",
+      "duration": 45,
+      "topic": "T1. Fundamenty AI — przegląd narzędzi generatywnych w 2026",
+      "form": "wykład + demo"
+    },
+    {
+      "no": "2",
+      "timeFrom": "09:45",
+      "timeTo": "10:30",
+      "duration": 45,
+      "topic": "T2. Bezpieczeństwo, RODO i klasyfikacja danych w pracy z AI",
+      "form": "wykład + ćwiczenie"
+    },
+    {
+      "no": "—",
+      "timeFrom": "10:30",
+      "timeTo": "10:45",
+      "duration": 15,
+      "topic": "Przerwa",
+      "form": "—"
+    },
+    {
+      "no": "3",
+      "timeFrom": "10:45",
+      "timeTo": "11:30",
+      "duration": 45,
+      "topic": "T3. Framework promptowania: Rola + Kontekst + Zadanie + Format",
+      "form": "warsztat"
+    },
+    {
+      "no": "4",
+      "timeFrom": "11:30",
+      "timeTo": "12:15",
+      "duration": 45,
+      "topic": "T4. Zaawansowane techniki promptowania",
+      "form": "warsztat"
+    },
+    {
+      "no": "—",
+      "timeFrom": "12:15",
+      "timeTo": "12:30",
+      "duration": 15,
+      "topic": "Przerwa",
+      "form": "—"
+    },
+    {
+      "no": "5",
+      "timeFrom": "12:30",
+      "timeTo": "13:15",
+      "duration": 45,
+      "topic": "T5. Praca z dokumentami",
+      "form": "warsztat"
+    },
+    {
+      "no": "6",
+      "timeFrom": "13:15",
+      "timeTo": "14:00",
+      "duration": 45,
+      "topic": "T6. NotebookLM — firmowa baza wiedzy",
+      "form": "warsztat"
+    },
+    {
+      "no": "—",
+      "timeFrom": "14:00",
+      "timeTo": "14:15",
+      "duration": 15,
+      "topic": "Przerwa",
+      "form": "—"
+    },
+    {
+      "no": "7",
+      "timeFrom": "14:15",
+      "timeTo": "15:00",
+      "duration": 45,
+      "topic": "T7. Research i analiza z AI",
+      "form": "warsztat"
+    },
+    {
+      "no": "8",
+      "timeFrom": "15:00",
+      "timeTo": "15:45",
+      "duration": 45,
+      "topic": "T8. Prezentacje, wizualizacje, plan wdrożenia",
+      "form": "warsztat"
+    },
+    {
+      "no": "W",
+      "timeFrom": "15:45",
+      "timeTo": "16:00",
+      "duration": 15,
+      "topic": "Walidacja końcowa",
+      "form": "walidacja"
+    }
   ]
 }

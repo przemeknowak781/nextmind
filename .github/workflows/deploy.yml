@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Codzienne odświeżenie terminów z Bazy Usług Rozwojowych.
+  # Strona jest statyczna, więc dane z BUR wchodzą do niej w czasie builda —
+  # bez tego harmonogramu nowe edycje pojawiłyby się dopiero przy kolejnym pushu.
+  schedule:
+    - cron: '17 4 * * *'
 
 permissions:
   contents: read
@@ -34,6 +39,12 @@ jobs:
         run: npm run build
         env:
           SITE_BASE: /nextmind
+          # Klucz generowany w profilu BUR (sekcja "Dostęp do API").
+          # Dodaj go w Settings → Secrets and variables → Actions jako BUR_API_KEY.
+          # Bez klucza build przechodzi normalnie — synchronizacja jest pomijana,
+          # a w UI działa fallback "Zapytaj o termin".
+          BUR_API_KEY: ${{ secrets.BUR_API_KEY }}
+          BUR_PROVIDER_ID: '199788'
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
