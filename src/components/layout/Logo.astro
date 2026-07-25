@@ -2,49 +2,26 @@
 interface Props {
   class?: string;
   variant?: 'default' | 'inverted';
+  alt?: string;
 }
-const { class: className = 'h-9 w-auto', variant = 'default' } = Astro.props;
+const {
+  class: className = 'h-12 w-auto',
+  variant = 'default',
+  alt = 'Next Mind Academy',
+} = Astro.props;
 
-const ink = variant === 'inverted' ? '#ffffff' : '#0a1530';
-const accent = '#2d5bff';
+// Two pre-rendered variants: the dark-ink original for light surfaces, and a
+// white-ink recolour for dark surfaces (the accent blue is kept in both).
+// Root-relative paths get the base prefix applied by scripts/rewrite-base.mjs.
+const src = variant === 'inverted' ? '/logo-inverted.png' : '/logo.png';
 ---
 
-<svg class={className} viewBox="0 0 220 36" fill="none" aria-hidden="true">
-  <!-- Monogram tile — solid blue square with white "n" -->
-  <g>
-    <rect x="0" y="0" width="36" height="36" rx="8" fill={accent} />
-    <text
-      x="18"
-      y="25"
-      text-anchor="middle"
-      font-family="'Geist', sans-serif"
-      font-size="20"
-      font-weight="700"
-      fill="#ffffff"
-      letter-spacing="-0.04em"
-    >n</text>
-  </g>
-
-  <!-- Wordmark — bold sans -->
-  <g transform="translate(48, 0)">
-    <text
-      x="0"
-      y="16"
-      font-family="'Geist', sans-serif"
-      font-size="13.5"
-      font-weight="600"
-      fill={ink}
-      letter-spacing="-0.04em"
-    >Next Mind</text>
-    <text
-      x="0"
-      y="31"
-      font-family="'Geist', sans-serif"
-      font-size="13.5"
-      font-weight="400"
-      fill={ink}
-      letter-spacing="-0.03em"
-      opacity="0.65"
-    >Academy</text>
-  </g>
-</svg>
+<img
+  src={src}
+  class={className}
+  width="556"
+  height="264"
+  alt={alt}
+  loading="eager"
+  decoding="async"
+/>
