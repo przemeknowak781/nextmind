@@ -6,22 +6,41 @@ import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 const subPages = [
   { slug: 'bur-jak-zapisac', title: 'BUR — krok po kroku', desc: 'Jak zarejestrować się w Bazie Usług Rozwojowych przez login.gov.pl i co dalej.', counter: '01' },
   { slug: 'kfs-priorytet-3', title: 'KFS Priorytet 3', desc: 'Krajowy Fundusz Szkoleniowy na zasadach z 2026 r. Do 90% dla podmiotów do 9 osób, do 70% dla pozostałych.', counter: '02' },
-  { slug: 'psf-podmiotowy-system-finansowania', title: 'PSF — operatorzy regionalni', desc: 'Lista operatorów per województwo + pułapy dofinansowań w 2026 r.', counter: '03' },
-  { slug: 'fers-akademia-hr', title: 'FERS — Akademia HR', desc: 'Program PARP dla pracowników działów HR i kadr. Często pomijany — niesłusznie.', counter: '04' },
+  { slug: 'psf-podmiotowy-system-finansowania', title: 'PSF — ścieżka regionalna', desc: 'Jak działa dofinansowanie przez operatora regionalnego i gdzie znaleźć właściwego dla swojego województwa.', counter: '03' },
 ];
 
 const compareRows = [
-  { label: 'Kto wnioskuje', kfs: 'Pracodawca (także podmiot bez pracowników) — elektronicznie przez praca.gov.pl do PUP', psf: 'Pracodawca lub pracownik przez operatora regionalnego', fers: 'Przedsiębiorca przez operatora programu' },
-  { label: 'Pułap dofinansowania', kfs: 'do 90% (do 9 osób) / do 70% (10 osób i więcej)', psf: 'zależnie od regionu i wielkości firmy', fers: 'do 80% wartości usługi' },
-  { label: 'Czas na decyzję', kfs: 'wg terminu naboru w PUP', psf: 'wg regulaminu operatora', fers: 'wg regulaminu rundy' },
-  { label: 'Budżet', kfs: 'Z Funduszu Pracy', psf: 'Środki UE per region', fers: 'Środki UE — centralne' },
-  { label: 'Najlepsze dla', kfs: 'Pracodawcy zatrudniającego pracownika', psf: 'Pracownika MŚP, freelancera', fers: 'Działu HR/personalnego' },
+  {
+    label: 'Kto wnioskuje',
+    kfs: 'Pracodawca — także podmiot niezatrudniający pracowników, na kształcenie własne',
+    psf: 'Przedsiębiorca (w części regionów również osoby dorosłe z własnej inicjatywy)',
+  },
+  {
+    label: 'Gdzie',
+    kfs: 'Powiatowy urząd pracy — wyłącznie elektronicznie przez praca.gov.pl',
+    psf: 'Operator wybrany dla danego województwa',
+  },
+  {
+    label: 'Pułap dofinansowania',
+    kfs: 'do 90% (do 9 osób) / do 70% (10 osób i więcej) — wynika z ustawy',
+    psf: 'Ustala operator w regulaminie naboru — różni się między województwami',
+  },
+  {
+    label: 'Źródło środków',
+    kfs: 'Fundusz Pracy',
+    psf: 'EFS+ w ramach regionalnego programu Fundusze Europejskie',
+  },
+  {
+    label: 'Warunek wspólny',
+    kfs: 'Od 2026 r. dostawca szkolenia musi być wpisany do BUR',
+    psf: 'Usługa kupowana przez Bazę Usług Rozwojowych',
+  },
 ];
 ---
 
 <BaseLayout
   title="Szkolenia AI z dofinansowaniem 2026 — KFS, PSF, BUR | Pełen przewodnik"
-  description="Wszystko, co musisz wiedzieć o dofinansowaniu szkoleń AI w 2026 r. KFS Priorytet 3, PSF, FERS, BUR. Kalkulator + krok po kroku."
+  description="Dofinansowanie szkoleń AI w 2026 r.: KFS Priorytet 3, ścieżka regionalna przez operatorów, BUR. Sprawdź, gdzie złożyć wniosek."
 >
   <div class="container-edge pt-8">
     <Breadcrumbs items={[
@@ -53,10 +72,10 @@ const compareRows = [
     </div>
   </Section>
 
-  <!-- KFS vs PSF vs FERS comparison -->
+  <!-- KFS vs regional (PSF) comparison -->
   <Section surface="paper-soft" padding="default" counter="00" eyebrow="Porównanie mechanizmów">
     <h2 class="mt-6 text-3xl md:text-4xl lg:text-[2.75rem] tracking-tight leading-tight max-w-3xl">
-      <span class="display-italic">KFS</span>, <span class="display-italic">PSF</span>, <span class="display-italic">FERS</span> — który dla Ciebie?
+      <span class="display-italic">KFS</span> czy <span class="display-italic">ścieżka regionalna</span> — który dla Ciebie?
     </h2>
 
     <div class="overflow-x-auto rounded-lg border border-[var(--color-rule)] mt-10 bg-[var(--color-card-raised)]">
@@ -65,8 +84,7 @@ const compareRows = [
           <tr class="bg-[var(--color-paper-deep)]">
             <th class="text-left px-4 py-4 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold w-32"></th>
             <th class="text-left px-4 py-4 font-display text-xl tracking-tight">KFS</th>
-            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">PSF</th>
-            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">FERS</th>
+            <th class="text-left px-4 py-4 font-display text-xl tracking-tight">Ścieżka regionalna (PSF)</th>
           </tr>
         </thead>
         <tbody>
@@ -75,7 +93,6 @@ const compareRows = [
               <th class="text-left px-4 py-3 text-xs uppercase tracking-[0.12em] text-[var(--color-ink-4)] font-semibold align-top">{row.label}</th>
               <td class="px-4 py-3 text-sm text-[var(--color-ink-2)]">{row.kfs}</td>
               <td class="px-4 py-3 text-sm text-[var(--color-ink-2)]">{row.psf}</td>
-              <td class="px-4 py-3 text-sm text-[var(--color-ink-2)]">{row.fers}</td>
             </tr>
           ))}
         </tbody>

@@ -3,107 +3,193 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 
-const operators = [
-  { region: 'dolnośląskie', name: 'DARR / DAWG', cap: '80%', notes: 'Standardowy pułap dla MŚP.' },
-  { region: 'małopolskie', name: 'Enterprise Advisors', cap: 'do 90%', notes: 'Jedne z najwyższych pułapów w Polsce.' },
-  { region: 'śląskie', name: 'WUP Katowice + operatorzy', cap: '80%', notes: 'Lista operatorów na stronie WUP.' },
-  { region: 'mazowieckie', name: 'Mazowiecki BFKK', cap: '80%', notes: 'Duża dostępność, ale wysoki popyt — zapis wcześnie.' },
-  { region: 'lubuskie', name: 'WUP Zielona Góra', cap: '80%', notes: 'Mniejszy budżet — szybkie wyczerpanie naborów.' },
-  { region: 'pomorskie', name: 'ARP Gdańsk', cap: '80–90%', notes: 'Premie dla mikroprzedsiębiorstw.' },
-  { region: 'wielkopolskie', name: 'Wielkopolska Agencja Rozwoju', cap: '80%', notes: 'Standardowy pułap.' },
-  { region: 'kujawsko-pomorskie', name: 'TARR Toruń', cap: '80%', notes: 'Standardowy pułap.' },
+// Zbiorcza lista operatorów i partnerów publikowana przez PARP — jedyne źródło,
+// które nadąża za zmianami naborów. Nie powielamy jej treści u siebie, bo
+// operatorzy i pułapy zmieniają się w trakcie roku.
+const PARP_OPERATORS_URL =
+  'https://serwis-uslugirozwojowe.parp.gov.pl/component/site/site/dofinansowania-bur/';
+
+const factors = [
+  { t: 'Województwo i konkretny projekt', d: 'Każdy region wdraża PSF w ramach własnego programu Fundusze Europejskie. To największe źródło różnic.' },
+  { t: 'Wielkość firmy', d: 'Mikro, małe i średnie firmy mają zwykle wyższe pułapy i niższe limity kwotowe niż duże.' },
+  { t: 'Podregion', d: 'W części województw pułap zależy od podregionu — na Mazowszu region warszawski stołeczny ma niższy poziom niż mazowiecki regionalny.' },
+  { t: 'Rodzaj usługi', d: 'Część operatorów premiuje usługi cyfrowe, zielone lub prowadzące do kwalifikacji wpisanej do ZRK.' },
+  { t: 'Kto się szkoli', d: 'Premie bywają przewidziane m.in. dla osób po 50. roku życia, z niepełnosprawnościami lub o niskich kwalifikacjach.' },
+];
+
+const steps = [
+  { t: 'Załóż konto w BUR', d: 'Rejestracja w Bazie Usług Rozwojowych przez login.gov.pl — profil zaufany, e-dowód albo bankowość elektroniczna.' },
+  { t: 'Znajdź operatora dla swojego województwa', d: 'Operator jest przypisany do regionu. Aktualny wykaz publikuje PARP — to jedyna lista, która nadąża za zmianami.' },
+  { t: 'Złóż wniosek u operatora', d: 'Nabory są cykliczne i bywają zamykane po wyczerpaniu alokacji, czasem tego samego dnia. Regulamin, terminy i pułapy określa operator.' },
+  { t: 'Podpisz umowę i odbierz ID wsparcia', d: 'Po pozytywnej decyzji operator zawiera umowę wsparcia i nadaje ID wsparcia.' },
+  { t: 'Zapisz się na usługę w BUR z ID wsparcia', d: 'Bez wpisanego ID zapis jest zwykłym zakupem komercyjnym — bez dofinansowania.' },
+  { t: 'Zrealizuj szkolenie i rozlicz je', d: 'Model rozliczenia zależy od regionu: refundacja po zapłacie, płatność operatora do dostawcy albo system bonowy. Na koniec obowiązkowa ocena usługi w BUR.' },
 ];
 ---
 
 <BaseLayout
-  title="PSF 2026 — Podmiotowy System Finansowania | Operatorzy regionalni"
-  description="Lista operatorów PSF per województwo, średnie poziomy dofinansowań i pułapy cenowe w 2026 r. Najszybsza ścieżka dla pracowników MŚP."
+  title="PSF 2026 — jak znaleźć operatora i złożyć wniosek"
+  description="Podmiotowy System Finansowania w 2026 r.: jak działa, od czego zależy pułap dofinansowania i gdzie znaleźć aktualnego operatora dla swojego województwa."
 >
   <div class="container-edge pt-8">
     <Breadcrumbs items={[
       { name: 'Strona główna', url: '/' },
       { name: 'Dofinansowanie', url: '/dofinansowanie/' },
-      { name: 'PSF — operatorzy regionalni' },
+      { name: 'PSF — ścieżka regionalna' },
     ]} />
   </div>
 
   <Section padding="default">
     <div class="eyebrow">Podmiotowy System Finansowania</div>
     <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight max-w-5xl">
-      PSF — operatorzy <span class="display-italic">regionalni</span>.
+      PSF — ścieżka <span class="display-italic">regionalna</span>.
     </h1>
     <p class="lead mt-7 text-[var(--color-ink-3)] max-w-3xl">
-      Najszybsza ścieżka dla pracownika MŚP lub freelancera. Środki UE rozdzielane przez operatorów regionalnych — różnice w pułapach i tempie obsługi między województwami są realne.
+      PSF to sposób dystrybucji środków EFS+ oparty na podejściu popytowym: to Ty wybierasz usługę
+      w Bazie Usług Rozwojowych, a operator refunduje jej część. Nie ma jednego ogólnopolskiego programu —
+      każde województwo wdraża PSF w ramach własnego programu Fundusze Europejskie, z własnym operatorem,
+      regulaminem i pułapami.
     </p>
   </Section>
 
-  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Operatorzy per województwo">
-    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl mb-10">
-      Wybierz <span class="display-italic">swoje</span>.
-    </h2>
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {operators.map((op) => (
-        <article class="op-card">
-          <div class="flex items-baseline justify-between mb-2">
-            <span class="font-mono text-xs uppercase tracking-[0.14em] text-[var(--color-ink-4)]">{op.region}</span>
-            <span class="font-display italic text-2xl text-[var(--color-accent)]">{op.cap}</span>
-          </div>
-          <h3 class="font-display text-2xl tracking-tight text-[var(--color-ink)]">{op.name}</h3>
-          <p class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">{op.notes}</p>
-        </article>
-      ))}
-    </div>
-    <p class="mt-8 text-[0.78rem] text-[var(--color-ink-4)]">
-      Pełna lista wszystkich 16 województw w naszej prywatnej bazie — napisz, podpowiemy operatora dla Twojego konkretnego przypadku.
-    </p>
-  </Section>
-
-  <Section padding="default" counter="02" eyebrow="Jak działa PSF">
-    <div class="grid lg:grid-cols-12 gap-12">
-      <div class="lg:col-span-5">
-        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">
-          Mechanizm w <span class="display-italic">trzech krokach</span>.
-        </h2>
-      </div>
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Znajdź swojego operatora">
+    <div class="grid lg:grid-cols-12 gap-10 items-start">
       <div class="lg:col-span-7">
-        <ol class="space-y-6">
-          <li class="flex gap-5">
-            <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0">01</span>
-            <div>
-              <h3 class="font-display text-xl tracking-tight">Składasz wniosek u operatora</h3>
-              <p class="mt-1 text-[var(--color-ink-3)]">Operator regionalny w województwie siedziby Twojej firmy. 2–4 tygodnie na decyzję.</p>
-            </div>
-          </li>
-          <li class="flex gap-5">
-            <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0">02</span>
-            <div>
-              <h3 class="font-display text-xl tracking-tight">Otrzymujesz ID wsparcia</h3>
-              <p class="mt-1 text-[var(--color-ink-3)]">ID wpisujesz w BUR przy zapisie na konkretną edycję. Bez ID nie ma dofinansowania.</p>
-            </div>
-          </li>
-          <li class="flex gap-5">
-            <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0">03</span>
-            <div>
-              <h3 class="font-display text-xl tracking-tight">Bierzesz udział i płacisz wkład</h3>
-              <p class="mt-1 text-[var(--color-ink-3)]">Operator wypłaca dofinansowanie bezpośrednio do dostawcy. Ty pokrywasz tylko 10–20% (wkład własny).</p>
-            </div>
-          </li>
-        </ol>
+        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">
+          Operator zależy od <span class="display-italic">województwa</span>.
+        </h2>
+        <p class="mt-5 text-[var(--color-ink-3)] leading-relaxed">
+          Świadomie nie publikujemy tu własnej listy operatorów. Nabory są cykliczne, operatorzy bywają
+          zmieniani w trakcie perspektywy, a przepisana tabela dezaktualizuje się w kilka miesięcy
+          i wprowadza w błąd. PARP prowadzi zbiorczy wykaz operatorów i partnerów dla wszystkich
+          województw — z numerami projektów i okresami ich realizacji.
+        </p>
+        <a href={PARP_OPERATORS_URL} target="_blank" rel="noopener" class="btn btn-primary mt-7">
+          Wykaz operatorów PARP →
+        </a>
       </div>
+      <div class="lg:col-span-5">
+        <div class="callout">
+          <h3 class="callout-t">Zanim złożysz wniosek</h3>
+          <p class="callout-d">
+            Regulamin konkretnego naboru jest źródłem prawdy o pułapie, limitach kwotowych i modelu
+            rozliczenia. Sprawdź go na stronie operatora — te warunki różnią się między województwami
+            i między kolejnymi naborami tego samego operatora.
+          </p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section padding="default" counter="02" eyebrow="Ile wynosi dofinansowanie">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Nie ma jednej <span class="display-italic">stawki</span>.
+    </h2>
+    <p class="mt-5 text-[var(--color-ink-3)] max-w-3xl leading-relaxed">
+      W praktyce dofinansowanie dla firm mieści się najczęściej w przedziale
+      <strong class="text-[var(--color-ink)] font-medium">od około 50% do 80%</strong> kosztu usługi netto.
+      Zdarzają się poziomy wyższe — w projektach adresowanych do osób dorosłych uczących się z własnej
+      inicjatywy spotykane są pułapy sięgające 95%. Wkład własny bywa więc bardzo różny: od kilku
+      do nawet pięćdziesięciu procent. Poniżej to, co realnie przesądza o wysokości.
+    </p>
+
+    <ul class="mt-10 grid md:grid-cols-2 gap-4 max-w-5xl">
+      {factors.map((f) => (
+        <li class="bg-[var(--color-card-raised)] border border-[var(--color-rule)] border-l-4 border-l-[var(--color-accent)] rounded-md p-5">
+          <h3 class="font-display text-xl tracking-tight text-[var(--color-ink)]">{f.t}</h3>
+          <p class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">{f.d}</p>
+        </li>
+      ))}
+    </ul>
+
+    <p class="mt-6 text-sm text-[var(--color-ink-4)] max-w-3xl">
+      Podajemy przedziały, a nie konkretne procenty per województwo, bo te ostatnie zmieniają się
+      wraz z kolejnymi naborami. Wiążący jest wyłącznie regulamin naboru u operatora.
+    </p>
+  </Section>
+
+  <Section surface="paper-soft" padding="default" counter="03" eyebrow="Jak to działa">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Mechanizm krok po <span class="display-italic">kroku</span>.
+    </h2>
+    <ol class="mt-10 space-y-6 max-w-4xl">
+      {steps.map((s, i) => (
+        <li class="flex items-start gap-5">
+          <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0 pt-1">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h3 class="font-display text-xl tracking-tight text-[var(--color-ink)]">{s.t}</h3>
+            <p class="mt-1.5 text-[var(--color-ink-3)] leading-relaxed">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section padding="default" counter="04" eyebrow="Częste nieporozumienie">
+    <div class="max-w-3xl">
+      <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">
+        Duże firmy <span class="display-italic">bywają</span> uprawnione.
+      </h2>
+      <p class="mt-5 text-[var(--color-ink-3)] leading-relaxed">
+        Wbrew rozpowszechnionemu przekonaniu PSF nie zawsze ogranicza się do MŚP. W części województw
+        z dofinansowania mogą korzystać również duże przedsiębiorstwa — zwykle z odrębnym limitem
+        kwotowym. W innych regionach wsparcie jest zarezerwowane wyłącznie dla MŚP. To kolejny powód,
+        by zaczynać od regulaminu swojego operatora, a nie od ogólnych opracowań.
+      </p>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="tight">
+    <div class="max-w-4xl">
+      <div class="eyebrow">Podstawa i źródła</div>
+      <ul class="mt-4 space-y-1.5 text-sm text-[var(--color-ink-2)]">
+        <li>— Wytyczne dotyczące realizacji projektów z udziałem środków EFS+ na lata 2021–2027 (definicja PSF)</li>
+        <li>— Regionalne programy Fundusze Europejskie — wdrażanie PSF w poszczególnych województwach</li>
+      </ul>
+      <ul class="mt-5 space-y-1.5 text-sm">
+        <li>
+          <a class="src" href={PARP_OPERATORS_URL} target="_blank" rel="noopener">
+            PARP — dofinansowania w BUR i wykaz operatorów
+          </a>
+        </li>
+        <li>
+          <a class="src" href="https://uslugirozwojowe.parp.gov.pl" target="_blank" rel="noopener">
+            Baza Usług Rozwojowych
+          </a>
+        </li>
+      </ul>
+      <p class="mt-5 text-xs text-[var(--color-ink-4)]">Stan na 2026 r.</p>
     </div>
   </Section>
 </BaseLayout>
 
 <style>
-  .op-card {
+  .callout {
     background: var(--color-card-raised);
     border: 1px solid var(--color-rule);
     border-radius: 8px;
     padding: 1.5rem;
-    transition: all 0.25s ease;
   }
-  .op-card:hover {
-    border-color: var(--color-ink);
-    transform: translateY(-2px);
+  .callout-t {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .callout-d {
+    margin-top: 0.65rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-ink-3);
+  }
+  .src {
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .src:hover {
+    color: var(--color-ink);
   }
 </style>
