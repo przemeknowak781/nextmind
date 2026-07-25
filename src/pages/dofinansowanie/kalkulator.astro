@@ -224,6 +224,15 @@ const PRICES = [
       </div>`;
   }
 
+  // Preselekcja z hero: /dofinansowanie/kalkulator/?kim=pracodawca
+  const preset = new URLSearchParams(location.search).get('kim');
+  if (preset) {
+    const target = document.querySelector(
+      `input[name="audience"][value="${CSS.escape(preset)}"]`
+    ) as HTMLInputElement | null;
+    if (target) target.checked = true;
+  }
+
   document.addEventListener('change', (e) => {
     const t = e.target as HTMLElement | null;
     if (t?.matches?.('input[name="audience"], input[name="headcount"], #region-select')) render();

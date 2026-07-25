@@ -5,6 +5,7 @@ import Section from '../components/ui/Section.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import CourseCard from '../components/courses/CourseCard.astro';
 import { SITE, TRUST_SIGNALS } from '../lib/site';
+import { AUDIENCES } from '../lib/advisor';
 import { formatDateShort, formatPrice } from '../lib/format';
 
 const courses = (await getCollection('courses')).sort((a, b) => a.data.order - b.data.order);
@@ -85,7 +86,28 @@ const personas = [
                 <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </a>
-            <a href="/dofinansowanie/kalkulator/" class="btn btn-ghost btn-lg">Sprawdź dofinansowanie</a>
+          </div>
+
+          <!-- Selektor grupy — wejście do analizatora ścieżki finansowania -->
+          <div class="picker mt-12 reveal reveal-4">
+            <h2 class="picker-q">Kim jesteś? Sprawdź, gdzie złożyć wniosek.</h2>
+            <div class="picker-grid">
+              {AUDIENCES.map((a) => (
+                <a href={`/dofinansowanie/kalkulator/?kim=${a.value}`} class="picker-card">
+                  <span class="picker-label">{a.label}</span>
+                  <span class="picker-hint">{a.hint}</span>
+                  <span class="picker-go" aria-hidden="true">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                </a>
+              ))}
+            </div>
+            <p class="picker-note">
+              Pułap zależy od tego, kto wnioskuje: <strong>do 90%</strong> dla firm do 9 osób i podmiotów
+              bez pracowników, <strong>do 70%</strong> dla większych. Osoby prywatne mają odrębne ścieżki.
+            </p>
           </div>
         </div>
 
@@ -947,4 +969,68 @@ const personas = [
     border-radius: 50% 0 50% 50%;
     opacity: 0.85;
   }
+
+  /* Selektor grupy klienta w hero — wejscie do analizatora */
+  .picker-q {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    margin-bottom: 1rem;
+  }
+  .picker-grid {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 900px) {
+    .picker-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .picker-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1rem 1.1rem 2.4rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .picker-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 32px -22px rgba(21, 17, 13, 0.28);
+  }
+  .picker-card:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .picker-label {
+    font-weight: 500;
+    color: var(--color-ink);
+    line-height: 1.25;
+  }
+  .picker-hint {
+    font-size: 0.8rem;
+    color: var(--color-ink-4);
+    line-height: 1.4;
+  }
+  .picker-go {
+    position: absolute;
+    left: 1.1rem;
+    bottom: 0.9rem;
+    color: var(--color-accent);
+    transition: transform 0.18s ease;
+  }
+  .picker-card:hover .picker-go { transform: translateX(3px); }
+  .picker-note {
+    margin-top: 0.9rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--color-ink-4);
+    max-width: 46rem;
+  }
+  .picker-note strong { color: var(--color-ink-2); font-weight: 500; }
 </style>
