@@ -85,7 +85,7 @@
     "categoryLabel": "Walidacja i certyfikat",
     "order": 11,
     "question": "Co to jest walidacja efektów uczenia się?",
-    "answer": "Walidacja to weryfikacja, czy uczestnik faktycznie zdobył deklarowane kompetencje. Wymóg BUR (SUZ-1). U nas: test wiedzy + zadanie praktyczne. Walidator (Krzysztof Liszka, Prezes Zarządu Expert-Sales) jest osobą inną niż prowadzący — zasada rozdzielności funkcji."
+    "answer": "Sprawdzamy, czy uczestnik faktycznie osiągnął deklarowane efekty uczenia się: test wiedzy i zadanie praktyczne. Weryfikację prowadzi osoba inna niż trener (Krzysztof Liszka, Prezes Zarządu Expert-Sales). Rozdzielenie tych ról to nasza dobrowolna praktyka jakościowa, wzorowana na zasadzie rozdzielności kształcenia i walidacji ze Zintegrowanego Systemu Kwalifikacji — szkolenie prowadzi do nabycia kompetencji, a nie kwalifikacji w rozumieniu ustawy o ZSK."
   },
   {
     "id": "faq-12",
@@ -93,7 +93,7 @@
     "categoryLabel": "Walidacja i certyfikat",
     "order": 12,
     "question": "Co, jeśli nie zaliczę testu?",
-    "answer": "Otrzymujesz dodatkowe 7 dni na poprawę testu online. Jeśli mimo wszystko nie zaliczysz — dostajesz zaświadczenie o uczestnictwie zamiast certyfikatu z walidacją. W praktyce 98% uczestników zalicza za pierwszym razem."
+    "answer": "Otrzymujesz dodatkowe 7 dni na poprawę testu online. Jeśli mimo to nie osiągniesz wszystkich efektów uczenia się, wydajemy zaświadczenie o uczestnictwie w szkoleniu zamiast zaświadczenia z potwierdzeniem efektów."
   },
   {
     "id": "faq-13",
@@ -108,8 +108,8 @@
     "category": "walidacja",
     "categoryLabel": "Walidacja i certyfikat",
     "order": 14,
-    "question": "Czy certyfikat jest zgodny z DigComp?",
-    "answer": "Tak. Każdy efekt uczenia się jest mapowany na konkretny obszar i poziom DigComp 2.2 (np. obszar 5.3, poziom 6). Mapowanie znajduje się na certyfikacie i w karcie usługi BUR."
+    "question": "Czy zaświadczenie jest zgodne z DigComp?",
+    "answer": "DigComp nie przewiduje procedury zgodności ani certyfikacji — to europejska rama odniesienia, celowo niepowiązana z systemami kwalifikacji. Nie istnieje więc „certyfikat DigComp\" i nikt go nie nadaje. Odnosimy natomiast każdy efekt uczenia się do konkretnej kompetencji i poziomu biegłości DigComp 2.2, żeby ułatwić Ci porównanie zakresu szkolenia. To nasze autorskie opracowanie, nie ocena zewnętrzna."
   },
   {
     "id": "faq-15",

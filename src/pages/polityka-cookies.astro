@@ -25,6 +25,14 @@ import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
           Mówiąc krótko: nie używamy cookies śledzących. Plausible, którego stosujemy do analityki, nie zostawia cookies ani identyfikatorów PII.
         </p>
 
+        <h2>Podstawa prawna</h2>
+        <p>
+          Przechowywanie informacji w Twoim urządzeniu i dostęp do informacji już w nim przechowywanych
+          regulują <strong>art. 399 ustawy z dnia 12 lipca 2024 r. — Prawo komunikacji elektronicznej</strong>
+          (Dz.U. 2024 poz. 1221), która od 10 listopada 2024 r. zastąpiła Prawo telekomunikacyjne, oraz
+          rozporządzenie <strong>RODO</strong> w zakresie przetwarzania danych osobowych.
+        </p>
+
         <h2>1. Czym są cookies</h2>
         <p>
           Cookies (ciasteczka) to niewielkie pliki tekstowe zapisywane przez przeglądarkę na Twoim urządzeniu.
@@ -36,7 +44,7 @@ import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
         <h3>Niezbędne</h3>
         <ul>
           <li>
-            <strong>nma-cookie-consent</strong> — zapisywany w localStorage (nie cookie HTTP) po wyrażeniu zgody.
+            <strong>nma-cookie-consent</strong> — zapamiętuje Twój wybór w pamięci lokalnej przeglądarki. Przepisy traktują pamięć lokalną tak samo jak ciasteczka, ale ten wpis jest niezbędny do realizacji Twojego żądania (zapamiętania decyzji), więc nie wymaga odrębnej zgody.
             Cel: zapamiętanie Twojej decyzji o zgodzie. Czas: do czasu wyczyszczenia danych przeglądarki.
           </li>
         </ul>
@@ -45,7 +53,7 @@ import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
         <p>
           <strong>Plausible Analytics</strong> — narzędzie analityki webowej, które stosujemy.
           <strong>Plausible nie stosuje cookies</strong>. Statystyki anonimowe, brak danych osobowych, brak fingerprintingu.
-          Plausible jest zgodne z RODO bez konieczności zgody (zgodnie z opinią CNIL i&nbsp;PUODO).
+          Mimo to wczytujemy je dopiero po Twojej zgodzie — dopóki jej nie wyrazisz, skrypt analityki nie jest pobierany.
         </p>
 
         <h3>Marketingowe</h3>
@@ -63,7 +71,7 @@ import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
           <li><strong>Tylko niezbędne</strong> — bez analityki.</li>
         </ul>
         <p>
-          Decyzję możesz zmienić w&nbsp;dowolnym momencie — wyczyść localStorage przeglądarki dla domeny <code>nextmindacademy.pl</code>.
+          Decyzję możesz zmienić w&nbsp;dowolnym momencie — <a href="#" data-cookie-reset class="ink-link">kliknij tutaj, aby ponownie wybrać ustawienia prywatności</a>.
         </p>
 
         <h2>4. Ustawienia w przeglądarce</h2>

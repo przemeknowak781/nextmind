@@ -27,7 +27,8 @@
             O ciasteczkach.
           </h2>
           <p id="cookie-desc" class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">
-            Używamy Plausible — analityki bez cookies i bez śledzenia. Wybierz, czy chcesz dodatkowe analityki.
+            Do statystyk odwiedzin możemy użyć Plausible — narzędzia, które nie zapisuje ciasteczek,
+            nie tworzy profili i nie śledzi Cię między stronami. Wczytamy je tylko za Twoją zgodą.
             Szczegóły w <a href="/polityka-cookies/" class="ink-link">polityce cookies</a>.
           </p>
           <div class="mt-4 flex flex-wrap gap-2">
@@ -45,20 +46,47 @@
 </div>
 
 <script>
+  // Zgoda steruje faktycznym wczytaniem analityki. Wcześniej oba przyciski
+  // zapisywały tylko wartość w localStorage, której nic nie odczytywało,
+  // a skrypt Plausible i tak ładował się na każdej podstronie.
   const KEY = 'nma-cookie-consent';
+  const PLAUSIBLE_SRC = 'https://plausible.io/js/script.js';
+  const PLAUSIBLE_DOMAIN = 'nextmindacademy.pl';
+
+  function loadAnalytics() {
+    if (document.querySelector(`script[src="${PLAUSIBLE_SRC}"]`)) return;
+    const s = document.createElement('script');
+    s.defer = true;
+    s.src = PLAUSIBLE_SRC;
+    s.setAttribute('data-domain', PLAUSIBLE_DOMAIN);
+    document.head.appendChild(s);
+  }
+
   const banner = document.getElementById('cookie-banner');
+  const stored = localStorage.getItem(KEY);
+
+  if (stored === 'all') loadAnalytics();
+
   if (banner) {
-    const stored = localStorage.getItem(KEY);
-    if (!stored) {
-      requestAnimationFrame(() => banner.removeAttribute('hidden'));
-    }
-    const acceptAll = banner.querySelector('[data-cookie-accept]');
-    const essential = banner.querySelector('[data-cookie-essential]');
+    if (!stored) requestAnimationFrame(() => banner.removeAttribute('hidden'));
+
     const close = (mode: string) => {
       localStorage.setItem(KEY, mode);
       banner.setAttribute('hidden', '');
+      if (mode === 'all') loadAnalytics();
     };
-    acceptAll?.addEventListener('click', () => close('all'));
-    essential?.addEventListener('click', () => close('essential'));
+
+    banner.querySelector('[data-cookie-accept]')?.addEventListener('click', () => close('all'));
+    banner.querySelector('[data-cookie-essential]')?.addEventListener('click', () => close('essential'));
   }
+
+  // Wycofanie zgody musi być równie łatwe jak jej udzielenie (art. 7 ust. 3 RODO).
+  // Link z polityki cookies: <a href="#" data-cookie-reset>
+  document.addEventListener('click', (e) => {
+    const t = (e.target as HTMLElement | null)?.closest?.('[data-cookie-reset]');
+    if (!t) return;
+    e.preventDefault();
+    localStorage.removeItem(KEY);
+    location.reload();
+  });
 </script>

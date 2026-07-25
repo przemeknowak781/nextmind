@@ -1,4 +1,5 @@
 ---
+import { getNearestEdition, formatEditionNumeric } from '../../lib/editions';
 import { getCollection, render, getEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/ui/Section.astro';
@@ -29,6 +30,8 @@ const schema = articleSchema({
   publishDate: a.publishDate.toISOString(),
   authorName: trainer?.data.name ?? 'Next Mind Academy',
 });
+
+const nearestEdition = await getNearestEdition();
 ---
 
 <BaseLayout
@@ -102,7 +105,7 @@ const schema = articleSchema({
         Albo od razu — <span class="display-italic text-[var(--color-marker)]">do praktyki</span>.
       </h2>
       <p class="mt-5 text-lg text-white/70 max-w-xl">
-        Najbliższa edycja Basic — 10.06.2026. Online live, kameralna grupa.
+        {nearestEdition ? `Najbliższa edycja — ${formatEditionNumeric(new Date(nearestEdition.data.date))}. Online live, kameralna grupa.` : 'Terminy kolejnych edycji ustalamy — napisz, a zarezerwujemy miejsce.'}
       </p>
       <div class="mt-8 flex flex-wrap gap-3">
         <a href="/szkolenia/" class="btn btn-accent btn-lg">Zobacz szkolenia</a>

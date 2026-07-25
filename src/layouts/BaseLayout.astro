@@ -101,12 +101,12 @@ const baseSchemas = [ORGANIZATION_SCHEMA, WEBSITE_SCHEMA, ...schemas];
     <!-- Sitemap -->
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <!-- Plausible analytics (privacy-first, opt-in via cookie banner) -->
-    <script
-      is:inline
-      defer
-      data-domain="nextmindacademy.pl"
-      src="https://plausible.io/js/script.js"></script>
+    <!--
+      Analityka NIE jest ładowana tutaj. Skrypt Plausible dokłada dopiero
+      CookieBanner.astro i wyłącznie po zgodzie użytkownika. Wcześniej skrypt
+      wisiał tu bezwarunkowo, mimo że banner deklarował wybór — a przycisk
+      "Tylko niezbędne" niczego nie zmieniał.
+    -->
 
     <slot name="head" />
   </head>

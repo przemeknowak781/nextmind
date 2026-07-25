@@ -1,12 +1,18 @@
 ---
 import { NAV } from '../../lib/site';
 import Logo from './Logo.astro';
+import { getNearestEdition, formatEditionLong, formatEditionNumeric } from '../../lib/editions';
 
 interface Props {
   hideBorder?: boolean;
 }
 const { hideBorder = false } = Astro.props;
 const path = Astro.url.pathname;
+
+// Pasek ogłoszeniowy czyta z danych — wcześniej data i liczba miejsc były
+// zaszyte na sztywno i po terminie reklamowały przeszłą edycję.
+const nearest = await getNearestEdition();
+const nearestDate = nearest ? new Date(nearest.data.date) : null;
 
 function isActive(href: string) {
   if (href === '/') return path === '/';
@@ -19,8 +25,21 @@ function isActive(href: string) {
   <div class="container-edge flex items-center justify-between gap-4 py-2 text-[0.8125rem]">
     <div class="flex items-center gap-3 opacity-90">
       <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-accent-soft)] animate-pulse"></span>
-      <span class="hidden sm:inline">Najbliższa edycja Basic — środa, <strong class="font-medium">10 czerwca 2026</strong>. Zostały 4 z 8 miejsc.</span>
-      <span class="sm:hidden">Najbliższa edycja: 10.06.2026 — 4 miejsca</span>
+      {nearest && nearestDate ? (
+        <>
+          <span class="hidden sm:inline">
+            Najbliższa edycja — <strong class="font-medium">{formatEditionLong(nearestDate)}</strong>.
+            {nearest.data.seatsAvailable > 0
+              ? ` Wolne miejsca: ${nearest.data.seatsAvailable} z ${nearest.data.seatsTotal}.`
+              : ' Brak wolnych miejsc.'}
+          </span>
+          <span class="sm:hidden">
+            Najbliższa edycja: {formatEditionNumeric(nearestDate)}
+          </span>
+        </>
+      ) : (
+        <span>Terminy kolejnych edycji ustalamy — napisz, a zarezerwujemy miejsce.</span>
+      )}
     </div>
     <a href="/terminy/" class="text-[var(--color-paper)] underline-offset-4 hover:underline whitespace-nowrap">
       Zobacz kalendarz →
