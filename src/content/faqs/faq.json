@@ -1,42 +1,162 @@
 [
-  { "id": "faq-1", "category": "szkolenia", "categoryLabel": "Szkolenia", "order": 1, "question": "Czy szkolenie jest dla mnie, jeśli nie znam ChatGPT?",
-    "answer": "Tak — szkolenie Basic 1-day jest zaprojektowane dla osób bez doświadczenia z AI. Zaczynamy od podstaw, przechodzimy przez bezpieczne wdrożenie krok po kroku. Jeśli używałeś już ChatGPT przez 3+ miesięcy, lepszy będzie Level 2." },
-  { "id": "faq-2", "category": "szkolenia", "categoryLabel": "Szkolenia", "order": 2, "question": "Czy potrzebuję płatnego konta ChatGPT, żeby uczestniczyć?",
-    "answer": "Nie — wystarczą darmowe konta OpenAI i Google. Pokazujemy też różnice między wersjami darmowymi a Plus, żebyś sam zdecydował, czy warto. Dla Level 2 Plus jest preferowany, ale można pracować bez niego." },
-  { "id": "faq-3", "category": "szkolenia", "categoryLabel": "Szkolenia", "order": 3, "question": "Czy szkolenie jest nagrywane?",
-    "answer": "Tak. Otrzymujesz dostęp do nagrania na 30 dni po szkoleniu, żebyś mógł wrócić do każdej części i powtórzyć ćwiczenia we własnym tempie." },
-  { "id": "faq-4", "category": "szkolenia", "categoryLabel": "Szkolenia", "order": 4, "question": "Co dostaję po szkoleniu?",
-    "answer": "Imienny certyfikat ukończenia (po pozytywnej walidacji), prezentację PDF, biblioteka 20+ szablonów promptów, checklisty RODO, plan wdrożenia 30/60/90 dni, nagranie szkolenia oraz dostęp do zamkniętej grupy absolwentów." },
-  { "id": "faq-5", "category": "szkolenia", "categoryLabel": "Szkolenia", "order": 5, "question": "Czy mogę zorganizować szkolenie zamknięte dla mojej firmy?",
-    "answer": "Tak — przygotowujemy dedykowane edycje zamknięte dla zespołów od 6 do 24 osób. Program dostosowujemy do branży. Skontaktuj się przez stronę dla firm — odpowiadamy w 24h." },
-  { "id": "faq-6", "category": "dofinansowanie", "categoryLabel": "Dofinansowanie", "order": 6, "question": "Kto może dostać dofinansowanie z KFS?",
-    "answer": "Pracodawca, który zatrudnia minimum 1 pracownika (umowa o pracę), w tym mikro/małe/średnie/duże firmy. Wniosek składa się w powiatowym urzędzie pracy właściwym dla siedziby firmy. W 2026 r. priorytet 3 obejmuje umiejętności cyfrowe i AI." },
-  { "id": "faq-7", "category": "dofinansowanie", "categoryLabel": "Dofinansowanie", "order": 7, "question": "Ile wynosi dofinansowanie z PSF w moim województwie?",
-    "answer": "Standardowo 80% dla małych firm i pracowników MŚP, do 90% w wybranych priorytetach (np. dla osób 50+, mikroprzedsiębiorców). Dokładne pułapy zależą od operatora regionalnego. Sprawdź w naszym kalkulatorze." },
-  { "id": "faq-8", "category": "dofinansowanie", "categoryLabel": "Dofinansowanie", "order": 8, "question": "Czy jako JDG (jednoosobowa działalność) dostanę dofinansowanie?",
-    "answer": "Tak — JDG jest mikroprzedsiębiorstwem i kwalifikuje się zarówno do KFS, jak i do PSF. W praktyce JDG bez pracowników korzysta najczęściej z PSF — KFS wymaga statusu pracodawcy (zatrudnienia min. 1 osoby)." },
-  { "id": "faq-9", "category": "dofinansowanie", "categoryLabel": "Dofinansowanie", "order": 9, "question": "Jak długo trwa proces wnioskowania?",
-    "answer": "PSF: zwykle 2–4 tygodnie od złożenia wniosku do decyzji. KFS: 4–8 tygodni (zależy od urzędu pracy i terminu naborów). Pomagamy przygotować dokumenty — minimalizujemy ryzyko zwrotu wniosku do uzupełnienia." },
-  { "id": "faq-10", "category": "dofinansowanie", "categoryLabel": "Dofinansowanie", "order": 10, "question": "Co, jeśli moje województwo nie ma już budżetu?",
-    "answer": "Środki PSF są refinansowane co rok (kalendarzowo). Jeśli budżet się skończył — czekasz na nowy nabór lub przechodzisz na KFS przez urząd pracy (osobny budżet). Pisz — podpowiemy najszybszą drogę." },
-  { "id": "faq-11", "category": "walidacja", "categoryLabel": "Walidacja i certyfikat", "order": 11, "question": "Co to jest walidacja efektów uczenia się?",
-    "answer": "Walidacja to weryfikacja, czy uczestnik faktycznie zdobył deklarowane kompetencje. Wymóg BUR (SUZ-1). U nas: test wiedzy + zadanie praktyczne. Walidator (Krzysztof Liszka, Prezes Zarządu Expert-Sales) jest osobą inną niż prowadzący — zasada rozdzielności funkcji." },
-  { "id": "faq-12", "category": "walidacja", "categoryLabel": "Walidacja i certyfikat", "order": 12, "question": "Co, jeśli nie zaliczę testu?",
-    "answer": "Otrzymujesz dodatkowe 7 dni na poprawę testu online. Jeśli mimo wszystko nie zaliczysz — dostajesz zaświadczenie o uczestnictwie zamiast certyfikatu z walidacją. W praktyce 98% uczestników zalicza za pierwszym razem." },
-  { "id": "faq-13", "category": "walidacja", "categoryLabel": "Walidacja i certyfikat", "order": 13, "question": "Czy certyfikat jest uznawany na rynku?",
-    "answer": "Certyfikat zawiera mapowanie efektów uczenia się na DigComp 2.2 — europejską ramę kompetencji cyfrowych. Jest akceptowany przez pracodawców i operatorów PSF jako dowód zdobycia kompetencji w obszarze AI/cyfrowym." },
-  { "id": "faq-14", "category": "walidacja", "categoryLabel": "Walidacja i certyfikat", "order": 14, "question": "Czy certyfikat jest zgodny z DigComp?",
-    "answer": "Tak. Każdy efekt uczenia się jest mapowany na konkretny obszar i poziom DigComp 2.2 (np. obszar 5.3, poziom 6). Mapowanie znajduje się na certyfikacie i w karcie usługi BUR." },
-  { "id": "faq-15", "category": "walidacja", "categoryLabel": "Walidacja i certyfikat", "order": 15, "question": "Czy certyfikat jest po polsku czy po angielsku?",
-    "answer": "Polski jest standardem. Wersję angielską możemy wystawić na żądanie — wystarczy zaznaczyć w formularzu zapisu lub napisać po szkoleniu." },
-  { "id": "faq-16", "category": "techniczne", "categoryLabel": "Techniczne", "order": 16, "question": "Jakie są wymagania techniczne?",
-    "answer": "Komputer (Windows 10+, macOS 12+, Linux), 8 GB RAM, kamera, mikrofon, łącze min. 8 Mbps download, aktualna przeglądarka. Konta Google i OpenAI (darmowe). Pełna lista na stronie kursu." },
-  { "id": "faq-17", "category": "techniczne", "categoryLabel": "Techniczne", "order": 17, "question": "Co jeśli mam wolne łącze?",
-    "answer": "Polecamy kabel Ethernet zamiast Wi-Fi. Jeśli łącze jest słabe — możesz wyłączyć kamerę. Ważne, żeby działał audio i można było uruchomić ChatGPT/Gemini w przeglądarce." },
-  { "id": "faq-18", "category": "techniczne", "categoryLabel": "Techniczne", "order": 18, "question": "Czy potrzebuję kamery?",
-    "answer": "Zalecamy włączoną kamerę — pomaga w grupowej dynamice. Jeśli nie możesz mieć kamery (np. z powodu polityki firmy), uczestniczysz tylko z mikrofonem." },
-  { "id": "faq-19", "category": "techniczne", "categoryLabel": "Techniczne", "order": 19, "question": "Co jeśli wypadnie mi termin?",
-    "answer": "Możesz przepisać się na inny termin bezkosztowo do 7 dni przed szkoleniem. Mniej niż 7 dni — opłata 30%. Mniej niż 24h — pełna opłata, ale dostajesz dostęp do nagrania." },
-  { "id": "faq-20", "category": "techniczne", "categoryLabel": "Techniczne", "order": 20, "question": "Jak zgłosić problem z dostępnością?",
-    "answer": "Email na kontakt@nextmindacademy.pl z opisem problemu. Działamy zgodnie z procedurą Deklaracji dostępności — odpowiadamy w 14 dni. Pełna procedura na stronie /deklaracja-dostepnosci/." }
+  {
+    "id": "faq-1",
+    "category": "szkolenia",
+    "categoryLabel": "Szkolenia",
+    "order": 1,
+    "question": "Czy szkolenie jest dla mnie, jeśli nie znam ChatGPT?",
+    "answer": "Tak — szkolenie Basic 1-day jest zaprojektowane dla osób bez doświadczenia z AI. Zaczynamy od podstaw, przechodzimy przez bezpieczne wdrożenie krok po kroku. Jeśli używałeś już ChatGPT przez 3+ miesięcy, lepszy będzie Level 2."
+  },
+  {
+    "id": "faq-2",
+    "category": "szkolenia",
+    "categoryLabel": "Szkolenia",
+    "order": 2,
+    "question": "Czy potrzebuję płatnego konta ChatGPT, żeby uczestniczyć?",
+    "answer": "Nie — wystarczą darmowe konta OpenAI i Google. Pokazujemy też różnice między wersjami darmowymi a Plus, żebyś sam zdecydował, czy warto. Dla Level 2 Plus jest preferowany, ale można pracować bez niego."
+  },
+  {
+    "id": "faq-3",
+    "category": "szkolenia",
+    "categoryLabel": "Szkolenia",
+    "order": 3,
+    "question": "Czy szkolenie jest nagrywane?",
+    "answer": "Tak. Otrzymujesz dostęp do nagrania na 30 dni po szkoleniu, żebyś mógł wrócić do każdej części i powtórzyć ćwiczenia we własnym tempie."
+  },
+  {
+    "id": "faq-4",
+    "category": "szkolenia",
+    "categoryLabel": "Szkolenia",
+    "order": 4,
+    "question": "Co dostaję po szkoleniu?",
+    "answer": "Imienny certyfikat ukończenia (po pozytywnej walidacji), prezentację PDF, biblioteka 20+ szablonów promptów, checklisty RODO, plan wdrożenia 30/60/90 dni, nagranie szkolenia oraz dostęp do zamkniętej grupy absolwentów."
+  },
+  {
+    "id": "faq-5",
+    "category": "szkolenia",
+    "categoryLabel": "Szkolenia",
+    "order": 5,
+    "question": "Czy mogę zorganizować szkolenie zamknięte dla mojej firmy?",
+    "answer": "Tak — przygotowujemy dedykowane edycje zamknięte dla zespołów od 6 do 24 osób. Program dostosowujemy do branży. Skontaktuj się przez stronę dla firm — odpowiadamy w 24h."
+  },
+  {
+    "id": "faq-6",
+    "category": "dofinansowanie",
+    "categoryLabel": "Dofinansowanie",
+    "order": 6,
+    "question": "Kto może dostać dofinansowanie z KFS?",
+    "answer": "Pracodawca — firma każdej wielkości, a od 2026 r. również podmiot niezatrudniający pracowników (na kształcenie własne). Wniosek składa się wyłącznie elektronicznie przez praca.gov.pl, do powiatowego urzędu pracy właściwego dla siedziby. Dofinansowanie wynosi do 90% kosztów dla podmiotów zatrudniających maksymalnie 9 osób i do 70% dla pozostałych. W 2026 r. Priorytet 3 obejmuje umiejętności cyfrowe, AI i kompetencje zielone."
+  },
+  {
+    "id": "faq-7",
+    "category": "dofinansowanie",
+    "categoryLabel": "Dofinansowanie",
+    "order": 7,
+    "question": "Ile wynosi dofinansowanie z PSF w moim województwie?",
+    "answer": "Standardowo 80% dla małych firm i pracowników MŚP, do 90% w wybranych priorytetach (np. dla osób 50+, mikroprzedsiębiorców). Dokładne pułapy zależą od operatora regionalnego. Sprawdź w naszym kalkulatorze."
+  },
+  {
+    "id": "faq-8",
+    "category": "dofinansowanie",
+    "categoryLabel": "Dofinansowanie",
+    "order": 8,
+    "question": "Czy jako JDG (jednoosobowa działalność) dostanę dofinansowanie?",
+    "answer": "Tak. Od 2026 r. o środki z KFS mogą ubiegać się także podmioty niezatrudniające pracowników — na kształcenie własne — i obejmuje je wyższy pułap, do 90% kosztów. JDG kwalifikuje się więc zarówno do KFS, jak i do dofinansowania ze środków regionalnych rozdzielanych przez operatorów."
+  },
+  {
+    "id": "faq-9",
+    "category": "dofinansowanie",
+    "categoryLabel": "Dofinansowanie",
+    "order": 9,
+    "question": "Jak długo trwa proces wnioskowania?",
+    "answer": "To zależy od instytucji i harmonogramu naboru — nie ma jednego ustawowego terminu. W KFS nabory ogłasza powiatowy urząd pracy i to on wyznacza termin rozpatrzenia wniosków; w ścieżce regionalnej decyduje regulamin operatora. Przed złożeniem wniosku sprawdź terminy w ogłoszeniu o naborze. Pomagamy przygotować dokumenty, żeby ograniczyć ryzyko zwrotu do uzupełnienia."
+  },
+  {
+    "id": "faq-10",
+    "category": "dofinansowanie",
+    "categoryLabel": "Dofinansowanie",
+    "order": 10,
+    "question": "Co, jeśli moje województwo nie ma już budżetu?",
+    "answer": "Środki PSF są refinansowane co rok (kalendarzowo). Jeśli budżet się skończył — czekasz na nowy nabór lub przechodzisz na KFS przez urząd pracy (osobny budżet). Pisz — podpowiemy najszybszą drogę."
+  },
+  {
+    "id": "faq-11",
+    "category": "walidacja",
+    "categoryLabel": "Walidacja i certyfikat",
+    "order": 11,
+    "question": "Co to jest walidacja efektów uczenia się?",
+    "answer": "Walidacja to weryfikacja, czy uczestnik faktycznie zdobył deklarowane kompetencje. Wymóg BUR (SUZ-1). U nas: test wiedzy + zadanie praktyczne. Walidator (Krzysztof Liszka, Prezes Zarządu Expert-Sales) jest osobą inną niż prowadzący — zasada rozdzielności funkcji."
+  },
+  {
+    "id": "faq-12",
+    "category": "walidacja",
+    "categoryLabel": "Walidacja i certyfikat",
+    "order": 12,
+    "question": "Co, jeśli nie zaliczę testu?",
+    "answer": "Otrzymujesz dodatkowe 7 dni na poprawę testu online. Jeśli mimo wszystko nie zaliczysz — dostajesz zaświadczenie o uczestnictwie zamiast certyfikatu z walidacją. W praktyce 98% uczestników zalicza za pierwszym razem."
+  },
+  {
+    "id": "faq-13",
+    "category": "walidacja",
+    "categoryLabel": "Walidacja i certyfikat",
+    "order": 13,
+    "question": "Czy certyfikat jest uznawany na rynku?",
+    "answer": "Certyfikat zawiera mapowanie efektów uczenia się na DigComp 2.2 — europejską ramę kompetencji cyfrowych. Jest akceptowany przez pracodawców i operatorów PSF jako dowód zdobycia kompetencji w obszarze AI/cyfrowym."
+  },
+  {
+    "id": "faq-14",
+    "category": "walidacja",
+    "categoryLabel": "Walidacja i certyfikat",
+    "order": 14,
+    "question": "Czy certyfikat jest zgodny z DigComp?",
+    "answer": "Tak. Każdy efekt uczenia się jest mapowany na konkretny obszar i poziom DigComp 2.2 (np. obszar 5.3, poziom 6). Mapowanie znajduje się na certyfikacie i w karcie usługi BUR."
+  },
+  {
+    "id": "faq-15",
+    "category": "walidacja",
+    "categoryLabel": "Walidacja i certyfikat",
+    "order": 15,
+    "question": "Czy certyfikat jest po polsku czy po angielsku?",
+    "answer": "Polski jest standardem. Wersję angielską możemy wystawić na żądanie — wystarczy zaznaczyć w formularzu zapisu lub napisać po szkoleniu."
+  },
+  {
+    "id": "faq-16",
+    "category": "techniczne",
+    "categoryLabel": "Techniczne",
+    "order": 16,
+    "question": "Jakie są wymagania techniczne?",
+    "answer": "Komputer (Windows 10+, macOS 12+, Linux), 8 GB RAM, kamera, mikrofon, łącze min. 8 Mbps download, aktualna przeglądarka. Konta Google i OpenAI (darmowe). Pełna lista na stronie kursu."
+  },
+  {
+    "id": "faq-17",
+    "category": "techniczne",
+    "categoryLabel": "Techniczne",
+    "order": 17,
+    "question": "Co jeśli mam wolne łącze?",
+    "answer": "Polecamy kabel Ethernet zamiast Wi-Fi. Jeśli łącze jest słabe — możesz wyłączyć kamerę. Ważne, żeby działał audio i można było uruchomić ChatGPT/Gemini w przeglądarce."
+  },
+  {
+    "id": "faq-18",
+    "category": "techniczne",
+    "categoryLabel": "Techniczne",
+    "order": 18,
+    "question": "Czy potrzebuję kamery?",
+    "answer": "Zalecamy włączoną kamerę — pomaga w grupowej dynamice. Jeśli nie możesz mieć kamery (np. z powodu polityki firmy), uczestniczysz tylko z mikrofonem."
+  },
+  {
+    "id": "faq-19",
+    "category": "techniczne",
+    "categoryLabel": "Techniczne",
+    "order": 19,
+    "question": "Co jeśli wypadnie mi termin?",
+    "answer": "Możesz przepisać się na inny termin bezkosztowo do 7 dni przed szkoleniem. Mniej niż 7 dni — opłata 30%. Mniej niż 24h — pełna opłata, ale dostajesz dostęp do nagrania."
+  },
+  {
+    "id": "faq-20",
+    "category": "techniczne",
+    "categoryLabel": "Techniczne",
+    "order": 20,
+    "question": "Jak zgłosić problem z dostępnością?",
+    "answer": "Email na kontakt@nextmindacademy.pl z opisem problemu. Działamy zgodnie z procedurą Deklaracji dostępności — odpowiadamy w 14 dni. Pełna procedura na stronie /deklaracja-dostepnosci/."
+  }
 ]

@@ -4,17 +4,104 @@ import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 import { formatPrice } from '../../lib/format';
 
-const tableRows = [
-  { status: 'Mikroprzedsiębiorca (do 9 osób)', cap: '100% kosztów', net: 0, label: 'Mikro' },
-  { status: 'Mała firma (10–49 osób)', cap: '80% kosztów', net: 298, label: 'Małe MŚP' },
-  { status: 'Średnia firma (50–249 osób)', cap: '80% kosztów', net: 298, label: 'Średnie MŚP' },
-  { status: 'Duża firma (250+ osób)', cap: '80% kosztów', net: 298, label: 'Duże' },
+// Cena referencyjna szkolenia Basic — podstawa wyliczeń w tabeli.
+const BASE_PRICE = 1490;
+
+// Pułapy z ustawy z 20 marca 2025 r. o rynku pracy i służbach zatrudnienia,
+// obowiązujące dla KFS od 1 stycznia 2026 r.
+const rates = [
+  {
+    status: 'Podmiot niezatrudniający pracowników lub zatrudniający do 9 osób',
+    hint: 'W przeliczeniu na pełny wymiar czasu pracy, na dzień złożenia wniosku',
+    pct: 90,
+    limit: '4-krotność przeciętnego wynagrodzenia',
+  },
+  {
+    status: 'Pracodawca zatrudniający 10–49 osób',
+    hint: 'Mała firma',
+    pct: 70,
+    limit: '8-krotność przeciętnego wynagrodzenia',
+  },
+  {
+    status: 'Pracodawca zatrudniający 50–249 osób',
+    hint: 'Średnia firma',
+    pct: 70,
+    limit: '12-krotność przeciętnego wynagrodzenia',
+  },
+  {
+    status: 'Pracodawca zatrudniający 250 osób i więcej',
+    hint: 'Duża firma',
+    pct: 70,
+    limit: '14-krotność przeciętnego wynagrodzenia',
+  },
+];
+
+const priorities = [
+  {
+    no: 1,
+    text: 'Poprawa zarządzania i komunikacji w firmie w oparciu o zasady przeciwdziałania dyskryminacji i mobbingowi, rozwój dialogu społecznego, partycypacji pracowniczej oraz wsparcie integracji w miejscu pracy.',
+  },
+  {
+    no: 2,
+    text: 'Wsparcie rozwoju umiejętności i kwalifikacji w zawodach określonych jako deficytowe na danym terenie, tj. w powiecie lub w województwie.',
+  },
+  {
+    no: 3,
+    text: 'Wsparcie kształcenia ustawicznego w związku z zastosowaniem w firmach nowych procesów, technologii i narzędzi pracy, ze szczególnym uwzględnieniem umiejętności cyfrowych, AI oraz tzw. umiejętności zielonych, zwłaszcza gdy powyższe czynniki stanowią zagrożenie utratą pracy.',
+    highlight: true,
+  },
+  {
+    no: 4,
+    text: 'Wsparcie rozwoju umiejętności i kwalifikacji w sektorze ochrony zdrowia i usług opiekuńczych, a także kompetencji członków lub pracowników spółdzielni socjalnych i osób pracujących w przedsiębiorstwach społecznych.',
+  },
+];
+
+const steps = [
+  {
+    t: 'Sprawdź nabór w swoim PUP',
+    d: 'Nabory ogłasza powiatowy urząd pracy właściwy dla siedziby pracodawcy. Terminy i budżety różnią się między powiatami — nie ma jednego ogólnopolskiego terminu.',
+  },
+  {
+    t: 'Dopasuj szkolenie do priorytetu',
+    d: 'Szkolenie musi mieścić się w co najmniej jednym priorytecie — krajowym, wojewódzkim albo powiatowym. Szkolenia z AI i kompetencji cyfrowych wpisują się w Priorytet 3.',
+  },
+  {
+    t: 'Wybierz dostawcę wpisanego do BUR',
+    d: 'Od 1 stycznia 2026 r. szkolenia finansowane z KFS mogą realizować wyłącznie instytucje wpisane do Bazy Usług Rozwojowych. To warunek formalny, nie zalecenie.',
+  },
+  {
+    t: 'Złóż wniosek elektronicznie przez praca.gov.pl',
+    d: 'Od 2026 r. wnioski przyjmowane są wyłącznie w formie elektronicznej, przez indywidualne konto na portalu praca.gov.pl (formularz PSZ-KFS). Potrzebny jest kwalifikowany podpis elektroniczny albo profil zaufany. Forma papierowa nie jest już przewidziana.',
+  },
+  {
+    t: 'Podpisz umowę i zrealizuj szkolenie',
+    d: 'Po pozytywnej decyzji PUP podpisujesz umowę o finansowanie. Szkolenie realizujesz dopiero po jej zawarciu — koszty poniesione wcześniej nie podlegają refundacji.',
+  },
+];
+
+const changes2026 = [
+  {
+    t: 'Nowa podstawa prawna',
+    d: 'KFS działa na podstawie ustawy z 20 marca 2025 r. o rynku pracy i służbach zatrudnienia, która zastąpiła ustawę o promocji zatrudnienia.',
+  },
+  {
+    t: 'Zmienione pułapy',
+    d: 'Zamiast wcześniejszych 80% i 100% obowiązują 70% i 90%. Wyższy pułap przysługuje podmiotom zatrudniającym maksymalnie 9 osób.',
+  },
+  {
+    t: 'Tylko wniosek elektroniczny',
+    d: 'Wnioski składa się wyłącznie przez praca.gov.pl. Zniknęła ścieżka papierowa i ePUAP.',
+  },
+  {
+    t: 'Obowiązkowy wpis dostawcy do BUR',
+    d: 'Szkolenie finansowane z KFS może przeprowadzić tylko instytucja wpisana do Bazy Usług Rozwojowych.',
+  },
 ];
 ---
 
 <BaseLayout
-  title="KFS Priorytet 3 — szkolenia AI i cyfrowe 2026 | Dofinansowanie do 90%"
-  description="Co to jest KFS Priorytet 3 w 2026 r., dla kogo jest i jak złożyć wniosek o dofinansowanie szkoleń AI do 90%. Przewodnik dla pracodawców."
+  title="KFS Priorytet 3 (2026) — dofinansowanie szkoleń AI i cyfrowych"
+  description="Priorytet 3 KFS w 2026 r.: dokładne brzmienie, pułapy 90% i 70%, limity, wniosek przez praca.gov.pl i obowiązek wpisu dostawcy do BUR. Dane ze źródeł urzędowych."
 >
   <div class="container-edge pt-8">
     <Breadcrumbs items={[
@@ -30,95 +117,236 @@ const tableRows = [
       KFS Priorytet 3 — <span class="display-italic">umiejętności cyfrowe</span> i AI w 2026.
     </h1>
     <p class="lead mt-7 text-[var(--color-ink-3)] max-w-3xl">
-      Co najważniejsze: priorytet 3 jest <strong class="text-[var(--color-ink)] font-medium">dla pracodawców</strong>, którzy zatrudniają minimum jednego pracownika.
-      Mikroprzedsiębiorcy mogą uzyskać do 100% pokrycia kosztów.
+      KFS to środki Funduszu Pracy na kształcenie ustawiczne, o które wnioskuje
+      <strong class="text-[var(--color-ink)] font-medium">pracodawca</strong> — nie pracownik indywidualnie.
+      Od 2026 r. zasady określa ustawa z 20 marca 2025 r. o rynku pracy i służbach zatrudnienia,
+      która zmieniła zarówno pułapy dofinansowania, jak i sposób składania wniosków.
     </p>
   </Section>
 
-  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Pułapy dofinansowania">
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Priorytety Ministra na 2026">
+    <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
+      Cztery priorytety. <span class="display-italic">Trzeci</span> dotyczy AI.
+    </h2>
+    <p class="mt-5 text-[var(--color-ink-3)] max-w-3xl">
+      Wniosek musi wpisywać się w co najmniej jeden priorytet. Poniżej priorytety krajowe ustalone przez
+      Ministra Rodziny, Pracy i Polityki Społecznej. Dodatkowo samorząd województwa może ustalić do trzech
+      priorytetów regionalnych, a powiat — jeden.
+    </p>
+
+    <ol class="mt-10 space-y-3 max-w-4xl">
+      {priorities.map((p) => (
+        <li class={`prio ${p.highlight ? 'prio-on' : ''}`}>
+          <span class="prio-no">{String(p.no).padStart(2, '0')}</span>
+          <div>
+            <p class="prio-text">{p.text}</p>
+            {p.highlight && (
+              <p class="mt-3 text-sm font-medium text-[var(--color-accent-deep)]">
+                To ścieżka dla szkoleń z ChatGPT, Gemini, Claude i kompetencji cyfrowych.
+              </p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section padding="default" counter="02" eyebrow="Pułapy dofinansowania">
     <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
       Ile <span class="display-italic">możesz</span> dostać.
     </h2>
+    <p class="mt-5 text-[var(--color-ink-3)] max-w-3xl">
+      Wysokość dofinansowania zależy wyłącznie od liczby zatrudnionych — nie od priorytetu.
+      Kolumna po prawej pokazuje Twój wkład własny przy szkoleniu za {formatPrice(BASE_PRICE)}.
+    </p>
 
     <div class="overflow-x-auto rounded-lg border border-[var(--color-rule)] mt-10 bg-[var(--color-card-raised)]">
       <table class="w-full">
         <thead>
           <tr class="bg-[var(--color-paper-deep)]">
-            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Status</th>
-            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Pułap KFS</th>
-            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Wkład Twój — szkolenie 1 490 zł</th>
+            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Zatrudnienie</th>
+            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Pułap</th>
+            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Limit roczny na pracodawcę</th>
+            <th class="text-left px-5 py-3 text-xs uppercase tracking-[0.14em] text-[var(--color-ink-3)] font-semibold">Twój wkład</th>
           </tr>
         </thead>
         <tbody>
-          {tableRows.map((row) => (
-            <tr class="border-t border-[var(--color-rule)]">
-              <td class="px-5 py-4 text-[var(--color-ink-2)]">{row.status}</td>
-              <td class="px-5 py-4 font-display italic text-2xl text-[var(--color-accent-deep)]">{row.cap}</td>
-              <td class="px-5 py-4 font-mono tabular-nums text-[var(--color-ink)]">{row.net === 0 ? '0 zł' : formatPrice(row.net)}</td>
+          {rates.map((row) => (
+            <tr class="border-t border-[var(--color-rule)] align-top">
+              <td class="px-5 py-4 text-[var(--color-ink-2)]">
+                {row.status}
+                <span class="block text-xs text-[var(--color-ink-4)] mt-1">{row.hint}</span>
+              </td>
+              <td class="px-5 py-4 font-display italic text-2xl text-[var(--color-accent-deep)] whitespace-nowrap">
+                do {row.pct}%
+              </td>
+              <td class="px-5 py-4 text-sm text-[var(--color-ink-3)]">{row.limit}</td>
+              <td class="px-5 py-4 font-mono tabular-nums text-[var(--color-ink)] whitespace-nowrap">
+                {formatPrice(Math.round(BASE_PRICE * (1 - row.pct / 100)))}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
 
-    <p class="text-[0.78rem] text-[var(--color-ink-4)] mt-4 max-w-3xl">
-      Uwaga: w niektórych priorytetach (m.in. Priorytet 3) urzędy pracy stosują pułapy nawet 90% dla MŚP.
-      Sprawdzaj zawsze indywidualnie u swojego PUP.
+    <div class="mt-6 grid md:grid-cols-2 gap-4 max-w-4xl">
+      <div class="note">
+        <h3 class="note-t">Limit na uczestnika</h3>
+        <p class="note-d">
+          Na jedną osobę wskazaną we wniosku wsparcie nie może przekroczyć
+          <strong>200% przeciętnego wynagrodzenia</strong> w danym roku kalendarzowym.
+          Przy szkoleniach w tej cenie limit nie jest praktyczną barierą.
+        </p>
+      </div>
+      <div class="note">
+        <h3 class="note-t">Limit na pracodawcę</h3>
+        <p class="note-d">
+          Niezależnie od liczby szkolonych osób obowiązuje roczny limit dla całej firmy —
+          od 4- do 14-krotności przeciętnego wynagrodzenia, zależnie od wielkości zatrudnienia.
+        </p>
+      </div>
+    </div>
+
+    <p class="mt-6 text-sm text-[var(--color-ink-3)] max-w-4xl leading-relaxed">
+      Wsparcie z KFS dla przedsiębiorcy stanowi <strong class="text-[var(--color-ink)] font-medium">pomoc de minimis</strong>
+      — trzeba je zmieścić w przysługującym firmie limicie i złożyć wymagane zaświadczenia oraz oświadczenia.
     </p>
   </Section>
 
-  <Section padding="default" counter="02" eyebrow="Jak złożyć wniosek">
+  <Section surface="paper-soft" padding="default" counter="03" eyebrow="Jak złożyć wniosek">
     <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
       Pięć kroków do <span class="display-italic">decyzji</span> PUP.
     </h2>
-    <ol class="mt-10 space-y-4 max-w-4xl">
-      {[
-        'Wybierz szkolenie z BUR — to warunek formalny.',
-        'Pobierz wzór wniosku z PUP (każde miasto ma własny, ale konstrukcja jest taka sama).',
-        'Wypełnij wniosek z konkretnym uzasadnieniem potrzeby szkolenia.',
-        'Załącz dokumenty: kartę usługi BUR, kosztorys, oświadczenie de minimis (jeśli dotyczy).',
-        'Złóż wniosek w PUP osobiście, listownie lub przez ePUAP.',
-      ].map((step, i) => (
-        <li class="flex items-start gap-4">
-          <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none">{String(i + 1).padStart(2, '0')}</span>
-          <span class="text-lg text-[var(--color-ink-2)] leading-relaxed pt-2">{step}</span>
+    <ol class="mt-10 space-y-6 max-w-4xl">
+      {steps.map((step, i) => (
+        <li class="flex items-start gap-5">
+          <span class="font-display italic text-3xl text-[var(--color-accent)] leading-none shrink-0 pt-1">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h3 class="font-display text-xl tracking-tight text-[var(--color-ink)]">{step.t}</h3>
+            <p class="mt-1.5 text-[var(--color-ink-3)] leading-relaxed">{step.d}</p>
+          </div>
         </li>
       ))}
     </ol>
-    <p class="mt-8 text-[var(--color-ink-3)]">
-      Czas oczekiwania na decyzję: <strong class="text-[var(--color-ink)]">2–4 tygodnie</strong>.
-    </p>
   </Section>
 
-  <Section surface="paper-soft" padding="default" counter="03" eyebrow="Najczęstsze błędy">
+  <Section padding="default" counter="04" eyebrow="Co się zmieniło w 2026">
     <h2 class="mt-6 text-3xl md:text-4xl tracking-tight leading-tight max-w-3xl">
-      Czego <span class="display-italic">unikać</span> w wniosku.
+      Cztery zmiany, które <span class="display-italic">zaskakują</span> wnioskodawców.
     </h2>
     <ul class="mt-10 grid md:grid-cols-2 gap-4 max-w-5xl">
-      {[
-        { e: 'Ogólnikowe uzasadnienie', d: '„Pracownik chce się rozwijać" — to za mało. PUP odrzuci.' },
-        { e: 'Brak związku ze stanowiskiem', d: 'Szkolenie SQL dla recepcjonistki — bez uzasadnienia odrzucone.' },
-        { e: 'Zła kategoria pracownika', d: 'Pomyłka w PESEL/wieku — automatyczny zwrot do uzupełnienia.' },
-        { e: 'Brak załączników', d: 'Karta usługi BUR i kosztorys — to nie dodatek. To wymóg.' },
-      ].map((m) => (
-        <li class="bg-[var(--color-card-raised)] border border-[var(--color-rule)] border-l-4 border-l-[var(--color-warn)] rounded-md p-5">
-          <h3 class="font-display text-xl tracking-tight text-[var(--color-ink)]">{m.e}</h3>
-          <p class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">{m.d}</p>
+      {changes2026.map((c) => (
+        <li class="bg-[var(--color-card-raised)] border border-[var(--color-rule)] border-l-4 border-l-[var(--color-accent)] rounded-md p-5">
+          <h3 class="font-display text-xl tracking-tight text-[var(--color-ink)]">{c.t}</h3>
+          <p class="mt-2 text-sm text-[var(--color-ink-3)] leading-relaxed">{c.d}</p>
         </li>
       ))}
     </ul>
   </Section>
 
+  <Section surface="paper-soft" padding="tight">
+    <div class="max-w-4xl">
+      <div class="eyebrow">Podstawa prawna i źródła</div>
+      <ul class="mt-4 space-y-1.5 text-sm text-[var(--color-ink-2)]">
+        <li>— Ustawa z dnia 20 marca 2025 r. o rynku pracy i służbach zatrudnienia</li>
+        <li>— Rozporządzenie Ministra Rodziny, Pracy i Polityki Społecznej z dnia 25 listopada 2025 r. w sprawie Krajowego Funduszu Szkoleniowego</li>
+        <li>— Rozporządzenie Komisji (UE) 2023/2831 — pomoc de minimis</li>
+      </ul>
+      <ul class="mt-5 space-y-1.5 text-sm">
+        <li>
+          <a class="src" href="https://psz.praca.gov.pl/dla-pracodawcow-i-przedsiebiorcow/podnoszenie-kompetencji-i-kwalifikacji-pracownikow-i-kandydatow-do-pracy/krajowy-fundusz-szkoleniowy" target="_blank" rel="noopener">
+            Publiczne Służby Zatrudnienia — Krajowy Fundusz Szkoleniowy
+          </a>
+        </li>
+        <li>
+          <a class="src" href="https://www.praca.gov.pl" target="_blank" rel="noopener">
+            praca.gov.pl — złożenie wniosku (formularz PSZ-KFS)
+          </a>
+        </li>
+        <li>
+          <a class="src" href="https://uslugirozwojowe.parp.gov.pl" target="_blank" rel="noopener">
+            Baza Usług Rozwojowych — wykaz uprawnionych dostawców
+          </a>
+        </li>
+      </ul>
+      <p class="mt-5 text-sm text-[var(--color-ink-3)] leading-relaxed">
+        Terminy naborów, wzory wniosków i priorytety powiatowe ustala powiatowy urząd pracy właściwy
+        dla siedziby pracodawcy — przed złożeniem wniosku potwierdź je u siebie.
+      </p>
+      <p class="mt-4 text-xs text-[var(--color-ink-4)]">Stan prawny: 2026 r.</p>
+    </div>
+  </Section>
+
   <section class="surface-night">
     <div class="container-edge py-20 md:py-28">
       <h2 class="text-4xl md:text-5xl text-[var(--color-paper)] tracking-tight leading-tight max-w-3xl">
-        Najlepszy moment na wniosek?<br />
-        <span class="display-italic text-[var(--color-marker)]">Luty / marzec</span>.
+        Nabory ogłasza <span class="display-italic text-[var(--color-marker)]">Twój PUP</span>.
       </h2>
       <p class="mt-5 text-lg text-white/70 max-w-2xl">
-        Nabory KFS otwierają się zwykle w I i II kwartale. Później budżet się szybko wyczerpuje. Pomagamy klientom uniknąć zwrotu wniosku — wpisujemy treść już na etapie pisania.
+        Terminy różnią się powiat po powiecie, a budżety bywają wyczerpywane w trakcie naboru.
+        Jesteśmy wpisani do BUR, więc nasze szkolenia spełniają wymóg formalny z 2026 r. —
+        pomożemy dobrać priorytet i skompletować dokumenty.
       </p>
       <a href="/kontakt/" class="mt-8 btn btn-accent btn-lg">Pomożemy z wnioskiem</a>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .prio {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+  }
+  .prio-on {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+  .prio-no {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--color-ink-mute);
+  }
+  .prio-on .prio-no {
+    color: var(--color-accent);
+  }
+  .prio-text {
+    color: var(--color-ink-2);
+    line-height: 1.6;
+  }
+  .note {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+  }
+  .note-t {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .note-d {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-ink-3);
+  }
+  .src {
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .src:hover {
+    color: var(--color-ink);
+  }
+</style>

@@ -5,15 +5,15 @@ import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 
 const subPages = [
   { slug: 'bur-jak-zapisac', title: 'BUR — krok po kroku', desc: 'Jak zarejestrować się w Bazie Usług Rozwojowych przez login.gov.pl i co dalej.', counter: '01' },
-  { slug: 'kfs-priorytet-3', title: 'KFS Priorytet 3', desc: 'Krajowy Fundusz Szkoleniowy w 2026 r. — dla pracodawców. Do 90% pokrycia.', counter: '02' },
+  { slug: 'kfs-priorytet-3', title: 'KFS Priorytet 3', desc: 'Krajowy Fundusz Szkoleniowy na zasadach z 2026 r. Do 90% dla podmiotów do 9 osób, do 70% dla pozostałych.', counter: '02' },
   { slug: 'psf-podmiotowy-system-finansowania', title: 'PSF — operatorzy regionalni', desc: 'Lista operatorów per województwo + pułapy dofinansowań w 2026 r.', counter: '03' },
   { slug: 'fers-akademia-hr', title: 'FERS — Akademia HR', desc: 'Program PARP dla pracowników działów HR i kadr. Często pomijany — niesłusznie.', counter: '04' },
 ];
 
 const compareRows = [
-  { label: 'Kto wnioskuje', kfs: 'Pracodawca przez PUP', psf: 'Pracownik / pracodawca przez Operatora regionalnego', fers: 'Pracownik HR przez PARP' },
-  { label: 'Pułap dofinansowania', kfs: '80% (do 100% mikro)', psf: '80–90%', fers: '80%' },
-  { label: 'Czas na decyzję', kfs: '4–8 tygodni', psf: '2–4 tygodnie', fers: '2–4 tygodnie' },
+  { label: 'Kto wnioskuje', kfs: 'Pracodawca (także podmiot bez pracowników) — elektronicznie przez praca.gov.pl do PUP', psf: 'Pracodawca lub pracownik przez operatora regionalnego', fers: 'Przedsiębiorca przez operatora programu' },
+  { label: 'Pułap dofinansowania', kfs: 'do 90% (do 9 osób) / do 70% (10 osób i więcej)', psf: 'zależnie od regionu i wielkości firmy', fers: 'do 80% wartości usługi' },
+  { label: 'Czas na decyzję', kfs: 'wg terminu naboru w PUP', psf: 'wg regulaminu operatora', fers: 'wg regulaminu rundy' },
   { label: 'Budżet', kfs: 'Z Funduszu Pracy', psf: 'Środki UE per region', fers: 'Środki UE — centralne' },
   { label: 'Najlepsze dla', kfs: 'Pracodawcy zatrudniającego pracownika', psf: 'Pracownika MŚP, freelancera', fers: 'Działu HR/personalnego' },
 ];
