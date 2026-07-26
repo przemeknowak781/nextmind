@@ -94,7 +94,12 @@ const PRICES = [
 
         <fieldset class="step">
           <legend class="step-legend"><span class="step-num" id="voiv-num">03</span> Województwo</legend>
-          <select name="region" class="field-select" id="region-select">
+          <select
+            name="region"
+            class="field-select"
+            id="region-select"
+            aria-label="Województwo — siedziba firmy lub miejsce zamieszkania"
+          >
             {REGIONS_SORTED.map((r) => (
               <option value={r.slug}>{r.name}</option>
             ))}

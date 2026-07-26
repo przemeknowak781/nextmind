@@ -9,7 +9,7 @@ export const ORGANIZATION_SCHEMA = {
   alternateName: SITE.shortName,
   legalName: OPERATOR.legalName,
   url: SITE.url,
-  logo: `${SITE.url}/logo.svg`,
+  logo: `${SITE.url}/logo.png`,
   email: SITE.email,
   address: {
     '@type': 'PostalAddress',
@@ -171,7 +171,7 @@ export function articleSchema(opts: {
     publisher: {
       '@type': 'Organization',
       name: SITE.name,
-      logo: { '@type': 'ImageObject', url: `${SITE.url}/logo.svg` },
+      logo: { '@type': 'ImageObject', url: `${SITE.url}/logo.png` },
     },
   };
 }

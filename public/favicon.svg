@@ -1,12 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
-  <rect width="36" height="36" rx="8" fill="#2D5BFF" />
-  <text
-    x="18" y="25"
-    text-anchor="middle"
-    font-family="'Geist', system-ui, sans-serif"
-    font-size="22"
-    font-weight="700"
-    fill="#ffffff"
-    letter-spacing="-1"
-  >n</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" role="img" aria-label="Next Mind Academy">
+  <!--
+    Biret z logo, rysowany ścieżkami. Poprzednia wersja renderowała literę
+    elementem <text> z fontem Geist — gdy font się nie wczytał (a w favikonie
+    zwykle się nie wczytuje), przeglądarka podstawiała inny krój.
+    Kolor akcentu zgodny z logo: #587afc.
+  -->
+  <rect width="36" height="36" rx="8" fill="#587afc" />
+  <!-- Czasza biretu -->
+  <path d="M18 9 L31 14.5 L18 20 L5 14.5 Z" fill="#ffffff" />
+  <!-- Część pod czaszą -->
+  <path d="M11 17.2 L11 22.4 Q18 26.6 25 22.4 L25 17.2 L18 20.2 Z" fill="#ffffff" opacity="0.82" />
+  <!-- Chwost -->
+  <path d="M31 14.5 L31 23" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" />
+  <circle cx="31" cy="24.4" r="1.8" fill="#ffffff" />
 </svg>

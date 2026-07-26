@@ -11,7 +11,7 @@ export const SITE = {
   description:
     'Praktyczne szkolenia z ChatGPT, Gemini, Claude i NotebookLM dla pracowników biurowych spoza IT. Online live, kameralna grupa 4–10 osób, zaświadczenie z mapowaniem na DigComp 2.2. Dofinansowanie z KFS i programów regionalnych.',
   email: 'kontakt@nextmindacademy.pl',
-  ogImage: '/og/default.svg',
+  ogImage: '/og/default.png',
 } as const;
 
 export const OPERATOR = {
