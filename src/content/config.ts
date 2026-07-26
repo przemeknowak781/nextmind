@@ -25,6 +25,8 @@ const courses = defineCollection({
     priceNet: z.number(),
     priceGross: z.number().optional(),
     priceWithKfs: z.number().optional(),
+    /** @deprecated Zakładało stały pułap 80% dla ścieżki regionalnej — taki pułap nie istnieje.
+     *  Poziom wsparcia ustala regulamin naboru u operatora i różni się między województwami. */
     priceWithPsf: z.number().optional(),
     vatExemptInfo: z.string().default('Zwolniony z VAT przy dofinansowaniu ≥70% (art. 43 ust. 1 pkt 29 ustawy o VAT).'),
     trainer: z.string(),

@@ -123,14 +123,28 @@ const personas = [
               {nearestParts ? `${nearestParts.year} · ${nearestParts.weekday}` : 'termin w ustalaniu'}
             </div>
             <div class="rule-dotted my-4"></div>
-            <p class="text-sm text-[var(--color-ink-2)] leading-snug">
-              <span class="display-italic text-[var(--color-ink)]">{nearestCourse?.data.eyebrow.split('•')[0].trim()}</span>
-              <br />Online live, 9:00–16:00.
-            </p>
-            <div class="mt-3 flex items-center gap-2 text-[0.78rem]">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-warn)]"></span>
-              <span class="text-[var(--color-ink-3)]"><strong class="text-[var(--color-ink)] font-medium">{nearestEdition?.data.seatsAvailable}</strong> z {nearestEdition?.data.seatsTotal} miejsc</span>
-            </div>
+            {nearestEdition ? (
+              <>
+                <p class="text-sm text-[var(--color-ink-2)] leading-snug">
+                  <span class="display-italic text-[var(--color-ink)]">
+                    {nearestCourse?.data.eyebrow.split('•')[0].trim()}
+                  </span>
+                  <br />Online live, 9:00–16:00.
+                </p>
+                <div class="mt-3 flex items-center gap-2 text-[0.78rem]">
+                  <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-warn)]"></span>
+                  <span class="text-[var(--color-ink-3)]">
+                    <strong class="text-[var(--color-ink)] font-medium">{nearestEdition.data.seatsAvailable}</strong>
+                    {' '}z {nearestEdition.data.seatsTotal} miejsc
+                  </span>
+                </div>
+              </>
+            ) : (
+              <p class="text-sm text-[var(--color-ink-2)] leading-snug">
+                Ustalamy terminy kolejnych edycji. Napisz, a zarezerwujemy dla Ciebie miejsce
+                i damy znać, gdy tylko otworzymy zapisy.
+              </p>
+            )}
             <a href={nearestCourse ? `/szkolenia/${nearestCourse.data.slug}/` : '/szkolenia/'} class="mt-5 inline-flex items-center gap-1.5 text-sm text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors group">
               <span class="border-b border-[var(--color-accent)] pb-0.5">Zobacz program</span>
               <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 16 16" fill="none">
@@ -229,19 +243,19 @@ const personas = [
             <span class="cost-value cost-strike">{formatPrice(1490)}</span>
           </div>
           <div class="cost-row">
-            <span class="cost-label">Z dofinansowaniem regionalnym</span>
-            <span class="cost-value">{formatPrice(298)}</span>
+            <span class="cost-label">Z KFS — firma od 10 osób (70%)</span>
+            <span class="cost-value">{formatPrice(447)}</span>
           </div>
           <div class="cost-row cost-row-final">
             <span class="cost-label-final">
-              <span class="display-italic text-[var(--color-marker)]">Z KFS Priorytet 3</span> — mikroprzedsiębiorca, 90%
+              <span class="display-italic text-[var(--color-marker)]">Z KFS Priorytet 3</span> — do 9 osób, 90%
             </span>
             <span class="cost-value-final">{formatPrice(149)}</span>
           </div>
 
           <p class="mt-6 text-[0.72rem] text-[var(--color-paper)] opacity-50 leading-relaxed">
-            Disclaimer: dofinansowanie zależy od województwa, statusu firmy i priorytetu. Sprawdź indywidualnie.
-            Stan prawny na 30.04.2026.
+            Pułapy KFS wynikają z ustawy i zależą od liczby zatrudnionych. Wsparcie regionalne rozliczane jest
+            osobno, a jego poziom ustala operator w regulaminie naboru. Stan prawny: 2026 r.
           </p>
         </div>
       </div>

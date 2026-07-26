@@ -60,9 +60,10 @@ export const NAV: {
       href: '/dofinansowanie/',
       children: [
         { label: 'BUR krok po kroku', href: '/dofinansowanie/bur-jak-zapisac/', summary: 'Jak zapisać się przez BUR' },
-        { label: 'KFS Priorytet 3', href: '/dofinansowanie/kfs-priorytet-3/', summary: 'Dofinansowanie do 90%' },
+        { label: 'KFS Priorytet 3', href: '/dofinansowanie/kfs-priorytet-3/', summary: 'Do 90% dla firm do 9 osób, do 70% dla większych' },
         { label: 'Dofinansowanie wg województw', href: '/dofinansowanie/wojewodztwa/', summary: 'Operator i warunki w Twoim regionie' },
-        { label: 'Kalkulator', href: '/dofinansowanie/kalkulator/', summary: 'Sprawdź, ile zapłacisz' },
+        { label: 'Analizator', href: '/dofinansowanie/kalkulator/', summary: 'Sprawdź, gdzie złożyć wniosek' },
+        { label: 'Pomoc z wnioskiem', href: '/pomoc-z-wnioskiem/', summary: 'Przygotujemy dokumenty razem z Tobą' },
       ],
     },
     { label: 'Dla firm', href: '/firmy/' },

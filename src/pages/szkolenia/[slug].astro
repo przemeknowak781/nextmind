@@ -152,12 +152,12 @@ const schemas = [
               <span>Cena katalogowa netto</span>
               <span class="course-price-strike font-mono tabular-nums">{formatPrice(c.priceNet)}</span>
             </div>
-            {c.priceWithPsf && (
-              <div class="course-price-row">
-                <span>Z dofinansowaniem regionalnym</span>
-                <span class="font-mono tabular-nums">{formatPrice(c.priceWithPsf)}</span>
-              </div>
-            )}
+            <div class="course-price-row">
+              <span>Ze wsparciem regionalnym</span>
+              <a href="/dofinansowanie/wojewodztwa/" class="text-[var(--color-accent-deep)] underline underline-offset-2">
+                zależnie od województwa
+              </a>
+            </div>
             {c.priceWithKfs && (
               <div class="course-price-row course-price-final">
                 <span class="display-italic text-[var(--color-ink)] text-lg">Z KFS, firma do 9 osób (90%)</span>
@@ -507,13 +507,14 @@ const schemas = [
             <span class="pricing-value font-mono tabular-nums">{formatPrice(c.priceNet)}</span>
             <span class="pricing-desc">100% z własnej kieszeni</span>
           </div>
-          {c.priceWithPsf && (
-            <div class="pricing-cell">
-              <span class="pricing-label">Z dofinansowaniem regionalnym</span>
-              <span class="pricing-value font-mono tabular-nums text-[var(--color-positive)]">{formatPrice(c.priceWithPsf)}</span>
-              <span class="pricing-desc">Pracownik MŚP, woj. dolnośląskie</span>
-            </div>
-          )}
+          <div class="pricing-cell">
+            <span class="pricing-label">Ze wsparciem regionalnym</span>
+            <span class="pricing-value font-display italic text-[var(--color-ink-2)]">zależy od regionu</span>
+            <span class="pricing-desc">
+              Poziom ustala operator w regulaminie naboru —
+              <a href="/dofinansowanie/wojewodztwa/" class="underline underline-offset-2">sprawdź swoje województwo</a>
+            </span>
+          </div>
           {c.priceWithKfs && (
             <div class="pricing-cell pricing-cell-highlight">
               <span class="pricing-label">Z KFS — firma do 9 osób (90%)</span>
