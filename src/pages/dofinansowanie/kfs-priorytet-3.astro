@@ -12,7 +12,7 @@ const BASE_PRICE = 1490;
 const rates = [
   {
     status: 'Podmiot niezatrudniający pracowników lub zatrudniający do 9 osób',
-    hint: 'W przeliczeniu na pełny wymiar czasu pracy, na dzień złożenia wniosku',
+    hint: 'W przeliczeniu na pełne etaty, na dzień złożenia wniosku (art. 126 ust. 1 i 2)',
     pct: 90,
     limit: '4-krotność przeciętnego wynagrodzenia',
   },
@@ -67,11 +67,11 @@ const steps = [
   },
   {
     t: 'Wybierz dostawcę wpisanego do BUR',
-    d: 'Od 1 stycznia 2026 r. szkolenia finansowane z KFS mogą realizować wyłącznie instytucje wpisane do Bazy Usług Rozwojowych. To warunek formalny, nie zalecenie.',
+    d: 'Od 1 stycznia 2026 r. szkolenie finansowane z KFS może przeprowadzić wyłącznie realizator wpisany do rejestru prowadzonego przez PARP — tego samego, który udostępniany jest publicznie jako Baza Usług Rozwojowych (art. 128 ust. 2). To warunek formalny, nie zalecenie.',
   },
   {
-    t: 'Złóż wniosek elektronicznie przez praca.gov.pl',
-    d: 'Od 2026 r. wnioski przyjmowane są wyłącznie w formie elektronicznej, przez indywidualne konto na portalu praca.gov.pl (formularz PSZ-KFS). Potrzebny jest kwalifikowany podpis elektroniczny albo profil zaufany. Forma papierowa nie jest już przewidziana.',
+    t: 'Złóż wniosek przez indywidualne konto',
+    d: 'Wniosek składa się w postaci elektronicznej, za pośrednictwem indywidualnego konta w systemie urzędów pracy (art. 126 ust. 4). Podpisujesz go podpisem kwalifikowanym, zaufanym albo osobistym z e-dowodu (art. 44 ust. 3). Jeżeli złożenie elektroniczne nie jest możliwe, wniosek można złożyć w urzędzie (art. 44 ust. 2).',
   },
   {
     t: 'Podpisz umowę i zrealizuj szkolenie',
@@ -90,18 +90,18 @@ const changes2026 = [
   },
   {
     t: 'Tylko wniosek elektroniczny',
-    d: 'Wnioski składa się wyłącznie przez praca.gov.pl. Zniknęła ścieżka papierowa i ePUAP.',
+    d: 'Wniosek składa się przez indywidualne konto w systemie urzędów pracy. Papier pozostaje wyłącznie jako ścieżka awaryjna, gdy droga elektroniczna jest niedostępna.',
   },
   {
     t: 'Obowiązkowy wpis dostawcy do BUR',
-    d: 'Szkolenie finansowane z KFS może przeprowadzić tylko instytucja wpisana do Bazy Usług Rozwojowych.',
+    d: 'Szkolenie może przeprowadzić tylko realizator wpisany do rejestru PARP (Baza Usług Rozwojowych). Ten sam wymóg objął też szkolenia dla osób bezrobotnych i poszukujących pracy.',
   },
 ];
 ---
 
 <BaseLayout
   title="KFS Priorytet 3 (2026) — dofinansowanie szkoleń AI i cyfrowych"
-  description="Priorytet 3 KFS w 2026 r.: dokładne brzmienie, pułapy 90% i 70%, limity, wniosek przez praca.gov.pl i obowiązek wpisu dostawcy do BUR. Dane ze źródeł urzędowych."
+  description="Priorytet 3 KFS w 2026 r.: dokładne brzmienie, pułapy 90% i 70%, limity, tryb składania wniosku i obowiązek wpisu realizatora do rejestru PARP. Dane ze źródeł urzędowych."
 >
   <div class="container-edge pt-8">
     <Breadcrumbs items={[
@@ -129,9 +129,9 @@ const changes2026 = [
       Cztery priorytety. <span class="display-italic">Trzeci</span> dotyczy AI.
     </h2>
     <p class="mt-5 text-[var(--color-ink-3)] max-w-3xl">
-      Wniosek musi wpisywać się w co najmniej jeden priorytet. Poniżej priorytety krajowe ustalone przez
-      Ministra Rodziny, Pracy i Polityki Społecznej. Dodatkowo samorząd województwa może ustalić do trzech
-      priorytetów regionalnych, a powiat — jeden.
+      Wniosek musi wpisywać się w co najmniej jeden priorytet. Ustawa określa je jako <strong>równorzędne</strong> —
+      numer to pozycja na liście, a nie ranga. Poniżej priorytety ustalone przez Ministra Rodziny, Pracy
+      i Polityki Społecznej; obok nich samorząd województwa może ustalić do trzech własnych, a powiat — jeden.
     </p>
 
     <ol class="mt-10 space-y-3 max-w-4xl">
@@ -263,7 +263,7 @@ const changes2026 = [
         </li>
         <li>
           <a class="src" href="https://www.praca.gov.pl" target="_blank" rel="noopener">
-            praca.gov.pl — złożenie wniosku (formularz PSZ-KFS)
+            praca.gov.pl — indywidualne konto do złożenia wniosku
           </a>
         </li>
         <li>

@@ -91,3 +91,16 @@ export const TRUST_SIGNALS = [
   { label: 'Polski', detail: 'Trener mówi po polsku' },
   { label: 'Online live', detail: 'Bez nagrań na YouTube' },
 ] as const;
+
+/**
+ * Adres, pod który formularze wysyłają dane (POST, multipart/form-data).
+ *
+ * Serwis jest statyczny i NIE MA własnego backendu — dopóki ta stała jest
+ * pusta, formularze otwierają wiadomość w programie pocztowym użytkownika
+ * zamiast udawać wysyłkę. Wcześniej przechwytywały submit i przekierowywały
+ * na stronę „dziękujemy", nie wysyłając niczego.
+ *
+ * Żeby je uruchomić, wpisz tu adres usługi przyjmującej formularze
+ * (np. Formspree, Web3Forms, własna funkcja) i zweryfikuj odbiór wiadomości.
+ */
+export const FORM_ENDPOINT = '';

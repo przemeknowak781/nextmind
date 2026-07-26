@@ -88,7 +88,7 @@ function pupIndividualPath(primary: boolean): Path {
   return {
     name: 'Bon na kształcenie ustawiczne — wniosek własny',
     where: 'Powiatowy urząd pracy właściwy dla miejsca zamieszkania',
-    coverage: 'do 100% przeciętnego wynagrodzenia',
+    coverage: 'do 100% przeciętnego wynagrodzenia (decyzja uznaniowa)',
     url: PUP_FINDER_URL,
     urlLabel: 'Znajdź swój urząd pracy',
     primary,
@@ -100,27 +100,27 @@ function pupIndividualPath(primary: boolean): Path {
       'Rozpocznij kształcenie w terminie wskazanym w decyzji urzędu.',
     ],
     caveat:
-      'Bon pokrywa koszty do wysokości 100% przeciętnego wynagrodzenia — nadwyżkę dopłacasz sam. Obowiązuje też limit zbiorczy 450% przeciętnego wynagrodzenia na osobę w okresie 3 lat. Urząd może dysponować ograniczonym budżetem.',
+      'Bon nie przysługuje z mocy prawa — starosta MOŻE go przyznać, więc decyzja jest uznaniowa i zależy też od budżetu urzędu. Pokrywa koszty do wysokości przeciętnego wynagrodzenia, nadwyżkę dopłacasz sam. Obowiązuje limit zbiorczy 450% przeciętnego wynagrodzenia na osobę w okresie 3 lat.',
   };
 }
 
 function kfsPath(rate: number): Path {
   return {
     name: 'KFS — Krajowy Fundusz Szkoleniowy',
-    where: 'Powiatowy urząd pracy właściwy dla siedziby — wniosek wyłącznie elektronicznie',
+    where: 'Powiatowy urząd pracy właściwy dla siedziby — wniosek przez indywidualne konto',
     coverage: `do ${Math.round(rate * 100)}% kosztów szkolenia`,
     url: KFS_URL,
     urlLabel: 'praca.gov.pl — złóż wniosek',
     primary: true,
     steps: [
       'Sprawdź termin naboru na stronie swojego powiatowego urzędu pracy.',
-      'Załóż konto na praca.gov.pl — potrzebny profil zaufany albo podpis kwalifikowany.',
-      'Wypełnij formularz PSZ-KFS i uzasadnij, jak szkolenie wiąże się ze stanowiskiem.',
+      'Załóż indywidualne konto w systemie urzędów pracy — do podpisu użyjesz podpisu kwalifikowanego, zaufanego albo osobistego z e-dowodu.',
+      'Wypełnij wniosek i uzasadnij, jak szkolenie wiąże się ze stanowiskiem.',
       'Dołącz dokumenty dotyczące pomocy de minimis.',
       'Podpisz umowę z urzędem — dopiero potem możesz zacząć szkolenie.',
     ],
     caveat:
-      'Warunek wstępny: opłacanie składek na Fundusz Pracy przez co najmniej 6 miesięcy przed złożeniem wniosku (albo ustawowe zwolnienie z nich). Od 2026 r. szkolenie musi realizować instytucja wpisana do BUR, a wsparcie stanowi pomoc de minimis. Po ukończeniu nie można zawiesić ani zakończyć działalności przez 3 miesiące.',
+      'Warunek wstępny: przez co najmniej 6 miesięcy przed złożeniem wniosku opłacałeś składki na Fundusz Pracy albo jesteś z nich zwolniony z mocy prawa. Szkolenie musi zrealizować podmiot wpisany do rejestru PARP, a wsparcie stanowi pomoc de minimis. Pracodawca i osoba prowadząca działalność nie mogą przez 3 miesiące od ukończenia zawiesić ani zakończyć działalności — poza przypadkiem upadłości.',
   };
 }
 
@@ -165,7 +165,7 @@ export function analyze(audience: Audience, regionSlug: string, headcount?: Head
     return {
       headline: 'Wnioskujesz na własne kształcenie',
       summary:
-        'Od 2026 r. o środki z KFS mogą ubiegać się również podmioty niezatrudniające pracowników — na kształcenie własne. Obejmuje Cię wyższy pułap.',
+        'Od 2026 r. o środki z KFS mogą ubiegać się również podmioty niezatrudniające pracowników — na kształcenie własne. Obejmuje Cię wyższy pułap. Liczbę zatrudnionych liczy się w przeliczeniu na pełne etaty.',
       kfsRate: 0.9,
       paths: [kfsPath(0.9), regionalPath(region, false)],
       region,
