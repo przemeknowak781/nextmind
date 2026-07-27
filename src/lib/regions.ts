@@ -175,10 +175,13 @@ export const REGIONS: Region[] = [
   {
     slug: 'mazowieckie',
     name: 'mazowieckie',
-    operator: 'Wojewódzki Urząd Pracy w Warszawie',
-    status: 'w-przygotowaniu',
-    note: 'Wsparcie dla osób dorosłych jest na etapie wyłaniania operatorów — bonu dla mieszkańca nadal nie potwierdziliśmy. Działające nabory adresowane są do pracodawców.',
-    url: 'https://wupwarszawa.praca.gov.pl/',
+    program: 'Działanie 7.4 Edukacja osób dorosłych (Fundusze Europejskie dla Mazowsza 2021–2027)',
+    operator: 'Operatorzy wybrani dla poszczególnych podregionów; wykaz prowadzi Wojewódzki Urząd Pracy w Warszawie',
+    coverage: 'do 100% kosztów przy wsparciu kompleksowym',
+    limit: 'do 14 900 zł na uczestnika',
+    status: 'aktywny',
+    note: 'Mazowsze jest podzielone na dwa regiony z odrębnymi projektami: w Regionie Mazowieckim Regionalnym działa sześciu operatorów (podregiony radomski, płocki, siedlecki, ostrołęcki, żyrardowski, ciechanowski), w Regionie Warszawskim Stołecznym trzech (m.st. Warszawa oraz powiaty grodziski, nowodworski, piaseczyński, pruszkowski i warszawski zachodni). Zgłaszasz się do operatora właściwego dla miejsca zamieszkania — WUP prowadzi wykaz, ale sam nie przyjmuje wniosków od mieszkańców.',
+    url: 'https://wupwarszawa.praca.gov.pl/-/25294201-zdobadz-dofinansowanie-z-bazy-uslug-rozwojowych',
     verified: '2026-07-27',
   },
   {
