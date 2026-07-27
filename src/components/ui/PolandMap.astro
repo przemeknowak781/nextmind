@@ -1,0 +1,140 @@
+---
+// Interaktywna mapa województw.
+//
+// Każde województwo jest zwykłym odnośnikiem do panelu z jego danymi
+// (`#woj-<slug>`), więc wybór działa bez JavaScriptu — panel pokazuje się
+// przez selektor :target. Skrypt na stronie tylko podświetla wybrany region
+// i synchronizuje listę rozwijaną.
+import map from '../../data/poland-map.json';
+import { REGIONS_SORTED, STATUS_LABELS, type Region } from '../../lib/regions';
+
+interface Props {
+  /** Prefiks identyfikatorów paneli, do których kierują odnośniki. */
+  target?: string;
+  class?: string;
+}
+const { target = 'woj', class: className = '' } = Astro.props;
+
+const data = map as unknown as {
+  viewBox: { width: number; height: number };
+  regions: Record<string, { d: string; cx: number; cy: number }>;
+};
+
+/** Dopisujemy kontur do danych regionu; kolejność rysowania bez znaczenia. */
+const shapes = REGIONS_SORTED.map((r: Region) => ({
+  region: r,
+  shape: data.regions[r.slug],
+})).filter((x) => x.shape);
+---
+
+<div class={`plmap ${className}`.trim()}>
+  <svg
+    viewBox={`0 0 ${data.viewBox.width} ${data.viewBox.height}`}
+    class="plmap-svg"
+    role="group"
+    aria-label="Mapa województw — wybierz swoje województwo"
+  >
+    {shapes.map(({ region, shape }) => (
+      <a
+        href={`#${target}-${region.slug}`}
+        class="plmap-a"
+        data-slug={region.slug}
+        aria-label={`${region.name} — ${STATUS_LABELS[region.status].label}`}
+      >
+        <title>{region.name} — {STATUS_LABELS[region.status].label}</title>
+        <path d={shape.d} class={`plmap-voi plmap-${region.status}`} />
+        <text x={shape.cx} y={shape.cy} class="plmap-label">{region.name}</text>
+      </a>
+    ))}
+  </svg>
+
+  <ul class="plmap-legend">
+    <li><span class="plmap-key plmap-aktywny"></span>Nabory prowadzone</li>
+    <li><span class="plmap-key plmap-wstrzymany"></span>Wstrzymany lub w przygotowaniu</li>
+    <li><span class="plmap-key plmap-do-sprawdzenia"></span>Sprawdź u operatora</li>
+  </ul>
+</div>
+
+<style>
+  .plmap { display: flex; flex-direction: column; gap: 1rem; }
+
+  .plmap-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+
+  .plmap-a { cursor: pointer; }
+  .plmap-a:focus { outline: none; }
+
+  .plmap-voi {
+    stroke: var(--color-paper);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    transition: fill 0.15s ease;
+  }
+  /* Kolory statusów — te same trzy tony, co na odznakach przy nazwach. */
+  .plmap-aktywny { fill: var(--color-accent); fill-opacity: 0.78; }
+  .plmap-wstrzymany,
+  .plmap-w-przygotowaniu { fill: var(--color-warn); fill-opacity: 0.4; }
+  .plmap-do-sprawdzenia { fill: var(--color-ink-mute); fill-opacity: 0.3; }
+
+  .plmap-a:hover .plmap-voi,
+  .plmap-a:focus-visible .plmap-voi,
+  .plmap-a[aria-current='true'] .plmap-voi {
+    fill-opacity: 1;
+  }
+  .plmap-a:focus-visible .plmap-voi,
+  .plmap-a[aria-current='true'] .plmap-voi {
+    stroke: var(--color-ink);
+    stroke-width: 2;
+  }
+
+  /* Nazwa pojawia się na najechaniu i przy wyborze — szesnaście podpisów naraz
+     byłoby nieczytelne przy tej wielkości mapy. */
+  .plmap-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+    fill: var(--color-ink);
+    paint-order: stroke;
+    stroke: var(--color-paper);
+    stroke-width: 3.5;
+    stroke-linejoin: round;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  .plmap-a:hover .plmap-label,
+  .plmap-a:focus-visible .plmap-label,
+  .plmap-a[aria-current='true'] .plmap-label {
+    opacity: 1;
+  }
+
+  .plmap-legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    font-size: 0.74rem;
+    color: var(--color-ink-4);
+  }
+  .plmap-legend li { display: flex; align-items: center; gap: 0.4rem; }
+  .plmap-key {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .plmap-key.plmap-aktywny { background: var(--color-accent); opacity: 0.78; }
+  .plmap-key.plmap-wstrzymany { background: var(--color-warn); opacity: 0.5; }
+  .plmap-key.plmap-do-sprawdzenia { background: var(--color-ink-mute); opacity: 0.4; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plmap-voi, .plmap-label { transition: none; }
+  }
+</style>

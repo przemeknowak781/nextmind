@@ -395,6 +395,31 @@
     height: 1px;
   }
 
+  /* Tytuł podstrony.
+     Wcześniej każda podstrona miała własny rozmiar (od 4,25 do 6 rem), przez co
+     nagłówek wypełniał cały pierwszy ekran i spychał treść pod zagięcie.
+     Jedna skala dla wszystkich podstron; strona główna ma własny hero. */
+  .page-h1 {
+    font-size: clamp(1.95rem, 5.6vw, 2.5rem);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  @media (min-width: 1024px) {
+    .page-h1 {
+      font-size: clamp(2.5rem, 3.4vw, 3.25rem);
+      line-height: 1.02;
+    }
+  }
+  /* Wariant dla stron dokumentowych (regulamin, polityki) — tam tytuł jest
+     etykietą dokumentu, a nie obietnicą, więc może być jeszcze spokojniejszy. */
+  .page-h1--doc {
+    font-size: clamp(1.75rem, 5vw, 2.1rem);
+  }
+  @media (min-width: 1024px) {
+    .page-h1--doc { font-size: clamp(2.1rem, 2.8vw, 2.6rem); }
+  }
+
   /* Section header */
   .section-header {
     display: flex;

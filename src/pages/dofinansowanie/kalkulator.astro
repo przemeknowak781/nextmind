@@ -57,7 +57,7 @@ const PRICES = [
   <Section padding="default">
     <div class="max-w-3xl">
       <div class="eyebrow">Analizator</div>
-      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[4.5rem] leading-[0.98] tracking-tight">
+      <h1 class="mt-5 page-h1">
         Gdzie złożyć <span class="display-italic">wniosek</span>?
       </h1>
       <p class="lead mt-6 text-[var(--color-ink-3)]">
@@ -243,13 +243,21 @@ const PRICES = [
       </div>`;
   }
 
-  // Preselekcja z hero: /dofinansowanie/kalkulator/?kim=pracodawca
-  const preset = new URLSearchParams(location.search).get('kim');
+  // Preselekcja z innych stron:
+  //   z hero            → ?kim=pracodawca
+  //   z mapy województw → ?region=slaskie
+  const params = new URLSearchParams(location.search);
+  const preset = params.get('kim');
   if (preset) {
     const target = document.querySelector(
       `input[name="audience"][value="${CSS.escape(preset)}"]`
     ) as HTMLInputElement | null;
     if (target) target.checked = true;
+  }
+  const presetRegion = params.get('region');
+  if (presetRegion) {
+    const sel = document.getElementById('region-select') as HTMLSelectElement | null;
+    if (sel && regions[presetRegion]) sel.value = presetRegion;
   }
 
   document.addEventListener('change', (e) => {
