@@ -3,13 +3,23 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 import { formatPrice } from '../../lib/format';
-import { getCatalog, plainDate, isRecruitmentOpen, seatsRange, BUR_FETCHED_AT } from '../../lib/bur';
+import {
+  getCatalog,
+  plainDate,
+  isRecruitmentOpen,
+  seatsRange,
+  lowestPrice,
+  BUR_FETCHED_AT,
+} from '../../lib/bur';
 
 // Katalog budujemy z naszego profilu w Bazie Usług Rozwojowych, a nie z ręcznie
 // utrzymywanych plików. Dzięki temu tytuły, ceny, liczba miejsc i terminy na
 // stronie są dokładnie tym, na co można się zapisać.
 const catalog = getCatalog();
 const seats = seatsRange();
+const cheapest = lowestPrice();
+const openCount = catalog.filter((o) => o.terms.some(isRecruitmentOpen)).length;
+const termCount = catalog.reduce((n, o) => n + o.terms.length, 0);
 
 const fetchedLabel = BUR_FETCHED_AT
   ? new Date(BUR_FETCHED_AT).toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -24,65 +34,114 @@ function shortDate(iso: string | null) {
     }) ?? ''
   );
 }
+
+function terminy(n: number) {
+  if (n === 1) return 'termin';
+  const m10 = n % 10;
+  const m100 = n % 100;
+  return m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? 'terminy' : 'terminów';
+}
 ---
 
 <BaseLayout
   title="Szkolenia AI i Microsoft 365 — pełny katalog z terminami"
   description="Wszystkie nasze szkolenia dostępne w Bazie Usług Rozwojowych: tematy, ceny, liczba miejsc i najbliższe terminy. Każde można rozliczyć z dofinansowania."
 >
-  <div class="container-edge pt-8">
+  <div class="container-edge pt-5">
     <Breadcrumbs items={[
       { name: 'Strona główna', url: '/' },
       { name: 'Szkolenia' },
     ]} />
   </div>
 
-  <Section padding="default">
-    <div class="max-w-3xl">
-      <div class="eyebrow">Katalog</div>
-      <h1 class="mt-5 page-h1">
-        Nasze <span class="display-italic">szkolenia</span>.
-      </h1>
-      <p class="lead mt-6 text-[var(--color-ink-3)]">
-        {catalog.length} tematów w ofercie, wszystkie wpisane do Bazy Usług Rozwojowych —
-        od jednodniowych warsztatów po programy stugodzinne.
-        {seats && ` Wielkość grup: od ${seats.min} do ${seats.max} osób, zależnie od szkolenia.`}
-      </p>
+  <Section padding="tight" class="hero-sec">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Katalog</div>
+        <h1 class="mt-4 page-h1">
+          Nasze <span class="display-italic">szkolenia</span>.
+        </h1>
+        <p class="hero-sub">
+          {catalog.length} tematów w ofercie, wszystkie wpisane do Bazy Usług Rozwojowych —
+          od jednodniowych warsztatów po programy stugodzinne.
+          {seats && ` Wielkość grup: od ${seats.min} do ${seats.max} osób, zależnie od szkolenia.`}
+        </p>
+        <div class="hero-cta">
+          <a href="/terminy/" class="btn btn-primary">Zobacz kalendarz terminów</a>
+          <a href="/dofinansowanie/kalkulator/" class="btn btn-ghost">Sprawdź dofinansowanie</a>
+        </div>
+      </div>
+
+      <dl class="facts">
+        <div class="fact">
+          <dt>Tematów w katalogu</dt>
+          <dd><span class="fact-big">{catalog.length}</span></dd>
+        </div>
+        <div class="fact">
+          <dt>Z otwartymi zapisami</dt>
+          <dd><span class="fact-big">{openCount}</span> tematów, łącznie {termCount} {terminy(termCount)}</dd>
+        </div>
+        {cheapest !== null && (
+          <div class="fact">
+            <dt>Najniższa cena w katalogu</dt>
+            <dd><span class="fact-big">{formatPrice(cheapest)}</span> netto</dd>
+          </div>
+        )}
+      </dl>
     </div>
   </Section>
 
   <Section surface="paper-soft" padding="default">
-    <div class="cat">
+    <div class="tiles">
       {catalog.map((o) => {
-        const next = o.terms.find((t) => isRecruitmentOpen(t)) ?? o.terms[0];
+        const open = o.terms.find((t) => isRecruitmentOpen(t));
+        const next = open ?? o.terms[0];
         return (
-          <article class="offer">
-            <div class="offer-main">
-              <h2 class="offer-title">
-                <a href={`/szkolenia/${o.slug}/`}>{o.title}</a>
-              </h2>
-              <div class="offer-meta">
-                {o.days > 0 && <span>{o.days === 1 ? '1 dzień' : `${o.days} dni`}</span>}
-                {o.hours && <span>{o.hours} h</span>}
-                {o.seatsMin && o.seatsMax && <span>{o.seatsMin}–{o.seatsMax} osób</span>}
-                <span>{o.terms.length} {o.terms.length === 1 ? 'termin' : 'terminy'}</span>
+          <article class={`tile ${open ? 'tile-open' : ''}`}>
+            <a href={`/szkolenia/${o.slug}/`} class="tile-link" aria-label={o.title}></a>
+
+            <div class="tile-top">
+              <span class="tile-hours">
+                {o.hours ? `${o.hours} h` : o.days === 1 ? '1 dzień' : `${o.days} dni`}
+              </span>
+              <span class={`tile-state ${open ? 'is-open' : ''}`}>
+                {open ? 'Zapisy otwarte' : 'Zapisy zamknięte'}
+              </span>
+            </div>
+
+            <h2 class="tile-title bur-title">{o.title}</h2>
+
+            <ul class="tile-meta">
+              {o.days > 0 && <li>{o.days === 1 ? '1 dzień zajęć' : `${o.days} dni zajęć`}</li>}
+              {o.seatsMin && o.seatsMax && <li>{o.seatsMin}–{o.seatsMax} osób</li>}
+              <li>{o.terms.length} {terminy(o.terms.length)}</li>
+            </ul>
+
+            <div class="tile-foot">
+              <div class="tile-price">
+                {o.priceNet !== null ? (
+                  <>
+                    <span class="tile-price-val">{formatPrice(o.priceNet)}</span>
+                    <span class="tile-price-lbl">netto / osoba</span>
+                  </>
+                ) : (
+                  <span class="tile-price-lbl">cena w karcie usługi</span>
+                )}
               </div>
               {next?.startDate && (
-                <p class="offer-next">
-                  Najbliższy termin: <strong>{shortDate(next.startDate)}</strong>
-                  {!isRecruitmentOpen(next) && ' — rekrutacja zamknięta'}
-                </p>
-              )}
-            </div>
-            <div class="offer-side">
-              {o.priceNet !== null && (
-                <div class="offer-price">
-                  <span class="offer-price-val">{formatPrice(o.priceNet)}</span>
-                  <span class="offer-price-lbl">netto / osoba</span>
+                <div class="tile-next">
+                  <span class="tile-next-lbl">{open ? 'Najbliższy' : 'Ostatni'}</span>
+                  <span class="tile-next-val">{shortDate(next.startDate)}</span>
                 </div>
               )}
-              <a href={`/szkolenia/${o.slug}/`} class="btn btn-secondary btn-sm">Program i terminy</a>
             </div>
+
+            <span class="tile-go" aria-hidden="true">
+              Program i terminy
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
           </article>
         );
       })}
@@ -110,60 +169,218 @@ function shortDate(iso: string | null) {
 </BaseLayout>
 
 <style>
-  .cat { display: grid; gap: 0.65rem; }
-  .offer {
+  .hero-sec { padding-block-start: 1.5rem; }
+  @media (min-width: 768px) { .hero-sec { padding-block-start: 2rem; } }
+  .hero { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3rem; }
+  }
+  .hero-sub {
+    margin-top: 1.1rem;
+    max-width: 34rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
+    color: var(--color-ink-3);
+  }
+  .hero-cta { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  .facts {
     display: grid;
-    gap: 1rem;
     background: var(--color-card-raised);
     border: 1px solid var(--color-rule);
-    border-radius: 8px;
-    padding: 1.35rem 1.5rem;
-    transition: border-color 0.18s ease;
+    border-radius: 10px;
+    overflow: hidden;
   }
-  .offer:hover { border-color: var(--color-rule-strong); }
-  @media (min-width: 860px) {
-    .offer { grid-template-columns: 1fr auto; align-items: center; gap: 2rem; }
-  }
-  .offer-title {
-    font-size: 1.05rem;
-    font-weight: 500;
-    line-height: 1.4;
-    color: var(--color-ink);
-  }
-  .offer-title a { color: inherit; text-decoration: none; }
-  .offer-title a:hover { color: var(--color-accent-deep); }
-  .offer-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem 0.9rem;
-    margin-top: 0.5rem;
-    font-size: 0.78rem;
+  .fact { padding: 0.85rem 1.1rem; }
+  .fact + .fact { border-top: 1px solid var(--color-rule); }
+  .fact dt {
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
     color: var(--color-ink-4);
+    font-weight: 600;
   }
-  .offer-meta span { white-space: nowrap; }
-  .offer-next { margin-top: 0.5rem; font-size: 0.82rem; color: var(--color-ink-3); }
-  .offer-next strong { color: var(--color-ink); font-weight: 500; }
-  .offer-side {
+  .fact dd { margin: 0.25rem 0 0; font-size: 0.9rem; line-height: 1.45; color: var(--color-ink-2); }
+  .fact-big {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-accent-deep);
+    font-feature-settings: 'tnum';
+    margin-right: 0.15rem;
+  }
+
+  /* ---------- Kafelki ---------- */
+  .tiles {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 12px;
+    padding: 1.35rem 1.4rem 1.25rem;
+    overflow: hidden;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  /* Cienki pasek u góry — akcent tylko tam, gdzie faktycznie można się zapisać. */
+  .tile::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--color-rule-strong);
+  }
+  .tile-open::before { background: var(--color-accent); }
+  .tile:hover {
+    border-color: var(--color-rule-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 22px 40px -30px rgba(21, 17, 13, 0.35);
+  }
+  .tile-open:hover { border-color: var(--color-accent); }
+
+  /* Cała kafelka jest klikalna, ale w drzewie dostępności to jeden zwykły
+     odnośnik — reszta treści zostaje tekstem, nie etykietą przycisku. */
+  .tile-link { position: absolute; inset: 0; z-index: 1; }
+  .tile-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -3px;
+    border-radius: 12px;
+  }
+
+  .tile-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .tile-hours {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+    background: var(--color-paper-deep);
+    border-radius: 999px;
+    padding: 0.22rem 0.6rem;
+    white-space: nowrap;
+  }
+  .tile-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.68rem;
+    color: var(--color-ink-4);
+    white-space: nowrap;
+  }
+  .tile-state::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: var(--color-ink-mute);
+  }
+  .tile-state.is-open { color: var(--color-positive); }
+  .tile-state.is-open::before { background: var(--color-positive); }
+
+  .tile-title {
+    margin-top: 0.9rem;
+    font-size: 1rem;
+    /* Tytuły z BUR bywają bardzo długie — przycinamy je wizualnie, pełny
+       tekst zostaje w HTML dla czytników ekranu i wyszukiwarek. */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tile:hover .tile-title { color: var(--color-accent-deep); }
+
+  .tile-meta {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.85rem;
+    font-size: 0.76rem;
+    color: var(--color-ink-4);
+  }
+  .tile-meta li { white-space: nowrap; position: relative; }
+  .tile-meta li + li::before {
+    content: '';
+    position: absolute;
+    left: -0.47rem;
+    top: 0.5rem;
+    width: 2px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--color-rule-strong);
+  }
+
+  .tile-foot {
+    margin-top: auto;
+    padding-top: 1.05rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
     gap: 1rem;
   }
-  @media (min-width: 860px) {
-    .offer-side { flex-direction: column; align-items: flex-end; gap: 0.6rem; }
-  }
-  .offer-price { text-align: right; white-space: nowrap; }
-  .offer-price-val {
+  .tile-price-val {
     display: block;
     font-family: var(--font-display);
     font-size: 1.35rem;
+    line-height: 1;
     color: var(--color-ink);
   }
-  .offer-price-lbl {
+  .tile-price-lbl {
     display: block;
-    font-size: 0.64rem;
+    margin-top: 0.25rem;
+    font-size: 0.62rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     color: var(--color-ink-4);
+  }
+  .tile-next { text-align: right; white-space: nowrap; }
+  .tile-next-lbl {
+    display: block;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--color-ink-4);
+  }
+  .tile-next-val {
+    display: block;
+    margin-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+    color: var(--color-ink);
+  }
+
+  .tile-go {
+    margin-top: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--color-rule);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-accent-deep);
+  }
+  .tile-go svg { transition: transform 0.18s ease; }
+  .tile:hover .tile-go svg { transform: translateX(3px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tile, .tile-go svg { transition: none; }
+    .tile:hover { transform: none; }
   }
 </style>

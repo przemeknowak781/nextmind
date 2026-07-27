@@ -273,10 +273,10 @@ const personas = [
         return (
           <a href={`/szkolenia/${o.slug}/`} class="hp-card">
             <span class="hp-card-meta">
-              {o.days === 1 ? '1 dzień' : `${o.days} dni`}
+              {o.hours ? `${o.hours} h` : o.days === 1 ? '1 dzień' : `${o.days} dni`}
               {o.seatsMin && o.seatsMax && ` · ${o.seatsMin}–${o.seatsMax} osób`}
             </span>
-            <h3 class="hp-card-title">{o.title}</h3>
+            <h3 class="hp-card-title bur-title">{o.title}</h3>
             <div class="hp-card-foot">
               {o.priceNet !== null && <span class="hp-card-price">{formatPrice(o.priceNet)} netto</span>}
               {next?.startDate && (
@@ -754,6 +754,66 @@ const personas = [
 
   /* Pasek zaufania — jeden ciąg, oddzielony kropkami. Sześć kafli
      w siatce zabierało ćwierć ekranu, nie wnosząc nic ponad tę treść. */
+  /* Karty polecanych szkoleń — po przejściu na katalog z BUR zostały bez
+     żadnych reguł, więc renderowały się jako goły odnośnik z nagłówkiem 700. */
+  .hp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-top: 3px solid var(--color-accent);
+    border-radius: 12px;
+    padding: 1.3rem 1.35rem 1.2rem;
+    text-decoration: none;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .hp-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 40px -30px rgba(21, 17, 13, 0.35);
+  }
+  .hp-card-meta {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-4);
+  }
+  .hp-card-title {
+    margin-top: 0.7rem;
+    font-size: 0.98rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hp-card:hover .hp-card-title { color: var(--color-accent-deep); }
+  .hp-card-foot {
+    margin-top: auto;
+    padding-top: 1.1rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .hp-card-price {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--color-ink);
+  }
+  .hp-card-next {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.75rem;
+    color: var(--color-ink-4);
+    white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hp-card { transition: none; }
+    .hp-card:hover { transform: none; }
+  }
+
   .hero-trust { margin-top: 2.25rem; }
   .trust-row {
     list-style: none;

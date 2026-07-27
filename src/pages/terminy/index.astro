@@ -5,19 +5,24 @@ import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 import { formatPrice } from '../../lib/format';
 import {
   getUpcomingServices,
-  groupByMonth,
+  getCalendar,
   isRecruitmentOpen,
   countDays,
   dayHours,
+  sessionDays,
   BUR_FETCHED_AT,
   plainDate,
 } from '../../lib/bur';
 
 // Terminy pochodzą wprost z naszego profilu w Bazie Usług Rozwojowych —
-// pobiera je scripts/fetch-bur.mjs przed buildem. Dzięki temu kalendarz na
-// stronie nie rozjeżdża się z tym, na co faktycznie można się zapisać.
+// pobiera je scripts/fetch-bur.mjs przed buildem. Kalendarz rysujemy
+// z harmonogramów, więc pokazuje dni, w których faktycznie są zajęcia.
 const upcoming = getUpcomingServices();
-const months = groupByMonth(upcoming);
+const months = getCalendar();
+const openCount = upcoming.filter(isRecruitmentOpen).length;
+const allSessionDays = new Set(upcoming.flatMap((s) => sessionDays(s))).size;
+
+const WEEKDAYS = ['pon', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
 
 const fetchedLabel = BUR_FETCHED_AT
   ? new Date(BUR_FETCHED_AT).toLocaleDateString('pl-PL', {
@@ -36,40 +41,64 @@ function dateRange(s: { startDate: string | null; endDate: string | null }) {
   return `${start} – ${f(s.endDate)}`;
 }
 
-function dayNum(d: string | null) {
-  return plainDate(d)?.toLocaleDateString('pl-PL', { day: '2-digit', timeZone: 'UTC' }) ?? '—';
-}
-function weekday(d: string | null) {
-  return plainDate(d)?.toLocaleDateString('pl-PL', { weekday: 'short', timeZone: 'UTC' }) ?? '';
+function longDay(iso: string) {
+  return (
+    plainDate(iso)?.toLocaleDateString('pl-PL', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'UTC',
+    }) ?? iso
+  );
 }
 ---
 
 <BaseLayout
   title="Terminy szkoleń AI — kalendarz najbliższych edycji"
-  description="Kalendarz szkoleń Next Mind Academy prosto z Bazy Usług Rozwojowych: daty, ceny, liczba miejsc i bezpośredni zapis przez BUR."
+  description="Kalendarz szkoleń Next Mind Academy prosto z Bazy Usług Rozwojowych: daty zajęć, ceny, liczba miejsc i bezpośredni zapis przez BUR."
 >
-  <div class="container-edge pt-8">
+  <div class="container-edge pt-5">
     <Breadcrumbs items={[
       { name: 'Strona główna', url: '/' },
       { name: 'Terminy' },
     ]} />
   </div>
 
-  <Section padding="default">
-    <div class="max-w-3xl">
-      <div class="eyebrow">Kalendarz</div>
-      <h1 class="mt-5 page-h1">
-        Najbliższe <span class="display-italic">terminy</span>.
-      </h1>
-      {upcoming.length > 0 ? (
-        <p class="lead mt-6 text-[var(--color-ink-3)]">
-          {upcoming.length} zaplanowanych szkoleń. Wszystkie są wpisane do Bazy Usług Rozwojowych,
-          więc każde możesz rozliczyć z dofinansowania — zapisu dokonujesz bezpośrednio w BUR.
-        </p>
-      ) : (
-        <p class="lead mt-6 text-[var(--color-ink-3)]">
-          Ustalamy terminy kolejnych edycji. Napisz, a zarezerwujemy dla Ciebie miejsce.
-        </p>
+  <Section padding="tight" class="hero-sec">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Kalendarz</div>
+        <h1 class="mt-4 page-h1">
+          Najbliższe <span class="display-italic">terminy</span>.
+        </h1>
+        {upcoming.length > 0 ? (
+          <p class="hero-sub">
+            Kalendarz pokazuje dni, w których faktycznie odbywają się zajęcia. Dzień startu edycji
+            jest wypełniony, kolejne dni zajęć — obrysowane. Zapisu dokonujesz w Bazie Usług
+            Rozwojowych, więc każdy termin możesz rozliczyć z dofinansowania.
+          </p>
+        ) : (
+          <p class="hero-sub">
+            Ustalamy terminy kolejnych edycji. Napisz, a zarezerwujemy dla Ciebie miejsce.
+          </p>
+        )}
+      </div>
+
+      {upcoming.length > 0 && (
+        <dl class="facts">
+          <div class="fact">
+            <dt>Zaplanowanych edycji</dt>
+            <dd><span class="fact-big">{upcoming.length}</span></dd>
+          </div>
+          <div class="fact">
+            <dt>Z otwartymi zapisami</dt>
+            <dd><span class="fact-big">{openCount}</span> z {upcoming.length}</dd>
+          </div>
+          <div class="fact">
+            <dt>Dni zajęć w kalendarzu</dt>
+            <dd><span class="fact-big">{allSessionDays}</span> w {months.length} miesiącach</dd>
+          </div>
+        </dl>
       )}
     </div>
   </Section>
@@ -80,58 +109,140 @@ function weekday(d: string | null) {
     </Section>
   )}
 
-  {months.map((month) => (
-    <Section surface="paper-soft" padding="tight">
-      <h2 class="month-head">{month.label}</h2>
-      <ul class="terms">
-        {month.services.map((s) => {
-          const hours = dayHours(s);
-          const days = countDays(s);
-          const open = isRecruitmentOpen(s);
-          return (
-            <li class="term">
-              <div class="term-date">
-                <span class="term-day">{dayNum(s.startDate)}</span>
-                <span class="term-wd">{weekday(s.startDate)}</span>
+  {months.length > 0 && (
+    <Section surface="paper-soft" padding="default" id="kalendarz">
+      <div class="cal" id="cal">
+        <nav class="cal-nav" aria-label="Wybór miesiąca">
+          {months.map((mo, i) => (
+            <a href={`#m-${mo.key}`} class="cal-tab" data-key={mo.key} aria-current={i === 0 ? 'true' : 'false'}>
+              {mo.label}
+              <span class="cal-tab-n">{mo.starts.length}</span>
+            </a>
+          ))}
+        </nav>
+
+        {months.map((mo, i) => (
+          <section class={`cal-month ${i === 0 ? 'is-on' : ''}`} id={`m-${mo.key}`} data-key={mo.key}>
+            <div class="cal-grid-wrap">
+              <div class="cal-head">
+                <h2 class="cal-title">{mo.label}</h2>
+                <p class="cal-sum">
+                  {mo.sessionDays} {mo.sessionDays === 1 ? 'dzień zajęć' : 'dni zajęć'}
+                  {mo.starts.length > 0 && ` · ${mo.starts.length} ${mo.starts.length === 1 ? 'start edycji' : 'startów edycji'}`}
+                </p>
               </div>
 
-              <div class="term-body">
-                <h3 class="term-title">{s.title}</h3>
-                <div class="term-meta">
-                  <span>{dateRange(s)}</span>
-                  {hours && <span>{hours.from}–{hours.to}</span>}
-                  {days > 1 && <span>{days} dni</span>}
-                  {s.hoursTotal && <span>{s.hoursTotal} h</span>}
-                  {s.seatsMax && <span>do {s.seatsMax} osób</span>}
-                </div>
-              </div>
+              <table class="cal-grid">
+                <caption class="sr-only">Kalendarz zajęć — {mo.label}</caption>
+                <thead>
+                  <tr>{WEEKDAYS.map((d) => <th scope="col">{d}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {mo.weeks.map((week) => (
+                    <tr>
+                      {week.map((d) => (
+                        <td
+                          class={[
+                            'cal-cell',
+                            !d.inMonth && 'is-out',
+                            d.past && 'is-past',
+                            // Dni z sąsiednich miesięcy zostają puste — inaczej
+                            // wyglądałyby na klikalne, a klikalne nie są.
+                            d.inMonth && d.sessions.length > 0 && 'has-session',
+                            d.inMonth && d.starts.length > 0 && 'has-start',
+                          ].filter(Boolean).join(' ')}
+                        >
+                          {d.sessions.length > 0 && d.inMonth ? (
+                            <a
+                              href={d.starts.length > 0 ? `#t-${d.starts[0].id}` : `#m-${mo.key}`}
+                              class="cal-day"
+                              data-day={d.iso}
+                            >
+                              <span class="cal-num">{d.day}</span>
+                              <span class="cal-dots" aria-hidden="true">
+                                {d.sessions.slice(0, 4).map((s) => (
+                                  <span class={`cal-dot ${d.starts.includes(s) ? 'is-start' : ''}`}></span>
+                                ))}
+                              </span>
+                              <span class="sr-only">
+                                {longDay(d.iso)} — zajęcia: {d.sessions.length}
+                                {d.starts.length > 0 ? `, w tym startujących edycji: ${d.starts.length}` : ''}
+                              </span>
+                            </a>
+                          ) : (
+                            <span class="cal-day"><span class="cal-num">{d.day}</span></span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-              <div class="term-side">
-                {s.priceNetPerParticipant !== null && (
-                  <div class="term-price">
-                    <span class="term-price-val">{formatPrice(s.priceNetPerParticipant)}</span>
-                    <span class="term-price-lbl">netto / osoba</span>
-                  </div>
-                )}
-                <a
-                  href={s.url}
-                  target="_blank"
-                  rel="noopener"
-                  class={`btn btn-sm ${open ? 'btn-primary' : 'btn-ghost'}`}
-                >
-                  {open ? 'Zapisz się przez BUR' : 'Zobacz w BUR'}
-                </a>
-                {!open && <span class="term-closed">Rekrutacja zamknięta</span>}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+              <ul class="cal-legend">
+                <li><span class="key key-start"></span>Start edycji</li>
+                <li><span class="key key-session"></span>Dzień zajęć</li>
+              </ul>
+            </div>
+
+            <div class="cal-list">
+              <h3 class="list-title">Edycje startujące w tym miesiącu</h3>
+              {mo.starts.length === 0 ? (
+                <p class="list-empty">
+                  W tym miesiącu trwają zajęcia edycji rozpoczętych wcześniej — nowa edycja nie startuje.
+                </p>
+              ) : (
+                <ol class="terms">
+                  {mo.starts.map((s) => {
+                    const hours = dayHours(s);
+                    const days = countDays(s);
+                    const open = isRecruitmentOpen(s);
+                    return (
+                      <li class="term" id={`t-${s.id}`}>
+                        <div class="term-date">
+                          <span class="term-day">{plainDate(s.startDate)?.getUTCDate()}</span>
+                          <span class="term-wd">
+                            {plainDate(s.startDate)?.toLocaleDateString('pl-PL', { weekday: 'short', timeZone: 'UTC' })}
+                          </span>
+                        </div>
+                        <div class="term-body">
+                          <h4 class="term-title bur-title">{s.title}</h4>
+                          <div class="term-meta">
+                            <span>{dateRange(s)}</span>
+                            {hours && <span>{hours.from}–{hours.to}</span>}
+                            {days > 1 && <span>{days} dni zajęć</span>}
+                            {s.hoursTotal && <span>{s.hoursTotal} h</span>}
+                            {s.seatsMax && <span>do {s.seatsMax} osób</span>}
+                          </div>
+                          <div class="term-foot">
+                            {s.priceNetPerParticipant !== null && (
+                              <span class="term-price">{formatPrice(s.priceNetPerParticipant)} <span>netto</span></span>
+                            )}
+                            <a
+                              href={s.url}
+                              target="_blank"
+                              rel="noopener"
+                              class={`btn btn-sm ${open ? 'btn-primary' : 'btn-ghost'}`}
+                            >
+                              {open ? 'Zapisz się przez BUR' : 'Zobacz w BUR'}
+                            </a>
+                            {!open && <span class="term-closed">Rekrutacja zamknięta</span>}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </div>
+          </section>
+        ))}
+      </div>
     </Section>
-  ))}
+  )}
 
   <Section padding="tight">
-    <p class="text-sm text-[var(--color-ink-4)] max-w-3xl">
+    <p class="text-sm text-[var(--color-ink-4)] max-w-3xl leading-relaxed">
       Dane pochodzą z naszego profilu dostawcy w Bazie Usług Rozwojowych
       {fetchedLabel && <> i zostały pobrane {fetchedLabel}</>}. Wiążąca jest karta usługi w BUR —
       to tam sprawdzisz aktualną dostępność miejsc i tam dokonujesz zapisu. Jeśli chcesz rozliczyć
@@ -142,91 +253,352 @@ function weekday(d: string | null) {
 </BaseLayout>
 
 <style>
-  .month-head {
+  .hero-sec { padding-block-start: 1.5rem; }
+  @media (min-width: 768px) { .hero-sec { padding-block-start: 2rem; } }
+  .hero { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3rem; }
+  }
+  .hero-sub {
+    margin-top: 1.1rem;
+    max-width: 36rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
+    color: var(--color-ink-3);
+  }
+  .facts {
+    display: grid;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .fact { padding: 0.85rem 1.1rem; }
+  .fact + .fact { border-top: 1px solid var(--color-rule); }
+  .fact dt {
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: var(--color-ink-4);
+    font-weight: 600;
+  }
+  .fact dd { margin: 0.25rem 0 0; font-size: 0.9rem; line-height: 1.45; color: var(--color-ink-2); }
+  .fact-big {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-accent-deep);
+    font-feature-settings: 'tnum';
+    margin-right: 0.15rem;
+  }
+
+  /* ---------- Przełącznik miesięcy ---------- */
+  .cal-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.75rem;
+  }
+  .cal-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--color-rule);
+    border-radius: 999px;
+    background: var(--color-card-raised);
+    font-size: 0.82rem;
+    color: var(--color-ink-3);
+    text-decoration: none;
+    text-transform: capitalize;
+    white-space: nowrap;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  .cal-tab:hover { border-color: var(--color-accent); color: var(--color-accent-deep); }
+  .cal-tab-n {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--color-ink-4);
+    background: var(--color-paper-deep);
+    border-radius: 999px;
+    padding: 0.05rem 0.4rem;
+  }
+  .cal-tab[aria-current='true'] {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+  .cal-tab[aria-current='true'] .cal-tab-n { background: rgba(255, 255, 255, 0.22); color: #fff; }
+
+  /* ---------- Miesiąc: siatka + lista ---------- */
+  /* Bez JavaScriptu widać wszystkie miesiące po kolei; skrypt zamienia to
+     w przełączanie i dopiero wtedy chowa nieaktywne. */
+  .cal-month { display: grid; gap: 2rem; align-items: start; }
+  .cal-month + .cal-month { margin-top: 3rem; }
+  @media (min-width: 1000px) {
+    .cal-month { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 3rem; }
+  }
+  #cal.js .cal-month { display: none; margin-top: 0; }
+  #cal.js .cal-month.is-on { display: grid; }
+
+  .cal-head { margin-bottom: 1rem; }
+  .cal-title {
     font-family: var(--font-display);
     font-size: 1.5rem;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     color: var(--color-ink);
     text-transform: capitalize;
-    margin-bottom: 1.25rem;
   }
-  .terms { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  .cal-sum { margin-top: 0.2rem; font-size: 0.8rem; color: var(--color-ink-4); }
+
+  .cal-grid {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 4px;
+    table-layout: fixed;
+  }
+  .cal-grid th {
+    padding-bottom: 0.4rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-4);
+    text-align: center;
+  }
+  .cal-cell { padding: 0; }
+  .cal-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--color-ink-4);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .is-out .cal-day { opacity: 0.25; }
+  .is-past .cal-day { opacity: 0.45; }
+
+  .has-session .cal-day {
+    background: var(--color-card-raised);
+    border-color: var(--color-rule);
+    color: var(--color-ink-2);
+  }
+  .has-start .cal-day {
+    border-color: var(--color-accent);
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+  a.cal-day:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-wash);
+    color: var(--color-accent-deep);
+  }
+  a.cal-day:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .cal-num { line-height: 1; }
+  .cal-dots { display: flex; gap: 2px; height: 5px; }
+  .cal-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    border: 1px solid var(--color-accent);
+    background: transparent;
+  }
+  .cal-dot.is-start { background: var(--color-accent); }
+
+  .cal-legend {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.2rem;
+    font-size: 0.74rem;
+    color: var(--color-ink-4);
+  }
+  .cal-legend li { display: flex; align-items: center; gap: 0.45rem; }
+  .key {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-accent);
+  }
+  .key-start { background: var(--color-accent); }
+
+  /* ---------- Lista edycji w miesiącu ---------- */
+  .list-title {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    font-weight: 600;
+    color: var(--color-ink-4);
+    margin-bottom: 0.9rem;
+  }
+  .list-empty {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--color-ink-4);
+    background: var(--color-card);
+    border: 1px dashed var(--color-rule-strong);
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+  }
+  .terms { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
   .term {
     display: grid;
-    grid-template-columns: 3.5rem 1fr;
+    grid-template-columns: 3rem 1fr;
     gap: 1rem;
     align-items: start;
     background: var(--color-card-raised);
     border: 1px solid var(--color-rule);
-    border-radius: 8px;
-    padding: 1.1rem 1.25rem;
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    scroll-margin-top: 7rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
-  @media (min-width: 900px) {
-    .term { grid-template-columns: 3.5rem 1fr auto; gap: 1.5rem; align-items: center; }
-  }
+  .term:target { border-color: var(--color-accent); }
   .term-date { text-align: center; }
   .term-day {
     display: block;
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 1.6rem;
     line-height: 1;
     color: var(--color-ink);
   }
   .term-wd {
     display: block;
-    font-size: 0.68rem;
+    font-size: 0.64rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-ink-4);
     margin-top: 0.15rem;
   }
   .term-title {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--color-ink);
-    line-height: 1.35;
+    font-size: 0.95rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .term-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem 0.9rem;
+    gap: 0.3rem 0.85rem;
     margin-top: 0.4rem;
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     color: var(--color-ink-4);
   }
   .term-meta span { white-space: nowrap; }
-  .term-side {
-    grid-column: 1 / -1;
+  .term-foot {
     display: flex;
-    align-items: center;
-    gap: 0.9rem;
     flex-wrap: wrap;
-    margin-top: 0.4rem;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.8rem;
   }
-  @media (min-width: 900px) {
-    .term-side {
-      grid-column: auto;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.5rem;
-      margin-top: 0;
-    }
-  }
-  .term-price { text-align: right; white-space: nowrap; }
-  .term-price-val {
-    display: block;
+  .term-price {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: var(--color-ink);
+    white-space: nowrap;
   }
-  .term-price-lbl {
-    display: block;
-    font-size: 0.66rem;
+  .term-price span {
+    font-size: 0.62rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--color-ink-4);
   }
   .term-closed { font-size: 0.7rem; color: var(--color-ink-4); }
   .src { color: var(--color-accent-deep); text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cal-tab, .cal-day, .term { transition: none; }
+  }
 </style>
+
+<style is:global>
+  /* Podświetlenie edycji po kliknięciu dnia w kalendarzu. Reguła jest globalna,
+     bo klasę dokłada skrypt już po zbudowaniu strony. */
+  .term.flash {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 3px var(--color-accent-wash);
+  }
+</style>
+
+<script>
+  // Przełączanie miesięcy. Bez skryptu strona pokazuje wszystkie miesiące
+  // jeden pod drugim — to poprawny, kompletny widok, tylko dłuższy.
+  const cal = document.getElementById('cal');
+
+  if (cal) {
+    const tabs = Array.from(cal.querySelectorAll<HTMLAnchorElement>('.cal-tab'));
+    const monthsEls = Array.from(cal.querySelectorAll<HTMLElement>('.cal-month'));
+
+    if (tabs.length > 0 && monthsEls.length > 0) {
+      cal.classList.add('js');
+      const first = monthsEls[0].dataset.key ?? '';
+
+      const show = (key: string) => {
+        const target = monthsEls.some((m) => m.dataset.key === key) ? key : first;
+        for (const m of monthsEls) m.classList.toggle('is-on', m.dataset.key === target);
+        for (const t of tabs) t.setAttribute('aria-current', String(t.dataset.key === target));
+      };
+
+      for (const t of tabs) {
+        t.addEventListener('click', (e) => {
+          // Adresu nie przepisujemy — kotwica pasująca do id sekcji przewinęłaby
+          // stronę tak, że przełącznik zniknąłby z ekranu.
+          e.preventDefault();
+          show(t.dataset.key ?? '');
+        });
+      }
+
+      // Kliknięcie w dzień prowadzi do edycji startującej tego dnia. Gdy tego
+      // dnia nic nie startuje (trwają zajęcia wcześniejszej edycji), zostawiamy
+      // użytkownika na kalendarzu zamiast przewijać go w przypadkowe miejsce.
+      for (const day of Array.from(cal.querySelectorAll<HTMLAnchorElement>('a[data-day]'))) {
+        day.addEventListener('click', (e) => {
+          e.preventDefault();
+          const id = day.getAttribute('href') ?? '';
+          const target = id.length > 1 ? cal.querySelector(id) : null;
+          if (!(target instanceof HTMLElement)) return;
+          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          target.classList.add('flash');
+          window.setTimeout(() => target.classList.remove('flash'), 1400);
+        });
+      }
+
+      // Wejście z adresu /terminy/#m-2026-09 (miesiąc) albo #t-<id> (edycja).
+      const fromHash = () => {
+        const m = /^#m-(\d{4}-\d{2})$/.exec(location.hash);
+        if (m) {
+          show(m[1]);
+          return;
+        }
+        const target = location.hash.startsWith('#t-') ? cal.querySelector(location.hash) : null;
+        if (target instanceof HTMLElement) {
+          const month = target.closest<HTMLElement>('.cal-month')?.dataset.key;
+          show(month ?? first);
+          requestAnimationFrame(() => target.scrollIntoView({ block: 'center' }));
+          return;
+        }
+        show(first);
+      };
+
+      window.addEventListener('hashchange', fromHash);
+      fromHash();
+    }
+  }
+</script>

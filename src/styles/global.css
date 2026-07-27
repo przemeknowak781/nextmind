@@ -420,6 +420,27 @@
     .page-h1--doc { font-size: clamp(2.1rem, 2.8vw, 2.6rem); }
   }
 
+  /* Nazwa usługi zaciągnięta z Bazy Usług Rozwojowych.
+     Te tytuły bywają wielozdaniowe („Sztuczna inteligencja w praktyce biurowej
+     i biznesowej: generowanie treści, grafiki oraz audio-video, …"). W kroju
+     nagłówkowym o grubości 700 jeden taki tytuł krzyczy mocniej niż cała reszta
+     strony, więc wszędzie, gdzie pokazujemy go dosłownie, idzie lżejszy stopień
+     i mniejszy rozmiar. */
+  .bur-title {
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    line-height: 1.35;
+    color: var(--color-ink);
+    text-wrap: pretty;
+  }
+  h1.bur-title {
+    font-size: clamp(1.35rem, 3.2vw, 1.7rem);
+    line-height: 1.28;
+  }
+  @media (min-width: 1024px) {
+    h1.bur-title { font-size: clamp(1.7rem, 2.2vw, 2rem); }
+  }
+
   /* Section header */
   .section-header {
     display: flex;

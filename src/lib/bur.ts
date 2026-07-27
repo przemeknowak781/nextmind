@@ -141,6 +141,125 @@ export function groupByMonth(services: BurService[]): MonthGroup[] {
 }
 
 /* ------------------------------------------------------------------ *
+ *  KALENDARZ
+ *
+ *  Kalendarz budujemy z harmonogramów, a nie z samych dat rozpoczęcia:
+ *  szkolenie wielodniowe zajmuje w kalendarzu tylko te dni, w których
+ *  faktycznie są zajęcia. Data rozpoczęcia edycji jest wyróżniona osobno,
+ *  bo to ona decyduje o zapisie.
+ * ------------------------------------------------------------------ */
+
+export interface CalendarDay {
+  /** RRRR-MM-DD */
+  iso: string;
+  day: number;
+  /** Czy dzień należy do miesiąca siatki, czy jest dopełnieniem tygodnia. */
+  inMonth: boolean;
+  past: boolean;
+  /** Edycje rozpoczynające się tego dnia. */
+  starts: BurService[];
+  /** Wszystkie usługi mające tego dnia zajęcia. */
+  sessions: BurService[];
+}
+
+export interface CalendarMonth {
+  /** RRRR-MM */
+  key: string;
+  label: string;
+  weeks: CalendarDay[][];
+  /** Edycje rozpoczynające się w tym miesiącu, wg daty startu. */
+  starts: BurService[];
+  /** Liczba dni z zajęciami w tym miesiącu. */
+  sessionDays: number;
+}
+
+/** Dni zajęć danej usługi, bez powtórzeń. */
+export function sessionDays(s: BurService): string[] {
+  const set = new Set<string>();
+  for (const h of s.schedule) {
+    const d = h.date?.slice(0, 10);
+    if (d) set.add(d);
+  }
+  return [...set].sort();
+}
+
+function isoToday(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Siatki miesięcy z zajęciami — tydzień zaczyna się w poniedziałek.
+ * Zwracamy tylko miesiące, w których coś się dzieje.
+ */
+export function getCalendar(): CalendarMonth[] {
+  const today = isoToday();
+  const services = getUpcomingServices();
+
+  const byDay = new Map<string, BurService[]>();
+  const byStart = new Map<string, BurService[]>();
+
+  for (const s of services) {
+    for (const iso of sessionDays(s)) {
+      if (!byDay.has(iso)) byDay.set(iso, []);
+      byDay.get(iso)!.push(s);
+    }
+    const start = s.startDate?.slice(0, 10);
+    if (start) {
+      if (!byStart.has(start)) byStart.set(start, []);
+      byStart.get(start)!.push(s);
+    }
+  }
+
+  const monthKeys = [...new Set([...byDay.keys(), ...byStart.keys()].map((d) => d.slice(0, 7)))].sort();
+
+  return monthKeys.map((key) => {
+    const [y, m] = key.split('-').map(Number);
+    const first = new Date(Date.UTC(y, m - 1, 1, 12));
+    const daysInMonth = new Date(Date.UTC(y, m, 0, 12)).getUTCDate();
+    // getUTCDay(): 0 = niedziela; przesuwamy tak, by 0 = poniedziałek.
+    const lead = (first.getUTCDay() + 6) % 7;
+
+    const cells: CalendarDay[] = [];
+    const push = (date: Date, inMonth: boolean) => {
+      const iso = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+      cells.push({
+        iso,
+        day: date.getUTCDate(),
+        inMonth,
+        past: iso < today,
+        starts: byStart.get(iso) ?? [],
+        sessions: byDay.get(iso) ?? [],
+      });
+    };
+
+    // Date.UTC samo przechodzi na sąsiedni miesiąc przy dniach spoza zakresu,
+    // więc dopełnienie tygodnia sprowadza się do liczenia w przód i w tył.
+    for (let i = lead; i > 0; i--) push(new Date(Date.UTC(y, m - 1, 1 - i, 12)), false);
+    for (let d = 1; d <= daysInMonth; d++) push(new Date(Date.UTC(y, m - 1, d, 12)), true);
+    for (let extra = 1; cells.length % 7 !== 0; extra++) {
+      push(new Date(Date.UTC(y, m - 1, daysInMonth + extra, 12)), false);
+    }
+
+    const weeks: CalendarDay[][] = [];
+    for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+    const starts = [...byStart.entries()]
+      .filter(([iso]) => iso.startsWith(key))
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .flatMap(([, list]) => list);
+
+    return {
+      key,
+      label: `${MIESIACE[m - 1]} ${y}`,
+      weeks,
+      starts,
+      sessionDays: cells.filter((c) => c.inMonth && c.sessions.length > 0).length,
+    };
+  });
+}
+
+/* ------------------------------------------------------------------ *
  *  KATALOG OFERT
  *
  *  W BUR jedna oferta występuje wielokrotnie — raz na każdy termin.
