@@ -1,29 +1,52 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
-import { formatDayNumber, formatMonthShort, formatWeekday } from '../../lib/format';
+import { formatPrice } from '../../lib/format';
+import {
+  getUpcomingServices,
+  groupByMonth,
+  isRecruitmentOpen,
+  countDays,
+  dayHours,
+  BUR_FETCHED_AT,
+  plainDate,
+} from '../../lib/bur';
 
-const editions = await getCollection('editions');
-const courses = await getCollection('courses');
-const courseMap = new Map(courses.map((c) => [c.data.slug, c]));
+// Terminy pochodzą wprost z naszego profilu w Bazie Usług Rozwojowych —
+// pobiera je scripts/fetch-bur.mjs przed buildem. Dzięki temu kalendarz na
+// stronie nie rozjeżdża się z tym, na co faktycznie można się zapisać.
+const upcoming = getUpcomingServices();
+const months = groupByMonth(upcoming);
 
-const sorted = [...editions].sort((a, b) => +a.data.date - +b.data.date);
-const upcoming = sorted.filter((e) => e.data.date >= new Date());
+const fetchedLabel = BUR_FETCHED_AT
+  ? new Date(BUR_FETCHED_AT).toLocaleDateString('pl-PL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
+  : null;
 
-// Group by month
-const byMonth = new Map<string, typeof upcoming>();
-for (const ed of upcoming) {
-  const key = `${ed.data.date.getFullYear()}-${String(ed.data.date.getMonth() + 1).padStart(2, '0')}`;
-  if (!byMonth.has(key)) byMonth.set(key, []);
-  byMonth.get(key)!.push(ed);
+function dateRange(s: { startDate: string | null; endDate: string | null }) {
+  if (!s.startDate) return '';
+  const f = (d: string) =>
+    plainDate(d)!.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+  const start = f(s.startDate);
+  if (!s.endDate || s.endDate.slice(0, 10) === s.startDate.slice(0, 10)) return start;
+  return `${start} – ${f(s.endDate)}`;
+}
+
+function dayNum(d: string | null) {
+  return plainDate(d)?.toLocaleDateString('pl-PL', { day: '2-digit', timeZone: 'UTC' }) ?? '—';
+}
+function weekday(d: string | null) {
+  return plainDate(d)?.toLocaleDateString('pl-PL', { weekday: 'short', timeZone: 'UTC' }) ?? '';
 }
 ---
 
 <BaseLayout
-  title="Wszystkie terminy szkoleń AI | Najbliższe edycje Basic i Level 2"
-  description="Pełny kalendarz najbliższych edycji szkoleń Next Mind Academy. Zobacz daty, dostępność miejsc i zapisz się przez BUR."
+  title="Terminy szkoleń AI — kalendarz najbliższych edycji"
+  description="Kalendarz szkoleń Next Mind Academy prosto z Bazy Usług Rozwojowych: daty, ceny, liczba miejsc i bezpośredni zapis przez BUR."
 >
   <div class="container-edge pt-8">
     <Breadcrumbs items={[
@@ -33,184 +56,177 @@ for (const ed of upcoming) {
   </div>
 
   <Section padding="default">
-    <div class="grid lg:grid-cols-12 gap-12 items-end mb-16">
-      <div class="lg:col-span-8">
-        <div class="eyebrow">Kalendarz edycji 2026</div>
-        <h1 class="mt-5 text-5xl md:text-6xl lg:text-[5.5rem] leading-[0.96] tracking-tight">
-          Najbliższe <span class="display-italic">terminy</span>.
-        </h1>
-        <p class="lead mt-6 text-[var(--color-ink-3)] max-w-2xl">
-          Wszystkie szkolenia są <strong class="text-[var(--color-ink)] font-medium">live online</strong>, w godzinach 9:00–16:00, w&nbsp;czwartki i&nbsp;wtorki.
-          Każda edycja to maksymalnie 8–10 osób.
+    <div class="max-w-3xl">
+      <div class="eyebrow">Kalendarz</div>
+      <h1 class="mt-5 text-5xl md:text-6xl lg:text-[4.75rem] leading-[0.98] tracking-tight">
+        Najbliższe <span class="display-italic">terminy</span>.
+      </h1>
+      {upcoming.length > 0 ? (
+        <p class="lead mt-6 text-[var(--color-ink-3)]">
+          {upcoming.length} zaplanowanych szkoleń. Wszystkie są wpisane do Bazy Usług Rozwojowych,
+          więc każde możesz rozliczyć z dofinansowania — zapisu dokonujesz bezpośrednio w BUR.
         </p>
-      </div>
-      <div class="lg:col-span-4 text-sm text-[var(--color-ink-3)] space-y-1.5">
-        <div class="flex items-center gap-3">
-          <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--color-positive)]"></span>
-          <span>Otwarty zapis</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--color-warn)]"></span>
-          <span>Ostatnie miejsca</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--color-rule-strong)]"></span>
-          <span>Planowany — zapis wkrótce</span>
-        </div>
-      </div>
+      ) : (
+        <p class="lead mt-6 text-[var(--color-ink-3)]">
+          Ustalamy terminy kolejnych edycji. Napisz, a zarezerwujemy dla Ciebie miejsce.
+        </p>
+      )}
     </div>
+  </Section>
 
-    <div class="space-y-12">
-      {[...byMonth.entries()].map(([_key, eds]) => {
-        const date = new Date(eds[0].data.date);
-        return (
-          <div class="month-block">
-            <h2 class="month-title">
-              <span class="font-mono text-xs uppercase tracking-[0.18em] text-[var(--color-ink-4)]">{date.getFullYear()}</span>
-              <span class="display-italic text-5xl text-[var(--color-ink)] mx-3">/</span>
-              <span class="font-display text-5xl tracking-tight">{formatMonthShort(date)}</span>
-            </h2>
+  {upcoming.length === 0 && (
+    <Section padding="tight">
+      <a href="/kontakt/" class="btn btn-primary btn-lg">Zostaw kontakt</a>
+    </Section>
+  )}
 
-            <div class="space-y-3 mt-6">
-              {eds.map((ed) => {
-                const course = courseMap.get(ed.data.courseSlug);
-                if (!course) return null;
-                const ratio = ed.data.seatsAvailable / ed.data.seatsTotal;
-                const status = ed.data.status === 'planned' ? 'rule-strong' :
-                              ratio > 0.5 ? 'positive' :
-                              ratio > 0.25 ? 'warn' : 'danger';
-                return (
-                  <a href={`/terminy/${ed.id.replace('.json', '')}/`} class="edition-row">
-                    <div class="edition-date">
-                      <span class="edition-day">{formatDayNumber(ed.data.date)}</span>
-                      <span class="edition-weekday">{formatWeekday(ed.data.date).slice(0, 3)}</span>
-                    </div>
-                    <div class="edition-main">
-                      <div class="text-[0.7rem] uppercase tracking-[0.14em] text-[var(--color-ink-4)] font-mono mb-1">
-                        {course.data.eyebrow.split('•')[2]?.trim() ?? course.data.levelLabel}
-                      </div>
-                      <h3 class="edition-title">{course.data.title.split(':')[0].trim()}</h3>
-                      <div class="text-sm text-[var(--color-ink-3)] mt-1">
-                        {ed.data.startTime}–{ed.data.endTime} · {ed.data.platform}
-                      </div>
-                    </div>
-                    <div class="edition-seats">
-                      <span class={`edition-dot edition-dot-${status}`}></span>
-                      <span class="font-mono tabular-nums">
-                        <strong class="text-[var(--color-ink)]">{ed.data.seatsAvailable}</strong>
-                        <span class="text-[var(--color-ink-4)]">/{ed.data.seatsTotal}</span>
-                      </span>
-                      <span class="text-xs text-[var(--color-ink-4)] block">miejsc</span>
-                    </div>
-                    <div class="edition-arrow">
-                      <svg class="w-4 h-4" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+  {months.map((month) => (
+    <Section surface="paper-soft" padding="tight">
+      <h2 class="month-head">{month.label}</h2>
+      <ul class="terms">
+        {month.services.map((s) => {
+          const hours = dayHours(s);
+          const days = countDays(s);
+          const open = isRecruitmentOpen(s);
+          return (
+            <li class="term">
+              <div class="term-date">
+                <span class="term-day">{dayNum(s.startDate)}</span>
+                <span class="term-wd">{weekday(s.startDate)}</span>
+              </div>
 
-    {upcoming.length === 0 && (
-      <div class="text-center py-20">
-        <p class="text-[var(--color-ink-3)]">Najbliższe terminy zostaną opublikowane wkrótce.</p>
-        <a href="/kontakt/" class="mt-6 btn btn-primary inline-flex">Zostaw kontakt</a>
-      </div>
-    )}
+              <div class="term-body">
+                <h3 class="term-title">{s.title}</h3>
+                <div class="term-meta">
+                  <span>{dateRange(s)}</span>
+                  {hours && <span>{hours.from}–{hours.to}</span>}
+                  {days > 1 && <span>{days} dni</span>}
+                  {s.hoursTotal && <span>{s.hoursTotal} h</span>}
+                  {s.seatsMax && <span>do {s.seatsMax} osób</span>}
+                </div>
+              </div>
+
+              <div class="term-side">
+                {s.priceNetPerParticipant !== null && (
+                  <div class="term-price">
+                    <span class="term-price-val">{formatPrice(s.priceNetPerParticipant)}</span>
+                    <span class="term-price-lbl">netto / osoba</span>
+                  </div>
+                )}
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener"
+                  class={`btn btn-sm ${open ? 'btn-primary' : 'btn-ghost'}`}
+                >
+                  {open ? 'Zapisz się przez BUR' : 'Zobacz w BUR'}
+                </a>
+                {!open && <span class="term-closed">Rekrutacja zamknięta</span>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
+  ))}
+
+  <Section padding="tight">
+    <p class="text-sm text-[var(--color-ink-4)] max-w-3xl">
+      Dane pochodzą z naszego profilu dostawcy w Bazie Usług Rozwojowych
+      {fetchedLabel && <> i zostały pobrane {fetchedLabel}</>}. Wiążąca jest karta usługi w BUR —
+      to tam sprawdzisz aktualną dostępność miejsc i tam dokonujesz zapisu. Jeśli chcesz rozliczyć
+      szkolenie z dofinansowania, najpierw
+      <a href="/dofinansowanie/kalkulator/" class="src"> sprawdź, gdzie złożyć wniosek</a>.
+    </p>
   </Section>
 </BaseLayout>
 
 <style>
-  .month-block { border-top: 1px solid var(--color-rule); padding-top: 2rem; }
-  .month-title { display: flex; align-items: baseline; }
-
-  .edition-row {
+  .month-head {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    text-transform: capitalize;
+    margin-bottom: 1.25rem;
+  }
+  .terms { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  .term {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
-    gap: 1.5rem;
-    align-items: center;
-    padding: 1.25rem 1.5rem;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 1rem;
+    align-items: start;
     background: var(--color-card-raised);
     border: 1px solid var(--color-rule);
     border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s ease;
+    padding: 1.1rem 1.25rem;
   }
-  .edition-row:hover {
-    border-color: var(--color-ink);
-    transform: translateX(2px);
+  @media (min-width: 900px) {
+    .term { grid-template-columns: 3.5rem 1fr auto; gap: 1.5rem; align-items: center; }
   }
-  .edition-date {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 4rem;
-    border-right: 1px dashed var(--color-rule);
-    padding-right: 1.5rem;
-  }
-  .edition-day {
+  .term-date { text-align: center; }
+  .term-day {
+    display: block;
     font-family: var(--font-display);
-    font-size: 3rem;
+    font-size: 1.75rem;
     line-height: 1;
     color: var(--color-ink);
   }
-  .edition-weekday {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    uppercase: true;
+  .term-wd {
+    display: block;
+    font-size: 0.68rem;
     text-transform: uppercase;
+    letter-spacing: 0.1em;
     color: var(--color-ink-4);
-    letter-spacing: 0.14em;
+    margin-top: 0.15rem;
+  }
+  .term-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    line-height: 1.35;
+  }
+  .term-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--color-ink-4);
+  }
+  .term-meta span { white-space: nowrap; }
+  .term-side {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
     margin-top: 0.4rem;
   }
-  .edition-title {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    line-height: 1.1;
-    color: var(--color-ink);
-    letter-spacing: -0.015em;
-  }
-  .edition-seats {
-    text-align: right;
-    font-size: 0.85rem;
-  }
-  .edition-dot {
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 999px;
-    margin-right: 0.4rem;
-  }
-  .edition-dot-positive { background: var(--color-positive); }
-  .edition-dot-warn { background: var(--color-warn); }
-  .edition-dot-danger { background: var(--color-danger); }
-  .edition-dot-rule-strong { background: var(--color-rule-strong); }
-
-  .edition-arrow {
-    color: var(--color-ink-3);
-    transition: transform 0.2s ease;
-  }
-  .edition-row:hover .edition-arrow {
-    color: var(--color-accent);
-    transform: translateX(2px);
-  }
-
-  @media (max-width: 768px) {
-    .edition-row {
-      grid-template-columns: auto 1fr;
-      grid-template-areas:
-        "date main"
-        "date seats";
-      gap: 0.5rem 1rem;
+  @media (min-width: 900px) {
+    .term-side {
+      grid-column: auto;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+      margin-top: 0;
     }
-    .edition-date { grid-area: date; border-right: none; padding-right: 0; }
-    .edition-main { grid-area: main; }
-    .edition-seats { grid-area: seats; text-align: left; }
-    .edition-arrow { display: none; }
   }
+  .term-price { text-align: right; white-space: nowrap; }
+  .term-price-val {
+    display: block;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+    color: var(--color-ink);
+  }
+  .term-price-lbl {
+    display: block;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-4);
+  }
+  .term-closed { font-size: 0.7rem; color: var(--color-ink-4); }
+  .src { color: var(--color-accent-deep); text-decoration: underline; text-underline-offset: 3px; }
 </style>

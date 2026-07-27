@@ -1,7 +1,8 @@
 ---
 import { NAV } from '../../lib/site';
 import Logo from './Logo.astro';
-import { getNearestEdition, formatEditionLong, formatEditionNumeric } from '../../lib/editions';
+import { formatEditionLong, formatEditionNumeric } from '../../lib/editions';
+import { getNearestOpenService, plainDate } from '../../lib/bur';
 
 interface Props {
   hideBorder?: boolean;
@@ -11,8 +12,9 @@ const path = Astro.url.pathname;
 
 // Pasek ogłoszeniowy czyta z danych — wcześniej data i liczba miejsc były
 // zaszyte na sztywno i po terminie reklamowały przeszłą edycję.
-const nearest = await getNearestEdition();
-const nearestDate = nearest ? new Date(nearest.data.date) : null;
+const nearest = getNearestOpenService();
+const nearestDate = plainDate(nearest?.startDate);
+
 
 function isActive(href: string) {
   if (href === '/') return path === '/';
@@ -28,10 +30,8 @@ function isActive(href: string) {
       {nearest && nearestDate ? (
         <>
           <span class="hidden sm:inline">
-            Najbliższa edycja — <strong class="font-medium">{formatEditionLong(nearestDate)}</strong>.
-            {nearest.data.seatsAvailable > 0
-              ? ` Wolne miejsca: ${nearest.data.seatsAvailable} z ${nearest.data.seatsTotal}.`
-              : ' Brak wolnych miejsc.'}
+            Najbliższe szkolenie — <strong class="font-medium">{formatEditionLong(nearestDate)}</strong>.
+             Zapisy otwarte.
           </span>
           <span class="sm:hidden">
             Najbliższa edycja: {formatEditionNumeric(nearestDate)}

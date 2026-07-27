@@ -39,10 +39,13 @@ jobs:
         run: npm run build
         env:
           SITE_BASE: /nextmind
-          # Klucz generowany w profilu BUR (sekcja "Dostęp do API").
-          # Dodaj go w Settings → Secrets and variables → Actions jako BUR_API_KEY.
-          # Bez klucza build przechodzi normalnie — synchronizacja jest pomijana,
-          # a w UI działa fallback "Zapytaj o termin".
+          # Dane dostępowe do API BUR. Dodaj oba w
+          # Settings → Secrets and variables → Actions:
+          #   BUR_API_USER — nazwa użytkownika BUR
+          #   BUR_API_KEY  — klucz z profilu BUR ("Dostęp do API")
+          # Bez nich build przechodzi normalnie — synchronizacja jest pomijana,
+          # a strona korzysta z danych zatwierdzonych w repozytorium.
+          BUR_API_USER: ${{ secrets.BUR_API_USER }}
           BUR_API_KEY: ${{ secrets.BUR_API_KEY }}
           BUR_PROVIDER_ID: '199788'
 

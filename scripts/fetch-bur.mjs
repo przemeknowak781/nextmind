@@ -1,58 +1,44 @@
-// Synchronizacja terminów z Bazy Usług Rozwojowych (BUR).
+// Synchronizacja usług i terminów z Bazy Usług Rozwojowych (API Publiczne BUR).
 //
-// Uruchamiane przed buildem. Pobiera usługi naszego profilu dostawcy z API BUR
-// i zapisuje je do src/data/bur-services.json, skąd czytają je strony Astro.
+// UWIERZYTELNIANIE
+// API wymaga tokenu JWT. Token uzyskujemy przez POST /autoryzacja/logowanie,
+// wysyłając nazwę użytkownika BUR i klucz autoryzacyjny generowany w profilu
+// („Dostęp do API"). Oba przekazujemy przez zmienne środowiskowe:
+//   BUR_API_USER  — nazwa użytkownika BUR
+//   BUR_API_KEY   — klucz autoryzacyjny
+// W GitHub Actions trzymamy je w repository secrets. Klucz działa wyłącznie
+// po stronie builda i nie trafia do przeglądarki ani do repozytorium.
 //
-// KLUCZ API
-// ---------
-// API BUR jest read-only i wymaga klucza autoryzacyjnego, który generuje się
-// w profilu użytkownika BUR (sekcja "Dostęp do API"). Klucz przekazujemy przez
-// zmienną środowiskową BUR_API_KEY — w GitHub Actions jako repository secret.
-// Klucz NIGDY nie trafia do repozytorium ani do kodu wysyłanego do przeglądarki:
-// skrypt działa wyłącznie po stronie builda.
+// ZACHOWANIE PRZY BŁĘDZIE
+// Brak danych dostępowych albo błąd API NIE przerywa builda — zostają ostatnie
+// pobrane dane, a w interfejsie działa fallback „Zapytaj o termin".
 //
-// ZACHOWANIE BEZ KLUCZA
-// ---------------------
-// Brak klucza lub błąd API NIE przerywa builda. Skrypt zostawia wtedy ostatnie
-// znane dane (albo pusty zestaw) i kończy się kodem 0. Dzięki temu strona
-// zawsze się zbuduje, a w UI zadziała fallback "Zapytaj o termin".
-//
-// TRYB ROZPOZNANIA SCHEMATU
-// -------------------------
-// Pola odpowiedzi API mapujemy przez FIELD_CANDIDATES — listę możliwych nazw.
-// Po dodaniu klucza uruchom `node scripts/fetch-bur.mjs --probe`, żeby zobaczyć
-// surową odpowiedź i potwierdzić mapowanie bez zapisywania pliku.
+// TRYB PODGLĄDU
+//   node scripts/fetch-bur.mjs --probe
+// pobiera dane i wypisuje surową odpowiedź bez zapisywania pliku.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-const API_BASE = process.env.BUR_API_BASE || 'https://uslugirozwojowe.parp.gov.pl/api';
-const API_KEY = process.env.BUR_API_KEY;
+const API = process.env.BUR_API_BASE || 'https://uslugirozwojowe.parp.gov.pl/api';
+const USER = process.env.BUR_API_USER;
+const KEY = process.env.BUR_API_KEY;
 const PROVIDER_ID = process.env.BUR_PROVIDER_ID || '199788';
 const OUT_FILE = path.resolve('src/data/bur-services.json');
 const PROBE = process.argv.includes('--probe');
-const TIMEOUT_MS = 20000;
+const TIMEOUT_MS = 30000;
 
-/** Możliwe nazwy pól w odpowiedzi API — bierzemy pierwszą, która istnieje. */
-const FIELD_CANDIDATES = {
-  id: ['id', 'idUslugi', 'serviceId', 'uslugaId'],
-  title: ['tytul', 'title', 'nazwa', 'nazwaUslugi'],
-  startDate: ['dataRozpoczecia', 'startDate', 'dataOd', 'terminRozpoczecia'],
-  endDate: ['dataZakonczenia', 'endDate', 'dataDo'],
-  price: ['cena', 'price', 'cenaNetto'],
-  seats: ['liczbaMiejsc', 'seats', 'liczbaUczestnikow'],
-};
+/** Odstęp między zapytaniami — API zwraca 429 przy zbyt szybkim odpytywaniu. */
+const THROTTLE_MS = Number(process.env.BUR_THROTTLE_MS || 350);
+const MAX_RETRIES = 4;
 
-function pick(obj, candidates) {
-  for (const key of candidates) {
-    if (obj && obj[key] !== undefined && obj[key] !== null) return obj[key];
-  }
-  return undefined;
-}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function serviceUrl(id) {
-  return `https://uslugirozwojowe.parp.gov.pl/wyszukiwarka/uslugi/podglad?id=${id}`;
-}
+/** Statusy usług, których nie pokazujemy. API zwraca je wersalikami. */
+const VISIBLE_STATUSES = ['OPUBLIKOWANA'];
+
+/** Ile dni wstecz jeszcze pokazujemy usługę (bufor na rozliczenia). */
+const KEEP_PAST_DAYS = 1;
 
 function readExisting() {
   try {
@@ -69,122 +55,178 @@ function writeOut(data) {
 
 /** Kończy pracę bez błędu, zostawiając ostatnie znane dane. */
 function bail(reason) {
-  const existing = readExisting();
   console.warn(`[bur] ${reason}`);
+  const existing = readExisting();
   if (existing?.services?.length) {
     console.warn(`[bur] Zostawiam poprzednie dane: ${existing.services.length} usług(i).`);
   } else {
     console.warn('[bur] Brak danych — w UI zadziała fallback "Zapytaj o termin".');
-    if (!existing) writeOut({ fetchedAt: null, source: 'brak', services: [] });
+    if (!existing) writeOut({ fetchedAt: null, providerId: PROVIDER_ID, services: [] });
   }
   process.exit(0);
 }
 
-async function request(pathname) {
-  const url = `${API_BASE}${pathname}`;
+async function request(pathname, opts = {}) {
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const r = await rawRequest(pathname, opts);
+    // 429 = przekroczony limit zapytań, 5xx = chwilowy błąd po stronie API
+    if (r.status !== 429 && r.status < 500) return r;
+    if (attempt === MAX_RETRIES) return r;
+    const wait = THROTTLE_MS * Math.pow(2, attempt + 1);
+    console.warn(`[bur] HTTP ${r.status} na ${pathname} — ponawiam za ${wait} ms`);
+    await sleep(wait);
+  }
+  return rawRequest(pathname, opts);
+}
+
+async function rawRequest(pathname, { method = 'GET', body, token } = {}) {
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
+    const res = await fetch(`${API}${pathname}`, {
+      method,
       headers: {
         Accept: 'application/json',
-        Authorization: `Bearer ${API_KEY}`,
-        'X-API-KEY': API_KEY,
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      body: body ? JSON.stringify(body) : undefined,
       signal: ac.signal,
     });
     const text = await res.text();
-    return { ok: res.ok, status: res.status, text, url };
+    let json = null;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      /* odpowiedź nie jest JSON-em */
+    }
+    return { ok: res.ok, status: res.status, json, text };
   } finally {
     clearTimeout(timer);
   }
 }
 
-async function main() {
-  if (!API_KEY) {
-    bail('Brak zmiennej BUR_API_KEY — pomijam synchronizację z BUR.');
+async function login() {
+  const r = await request('/autoryzacja/logowanie', {
+    method: 'POST',
+    body: { nazwaUzytkownika: USER, kluczAutoryzacyjny: KEY },
+  });
+  if (!r.ok || !r.json?.token) {
+    // Nie logujemy treści odpowiedzi w całości — mogłaby zawierać dane wrażliwe.
+    bail(`Logowanie do API nie powiodło się (HTTP ${r.status}). Sprawdź BUR_API_USER i BUR_API_KEY.`);
   }
+  return r.json.token;
+}
 
-  // Ścieżkę listy usług potwierdzamy przy pierwszym uruchomieniu z kluczem
-  // (dokumentacja API: https://uslugirozwojowe.parp.gov.pl/api/).
-  const candidates = [
-    `/uslugi?dostawcaId=${PROVIDER_ID}`,
-    `/uslugi?idDostawcy=${PROVIDER_ID}`,
-    `/services?providerId=${PROVIDER_ID}`,
-  ];
-
-  let payload = null;
-  let usedUrl = null;
-
-  for (const c of candidates) {
-    let r;
-    try {
-      r = await request(c);
-    } catch (e) {
-      console.warn(`[bur] ${c} — błąd sieci: ${e.message}`);
-      continue;
-    }
+/** Pobiera wszystkie strony z endpointu zwracającego {lista, wszystkieElementy}. */
+async function fetchAllPages(pathname, token, label) {
+  const out = [];
+  for (let page = 1; page <= 50; page++) {
+    const sep = pathname.includes('?') ? '&' : '?';
+    await sleep(THROTTLE_MS);
+    const r = await request(`${pathname}${sep}strona=${page}`, { token });
     if (!r.ok) {
-      console.warn(`[bur] ${c} — HTTP ${r.status}`);
-      continue;
-    }
-    try {
-      payload = JSON.parse(r.text);
-      usedUrl = r.url;
+      console.warn(`[bur] ${label}: HTTP ${r.status} na stronie ${page} — przerywam pobieranie.`);
       break;
-    } catch {
-      console.warn(`[bur] ${c} — odpowiedź nie jest JSON-em`);
     }
+    const list = r.json?.lista ?? [];
+    out.push(...list);
+    const total = r.json?.wszystkieElementy ?? out.length;
+    if (out.length >= total || list.length === 0) break;
+  }
+  return out;
+}
+
+/** Kwoty w API są liczbami całkowitymi w groszach. */
+function money(v) {
+  return typeof v === 'number' ? v / 100 : null;
+}
+
+function serviceUrl(id) {
+  return `https://uslugirozwojowe.parp.gov.pl/wyszukiwarka/uslugi/podglad?id=${id}`;
+}
+
+async function main() {
+  if (!USER || !KEY) {
+    bail('Brak BUR_API_USER lub BUR_API_KEY — pomijam synchronizację z BUR.');
   }
 
-  if (!payload) {
-    bail('Żaden ze znanych endpointów nie zwrócił poprawnych danych.');
-  }
+  const token = await login();
+  console.log('[bur] Zalogowano, pobieram usługi dostawcy…');
+
+  const raw = await fetchAllPages(`/dostawca-uslug/${PROVIDER_ID}/usluga`, token, 'usługi');
+  if (raw.length === 0) bail('API nie zwróciło żadnej usługi dla tego dostawcy.');
+  console.log(`[bur] Pobrano ${raw.length} usług(i).`);
 
   if (PROBE) {
-    console.log('[bur] Endpoint:', usedUrl);
-    console.log('[bur] Surowa odpowiedź (pierwsze 4000 znaków):');
-    console.log(JSON.stringify(payload, null, 2).slice(0, 4000));
+    console.log('[bur] Przykładowy rekord:');
+    console.log(JSON.stringify(raw[0], null, 2).slice(0, 2500));
+    const statuses = [...new Set(raw.map((s) => s.status))];
+    console.log('[bur] Statusy w danych:', statuses.join(', '));
     console.log('\n[bur] Tryb --probe: nie zapisuję pliku.');
     return;
   }
 
-  const rows = Array.isArray(payload)
-    ? payload
-    : payload.items || payload.content || payload.data || payload.uslugi || [];
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - KEEP_PAST_DAYS);
+  cutoff.setHours(0, 0, 0, 0);
 
-  if (!Array.isArray(rows) || rows.length === 0) {
-    bail('API odpowiedziało, ale nie znalazłem listy usług w odpowiedzi.');
-  }
-
-  const services = rows
-    .map((row) => {
-      const id = pick(row, FIELD_CANDIDATES.id);
-      if (id === undefined) return null;
-      return {
-        id: String(id),
-        title: pick(row, FIELD_CANDIDATES.title) ?? null,
-        startDate: pick(row, FIELD_CANDIDATES.startDate) ?? null,
-        endDate: pick(row, FIELD_CANDIDATES.endDate) ?? null,
-        price: pick(row, FIELD_CANDIDATES.price) ?? null,
-        seats: pick(row, FIELD_CANDIDATES.seats) ?? null,
-        url: serviceUrl(id),
-      };
+  const visible = raw
+    .filter((s) => VISIBLE_STATUSES.includes(String(s.status).toUpperCase()))
+    .filter((s) => {
+      const end = s.dataZakonczeniaUslugi ? new Date(s.dataZakonczeniaUslugi) : null;
+      return !end || end >= cutoff;
     })
-    .filter(Boolean);
+    .sort((a, b) => String(a.dataRozpoczeciaUslugi).localeCompare(String(b.dataRozpoczeciaUslugi)));
 
-  if (services.length === 0) {
-    bail('Nie udało się zmapować żadnej usługi — sprawdź FIELD_CANDIDATES przez --probe.');
+  console.log(`[bur] Aktualnych (opublikowane, niezakończone): ${visible.length}.`);
+
+  // Harmonogram pobieramy tylko dla usług aktualnych — to on daje realne terminy.
+  const services = [];
+  let done = 0;
+  for (const s of visible) {
+    if (++done % 20 === 0) console.log(`[bur]   …${done}/${visible.length}`);
+    let schedule = [];
+    try {
+      schedule = await fetchAllPages(`/usluga/${s.id}/harmonogram`, token, `harmonogram ${s.id}`);
+    } catch {
+      /* brak harmonogramu nie dyskwalifikuje usługi */
+    }
+    services.push({
+      id: String(s.id),
+      numer: s.numer ?? null,
+      title: s.tytul ?? null,
+      status: s.status ?? null,
+      startDate: s.dataRozpoczeciaUslugi ?? null,
+      endDate: s.dataZakonczeniaUslugi ?? null,
+      recruitmentEnd: s.dataZakonczeniaRekrutacji ?? null,
+      funded: Boolean(s.czyUslugaDofinansowana),
+      priceNetPerParticipant: money(s.cenaNettoZaUczestnika),
+      priceGrossPerParticipant: money(s.cenaBruttoZaUczestnika),
+      hoursTotal: s.liczbaGodzin ?? null,
+      seatsMin: s.minimalnaLiczbaUczestnikow ?? null,
+      seatsMax: s.maksymalnaLiczbaUczestnikow ?? null,
+      url: serviceUrl(s.id),
+      schedule: schedule.map((h) => ({
+        date: h.data ?? null,
+        from: h.godzinaRozpoczecia ?? null,
+        to: h.godzinaZakonczenia ?? null,
+        topic: h.temat ?? null,
+        type: h.typAktywnosci ?? null,
+      })),
+    });
   }
 
   writeOut({
     fetchedAt: new Date().toISOString(),
-    source: usedUrl,
     providerId: PROVIDER_ID,
     services,
   });
 
-  console.log(`[bur] Zapisano ${services.length} usług(i) do ${path.relative(process.cwd(), OUT_FILE)}`);
+  const withSchedule = services.filter((s) => s.schedule.length > 0).length;
+  console.log(
+    `[bur] Zapisano ${services.length} usług(i) (${withSchedule} z harmonogramem) do ${path.relative(process.cwd(), OUT_FILE)}`
+  );
 }
 
 main().catch((e) => bail(`Nieoczekiwany błąd: ${e.message}`));
