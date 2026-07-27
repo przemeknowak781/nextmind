@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 import PolandMap from '../../components/ui/PolandMap.astro';
-import { REGIONS_SORTED, STATUS_LABELS, PARP_OPERATORS_URL, BUR_URL } from '../../lib/regions';
+import { REGIONS_SORTED, STATUS_LABELS, PARP_OPERATORS_URL, BUR_URL, formatVerified } from '../../lib/regions';
 
 const activeCount = REGIONS_SORTED.filter((r) => r.status === 'aktywny').length;
 
@@ -116,7 +116,7 @@ const steps = [
     </div>
 
     <p class="picker-src">
-      Dane potwierdziliśmy u operatorów 25 lipca 2026 r. Wiążący pozostaje regulamin konkretnego
+      Dane potwierdziliśmy u operatorów {formatVerified()}. Wiążący pozostaje regulamin konkretnego
       naboru — pułapy i limity zmieniają się między rundami.
     </p>
   </Section>
@@ -154,7 +154,7 @@ const steps = [
       <li><a class="src" href={PARP_OPERATORS_URL} target="_blank" rel="noopener">PARP — dofinansowania w BUR i wykaz operatorów</a></li>
       <li><a class="src" href={BUR_URL} target="_blank" rel="noopener">Baza Usług Rozwojowych</a></li>
     </ul>
-    <p class="mt-4 text-xs text-[var(--color-ink-4)]">Dane operatorów zweryfikowane 25.07.2026.</p>
+    <p class="mt-4 text-xs text-[var(--color-ink-4)]">Dane operatorów zweryfikowane {formatVerified()}.</p>
   </Section>
 </BaseLayout>
 

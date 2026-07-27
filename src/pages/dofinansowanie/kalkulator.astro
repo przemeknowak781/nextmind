@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 import { AUDIENCES, analyze, type Audience, type Headcount } from '../../lib/advisor';
-import { REGIONS_SORTED, STATUS_LABELS, PARP_OPERATORS_URL } from '../../lib/regions';
+import { REGIONS_SORTED, STATUS_LABELS, PARP_OPERATORS_URL, formatVerified } from '../../lib/regions';
 import { getCatalog } from '../../lib/bur';
 
 // Wyniki liczymy w czasie builda — logika zostaje w jednym miejscu (advisor.ts),
@@ -135,7 +135,7 @@ const PRICES = [
     <p class="text-sm text-[var(--color-ink-4)] max-w-3xl">
       Analizator wskazuje właściwą instytucję i tryb złożenia wniosku. Pułapy podajemy tylko tam,
       gdzie wynikają z przepisów — dla ścieżki regionalnej wiążący jest regulamin konkretnego naboru.
-      Dane regionalne zweryfikowane 25.07.2026.
+      Dane regionalne zweryfikowane {formatVerified()}.
       <a class="src" href={PARP_OPERATORS_URL} target="_blank" rel="noopener">Wykaz operatorów PARP</a>.
     </p>
   </Section>
