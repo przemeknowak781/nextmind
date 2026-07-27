@@ -4,21 +4,63 @@ import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 
 const steps = [
-  { title: 'Załóż profil w BUR przez login.gov.pl', desc: 'Jednorazowa rejestracja (2–3 min). Profil Zaufany, e-dowód lub bankowość elektroniczna — każda z opcji wystarczy.', time: '~3 min' },
-  { title: 'Znajdź szkolenie w wyszukiwarce', desc: 'uslugirozwojowe.parp.gov.pl — filtruj po frazie, województwie, dofinansowaniu. Każde szkolenie ma własną kartę usługi z programem i efektami uczenia się.', time: '~10 min' },
-  { title: 'Skontaktuj się z operatorem w swoim województwie', desc: 'Operatora dla Twojego regionu znajdziesz w wykazie PARP. Warunki i terminy naboru określa jego regulamin.', time: '~15 min' },
-  { title: 'Złóż wniosek (z naszą pomocą)', desc: 'Pomożemy wypełnić wniosek tak, żeby przeszedł bez zwrotu do uzupełnienia. Większość pól dotyczy profilu rozwojowego.', time: '~30 min' },
-  { title: 'Dostań ID wsparcia od operatora', desc: '2–4 tygodnie na decyzję. Po akceptacji otrzymasz unikalne ID, które wpiszesz przy zapisie na konkretną edycję.', time: '2–4 tyg.' },
-  { title: 'Zapisz się na konkretną edycję', desc: 'Wracasz do BUR, wybierasz datę szkolenia, wpisujesz ID wsparcia. Dostawca dostaje powiadomienie i wysyła materiały onboardingowe.', time: '~5 min' },
-  { title: 'Bierzesz udział i otrzymujesz fakturę', desc: 'Po szkoleniu wypełniasz ankietę uczestnika w BUR. Otrzymujesz fakturę z rozbiciem na dofinansowanie i Twój wkład (10–20%).', time: 'Wkład 10–20%' },
+  {
+    title: 'Załóż profil w BUR przez login.gov.pl',
+    desc: 'Jednorazowa rejestracja (2–3 min). Profil Zaufany, e-dowód lub bankowość elektroniczna — każda z opcji wystarczy.',
+    time: '~3 min',
+    where: 'login.gov.pl',
+  },
+  {
+    title: 'Znajdź szkolenie w wyszukiwarce',
+    desc: 'uslugirozwojowe.parp.gov.pl — filtruj po frazie, województwie, dofinansowaniu. Każde szkolenie ma własną kartę usługi z programem i efektami uczenia się.',
+    time: '~10 min',
+    where: 'Baza Usług Rozwojowych',
+  },
+  {
+    title: 'Skontaktuj się z operatorem w swoim województwie',
+    desc: 'Operatora dla Twojego regionu znajdziesz w wykazie PARP. Warunki i terminy naboru określa jego regulamin.',
+    time: '~15 min',
+    where: 'Wykaz operatorów PARP',
+  },
+  {
+    title: 'Złóż wniosek (z naszą pomocą)',
+    desc: 'Pomożemy wypełnić wniosek tak, żeby przeszedł bez zwrotu do uzupełnienia. Większość pól dotyczy profilu rozwojowego.',
+    time: '~30 min',
+    where: 'System operatora',
+  },
+  {
+    title: 'Dostań ID wsparcia od operatora',
+    desc: '2–4 tygodnie na decyzję. Po akceptacji otrzymasz unikalne ID, które wpiszesz przy zapisie na konkretną edycję.',
+    time: '2–4 tyg.',
+    where: 'Czekasz na decyzję',
+  },
+  {
+    title: 'Zapisz się na konkretną edycję',
+    desc: 'Wracasz do BUR, wybierasz datę szkolenia, wpisujesz ID wsparcia. Dostawca dostaje powiadomienie i wysyła materiały onboardingowe.',
+    time: '~5 min',
+    where: 'Baza Usług Rozwojowych',
+  },
+  {
+    title: 'Bierzesz udział i otrzymujesz fakturę',
+    desc: 'Po szkoleniu wypełniasz ankietę uczestnika w BUR. Na fakturze widać podział na dofinansowanie i Twój wkład własny — jego wysokość ustala program w Twoim województwie.',
+    time: 'Po szkoleniu',
+    where: 'Baza Usług Rozwojowych',
+  },
 ];
+
+// Sumę liczymy z danych powyżej, żeby deklaracja w nagłówku nie rozjechała się
+// z krokami, gdyby któryś się zmienił. Oczekiwanie na decyzję operatora liczymy
+// osobno — to nie jest czas, który spędzasz przy dokumentach.
+const activeMinutes = steps
+  .map((s) => Number(/^~(\d+)\s*min$/.exec(s.time)?.[1] ?? 0))
+  .reduce((a, b) => a + b, 0);
 ---
 
 <BaseLayout
   title="BUR krok po kroku — jak zapisać się na szkolenie z dofinansowaniem 2026"
   description="Pełny przewodnik: jak zarejestrować się w Bazie Usług Rozwojowych przez login.gov.pl, znaleźć szkolenie i otrzymać dofinansowanie do 90% w 2026 r."
 >
-  <div class="container-edge pt-8">
+  <div class="container-edge pt-5">
     <Breadcrumbs items={[
       { name: 'Strona główna', url: '/' },
       { name: 'Dofinansowanie', url: '/dofinansowanie/' },
@@ -26,137 +68,389 @@ const steps = [
     ]} />
   </div>
 
-  <Section padding="default">
-    <div class="grid lg:grid-cols-12 gap-12 items-end">
-      <div class="lg:col-span-9">
+  <Section padding="tight" class="hero-sec">
+    <div class="hero">
+      <div>
         <div class="eyebrow">Przewodnik 7-stopniowy</div>
-        <h1 class="mt-5 page-h1">
+        <h1 class="mt-4 page-h1">
           BUR <span class="display-italic">krok po kroku</span>.<br />
           Bez urzędowego bełkotu.
         </h1>
-        <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
-          Większość pracowników biurowych w Polsce ma prawo do dofinansowanej edukacji — ale nie wie, jak je odebrać.
-          Ten przewodnik rozkłada Bazę Usług Rozwojowych na czynniki pierwsze.
+        <p class="hero-sub">
+          Większość pracowników biurowych w Polsce ma prawo do dofinansowanej edukacji — ale nie wie,
+          jak je odebrać. Ten przewodnik rozkłada Bazę Usług Rozwojowych na czynniki pierwsze.
         </p>
+        <div class="hero-cta">
+          <a href="#kroki" class="btn btn-primary">Zacznij od kroku 01</a>
+          <a href="/pomoc-z-wnioskiem/" class="btn btn-ghost">Zrobimy to za Ciebie</a>
+        </div>
       </div>
+
+      <dl class="facts">
+        <div class="fact">
+          <dt>Kroków</dt>
+          <dd><span class="fact-big">{steps.length}</span></dd>
+        </div>
+        <div class="fact">
+          <dt>Twojego czasu przy dokumentach</dt>
+          <dd><span class="fact-big">~{activeMinutes}</span> min łącznie</dd>
+        </div>
+        <div class="fact">
+          <dt>Oczekiwanie na decyzję operatora</dt>
+          <dd><span class="fact-big">2–4</span> tygodnie</dd>
+        </div>
+        <div class="fact">
+          <dt>Wkład własny</dt>
+          <dd>
+            Zależy od programu w Twoim regionie —
+            <a href="/dofinansowanie/wojewodztwa/" class="fact-link">sprawdź na mapie</a>
+          </dd>
+        </div>
+      </dl>
     </div>
   </Section>
 
-  <Section surface="paper-soft" padding="default">
-    <ol class="bur-steps">
-      {steps.map((step, i) => (
-        <li class="bur-step">
-          <div class="bur-step-marker">
-            <span class="bur-step-num">{String(i + 1).padStart(2, '0')}</span>
-            <span class="bur-step-time">{step.time}</span>
-          </div>
-          <div>
-            <h2 class="bur-step-title">{step.title}</h2>
-            <p class="bur-step-desc">{step.desc}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
+  <!-- Prezentacja kroków: szyna po lewej zostaje na ekranie i pokazuje, gdzie
+       jesteś, karta kroku po prawej wchodzi przy przewijaniu. Bez JavaScriptu
+       widać wszystkie kroki naraz — animacja i licznik to dodatek. -->
+  <Section surface="paper-soft" padding="tight" id="kroki">
+    <div class="flow" id="flow">
+      <aside class="rail">
+        <div class="rail-eyebrow">Krok</div>
+        <div class="rail-num" id="rail-num">01</div>
+        <p class="rail-title" id="rail-title">{steps[0].title}</p>
+        <div class="rail-bar"><span id="rail-fill"></span></div>
+        <ol class="rail-dots" id="rail-dots">
+          {steps.map((s, i) => (
+            <li>
+              <a href={`#krok-${i + 1}`} class="rail-dot" data-i={i} aria-label={`Krok ${i + 1}: ${s.title}`}>
+                <span>{String(i + 1).padStart(2, '0')}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+
+        <div class="rail-help">
+          <p class="rail-help-t">Nie chcesz przechodzić tego sam?</p>
+          <p class="rail-help-d">
+            Kroki 03–04 bierzemy na siebie, jeśli szkolisz się u nas.
+          </p>
+          <a href="/pomoc-z-wnioskiem/" class="rail-help-a">Zobacz, jak pomagamy →</a>
+        </div>
+      </aside>
+
+      <ol class="flow-steps">
+        {steps.map((step, i) => (
+          <li class="flow-step" id={`krok-${i + 1}`} data-i={i}>
+            <div class="step-head">
+              <span class="step-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="step-line" aria-hidden="true"></span>
+              <span class="step-time">{step.time}</span>
+            </div>
+            <h2 class="step-title">{step.title}</h2>
+            <p class="step-desc">{step.desc}</p>
+            <p class="step-where"><span>Gdzie</span> {step.where}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
   </Section>
 
-  <Section padding="default">
-    <div class="grid lg:grid-cols-12 gap-12">
-      <div class="lg:col-span-5">
-        <h2 class="text-3xl md:text-4xl tracking-tight leading-tight">Najczęstsze <span class="display-italic">pułapki</span>.</h2>
-      </div>
-      <div class="lg:col-span-7 space-y-3">
-        {[
-          { t: 'Zapis bez decyzji operatora', d: 'Klikasz „zapisz się" w BUR od razu — bez wniosku do operatora. Płacisz 100% z własnej kieszeni.' },
-          { t: 'Brak ID wsparcia w zapisie', d: 'Bez ID wsparcia od operatora — nie ma dofinansowania. ID dostajesz po pozytywnej decyzji.' },
-          { t: 'Wybór dostawcy bez statusu BUR', d: 'Niektóre firmy szkoleniowe nie są w BUR. Ich szkolenia nie podlegają dofinansowaniu.' },
-          { t: 'Zapomniana ankieta po szkoleniu', d: 'Jeśli nie wypełnisz ankiety w BUR — operator wstrzyma wypłatę i obciąży Cię całą kwotą.' },
-        ].map((p) => (
-          <div class="pitfall">
-            <span class="pitfall-icon">!</span>
-            <div>
-              <h3 class="pitfall-title">{p.t}</h3>
-              <p class="pitfall-desc">{p.d}</p>
-            </div>
+  <Section padding="default" counter="01" eyebrow="Czego unikać">
+    <div class="sec-head">
+      <h2 class="sec-h2">Najczęstsze <span class="display-italic">pułapki</span>.</h2>
+      <p class="sec-intro">
+        Każda z nich kończy się tak samo: płacisz pełną cenę szkolenia z własnej kieszeni.
+      </p>
+    </div>
+
+    <div class="pitfalls">
+      {[
+        { t: 'Zapis bez decyzji operatora', d: 'Klikasz „zapisz się" w BUR od razu — bez wniosku do operatora. Płacisz 100% z własnej kieszeni.' },
+        { t: 'Brak ID wsparcia w zapisie', d: 'Bez ID wsparcia od operatora — nie ma dofinansowania. ID dostajesz po pozytywnej decyzji.' },
+        { t: 'Wybór dostawcy bez statusu BUR', d: 'Niektóre firmy szkoleniowe nie są w BUR. Ich szkolenia nie podlegają dofinansowaniu.' },
+        { t: 'Zapomniana ankieta po szkoleniu', d: 'Jeśli nie wypełnisz ankiety w BUR — operator wstrzyma wypłatę i obciąży Cię całą kwotą.' },
+      ].map((p) => (
+        <div class="pitfall">
+          <span class="pitfall-icon" aria-hidden="true">!</span>
+          <div>
+            <h3 class="pitfall-title">{p.t}</h3>
+            <p class="pitfall-desc">{p.d}</p>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   </Section>
 
   <section class="surface-night">
-    <div class="container-edge py-20 md:py-28">
-      <h2 class="text-4xl md:text-5xl text-[var(--color-paper)] tracking-tight leading-tight max-w-3xl">
-        Pomożemy <span class="display-italic text-[var(--color-marker)]">wypełnić wniosek</span>.
-      </h2>
-      <p class="mt-5 text-lg text-white/70 max-w-xl">
-        Wypełniamy wniosek razem przez 30 minut na zoom-callu. Bezpłatnie — to inwestycja w Ciebie jako uczestnika.
-      </p>
-      <a href="/kontakt/" class="mt-8 btn btn-accent btn-lg">Umów rozmowę</a>
+    <div class="container-edge py-16 md:py-20">
+      <div class="grid lg:grid-cols-12 gap-x-12 gap-y-6 items-center">
+        <div class="lg:col-span-8">
+          <h2 class="text-3xl md:text-4xl text-[var(--color-paper)] tracking-tight leading-tight">
+            Pomożemy <span class="display-italic text-[var(--color-marker)]">wypełnić wniosek</span>.
+          </h2>
+          <p class="mt-4 text-white/70 leading-relaxed max-w-2xl">
+            Wypełniamy wniosek razem przez 30 minut na zoom-callu. Bezpłatnie — to inwestycja
+            w Ciebie jako uczestnika.
+          </p>
+        </div>
+        <div class="lg:col-span-4 flex flex-wrap gap-3 lg:justify-end">
+          <a href="/kontakt/" class="btn btn-accent btn-lg">Umów rozmowę</a>
+        </div>
+      </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .bur-steps {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  /* ---------- Nagłówek ---------- */
+  .hero-sec { padding-block-start: 1.5rem; }
+  @media (min-width: 768px) { .hero-sec { padding-block-start: 2rem; } }
+
+  .hero { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3rem; }
+  }
+  .hero-sub {
+    margin-top: 1.1rem;
+    max-width: 34rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
+    color: var(--color-ink-3);
+  }
+  .hero-cta { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  .facts {
     display: grid;
-    gap: 0;
-    border-left: 1px dashed var(--color-rule-strong);
-    margin-left: 1.75rem;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 10px;
+    overflow: hidden;
   }
-  .bur-step {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 2rem;
-    padding-block: 2rem;
-    margin-left: -1.75rem;
+  .fact { padding: 0.85rem 1.1rem; }
+  .fact + .fact { border-top: 1px solid var(--color-rule); }
+  .fact dt {
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: var(--color-ink-4);
+    font-weight: 600;
   }
-  .bur-step-marker {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    padding-top: 0.2rem;
+  .fact dd {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--color-ink-2);
   }
-  .bur-step-num {
-    width: 3.5rem;
-    height: 3.5rem;
+  .fact-big {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-accent-deep);
+    font-feature-settings: 'tnum';
+    margin-right: 0.15rem;
+  }
+  .fact-link {
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---------- Prezentacja kroków ---------- */
+  .flow { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 900px) {
+    .flow { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 3.5rem; }
+  }
+
+  .rail { display: none; }
+  @media (min-width: 900px) {
+    .rail {
+      display: block;
+      position: sticky;
+      top: 7.5rem;
+    }
+  }
+  .rail-eyebrow {
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-4);
+    font-weight: 600;
+  }
+  .rail-num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 4.5rem;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--color-accent);
+    font-feature-settings: 'tnum';
+    margin-top: 0.35rem;
+  }
+  .rail-title {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--color-ink-2);
+    min-height: 2.7rem;
+  }
+  .rail-bar {
+    margin-top: 1.1rem;
+    height: 2px;
+    background: var(--color-rule);
     border-radius: 999px;
+    overflow: hidden;
+  }
+  .rail-bar span {
+    display: block;
+    height: 100%;
+    width: 14.28%;
     background: var(--color-accent);
-    border: 1px solid var(--color-accent);
+    transition: width 0.35s cubic-bezier(0.2, 0.7, 0.1, 1);
+  }
+  .rail-dots {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .rail-dot {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-rule);
+    background: var(--color-card-raised);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-ink-4);
+    text-decoration: none;
+    transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  }
+  .rail-dot:hover { border-color: var(--color-accent); color: var(--color-accent-deep); }
+  .rail-dot[aria-current='true'] {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+  .rail-dot.done { color: var(--color-ink-3); border-color: var(--color-rule-strong); }
+
+  .rail-help {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px dotted var(--color-rule-strong);
+  }
+  .rail-help-t { font-weight: 500; color: var(--color-ink); font-size: 0.92rem; }
+  .rail-help-d {
+    margin-top: 0.35rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--color-ink-4);
+  }
+  .rail-help-a {
+    display: inline-block;
+    margin-top: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .flow-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+  .flow-step {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 10px;
+    padding: 1.5rem 1.6rem 1.35rem;
+    scroll-margin-top: 7rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  /* Aktywny krok wyróżniamy dopiero, gdy działa obserwator — bez skryptu
+     wszystkie karty wyglądają tak samo i to jest poprawny stan. */
+  #flow.js .flow-step.active {
+    border-color: var(--color-accent);
+    box-shadow: 0 18px 40px -30px rgba(21, 17, 13, 0.35);
+  }
+
+  .step-head { display: flex; align-items: center; gap: 0.9rem; }
+  .step-num {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.25rem;
-    color: white;
-    font-feature-settings: 'tnum';
-    box-shadow: 0 4px 12px rgba(45, 91, 255, 0.25);
-  }
-  .bur-step-time {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 1.35rem;
+    line-height: 1;
     color: var(--color-accent);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    text-align: center;
+    font-feature-settings: 'tnum';
   }
-  .bur-step-title {
+  .step-line { flex: 1; height: 1px; background: var(--color-rule); }
+  .step-time {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--color-ink-4);
+    white-space: nowrap;
+  }
+  .step-title {
+    margin-top: 0.9rem;
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
-    line-height: 1.1;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1.2;
     letter-spacing: -0.02em;
     color: var(--color-ink);
-    margin-bottom: 0.5rem;
   }
-  .bur-step-desc {
+  .step-desc {
+    margin-top: 0.55rem;
     color: var(--color-ink-3);
-    line-height: 1.6;
-    max-width: 56rem;
+    line-height: 1.62;
+    font-size: 0.94rem;
+    max-width: 52ch;
   }
+  .step-where {
+    margin-top: 0.9rem;
+    padding-top: 0.8rem;
+    border-top: 1px dotted var(--color-rule-strong);
+    font-size: 0.78rem;
+    color: var(--color-ink-3);
+  }
+  .step-where span {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--color-ink-4);
+    margin-right: 0.5rem;
+  }
+
+  /* Wejście karty przy przewijaniu — włącza je dopiero skrypt. */
+  #flow.js .flow-step {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.1, 1),
+      border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  #flow.js .flow-step.seen { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #flow.js .flow-step { opacity: 1; transform: none; transition: none; }
+    .rail-bar span { transition: none; }
+  }
+
+  /* ---------- Pułapki ---------- */
+  .sec-head { display: grid; gap: 1.25rem; margin-bottom: 2.5rem; align-items: end; }
+  @media (min-width: 900px) {
+    .sec-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3rem; margin-bottom: 3rem; }
+  }
+  .sec-h2 { font-size: clamp(1.65rem, 3.4vw, 2.35rem); line-height: 1.1; letter-spacing: -0.025em; }
+  .sec-intro { color: var(--color-ink-3); font-size: 0.94rem; line-height: 1.62; }
+
+  .pitfalls { display: grid; gap: 0.6rem; }
+  @media (min-width: 720px) { .pitfalls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .pitfall {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -165,7 +459,7 @@ const steps = [
     background: var(--color-card-raised);
     border: 1px solid var(--color-rule);
     border-left: 3px solid var(--color-danger);
-    border-radius: 6px;
+    border-radius: 8px;
   }
   .pitfall-icon {
     font-family: var(--font-display);
@@ -175,5 +469,80 @@ const steps = [
     line-height: 1;
   }
   .pitfall-title { font-weight: 500; color: var(--color-ink); margin-bottom: 0.3rem; }
-  .pitfall-desc { font-size: 0.92rem; color: var(--color-ink-3); line-height: 1.5; }
+  .pitfall-desc { font-size: 0.9rem; color: var(--color-ink-3); line-height: 1.55; }
 </style>
+
+<script>
+  // Prezentacja kroków przy przewijaniu. Wszystko tu jest dodatkiem: bez
+  // skryptu karty są widoczne, a szyna pokazuje pierwszy krok.
+  const flow = document.getElementById('flow');
+  const num = document.getElementById('rail-num');
+  const title = document.getElementById('rail-title');
+  const fill = document.getElementById('rail-fill');
+
+  if (flow && num && title && fill && 'IntersectionObserver' in window) {
+    const railNum = num;
+    const railTitle = title;
+    const railFill = fill as HTMLElement;
+    const steps = Array.from(flow.querySelectorAll<HTMLElement>('.flow-step'));
+    const dots = Array.from(flow.querySelectorAll<HTMLAnchorElement>('.rail-dot'));
+    flow.classList.add('js');
+
+    const titles = steps.map((s) => s.querySelector('.step-title')?.textContent?.trim() ?? '');
+    let current = -1;
+
+    function setActive(i: number) {
+      if (i === current) return;
+      current = i;
+      railNum.textContent = String(i + 1).padStart(2, '0');
+      railTitle.textContent = titles[i];
+      railFill.style.width = `${((i + 1) / steps.length) * 100}%`;
+      steps.forEach((s, k) => s.classList.toggle('active', k === i));
+      dots.forEach((d, k) => {
+        d.setAttribute('aria-current', String(k === i));
+        d.classList.toggle('done', k < i);
+      });
+    }
+
+    // Odsłanianie kart — raz zobaczona karta zostaje widoczna.
+    const reveal = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('seen');
+            reveal.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px', threshold: 0.05 }
+    );
+    for (const s of steps) reveal.observe(s);
+
+    // Aktywny krok = ostatni, którego górna krawędź minęła linię pod nagłówkiem.
+    // Linia musi leżeć poniżej scroll-margin-top kart (7rem), inaczej kliknięcie
+    // w kropkę szyny podświetlałoby krok następny po docelowym.
+    const LINE = 160;
+
+    function track() {
+      let best = 0;
+      steps.forEach((s, i) => {
+        if (s.getBoundingClientRect().top <= LINE) best = i;
+      });
+      setActive(best);
+    }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        track();
+        ticking = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    track();
+  }
+</script>

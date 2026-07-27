@@ -21,7 +21,7 @@ const steps = [
   title="Dofinansowanie szkoleń według województw — gdzie złożyć wniosek"
   description="Programy dofinansowania szkoleń dla osób dorosłych i firm w podziale na województwa: operator, poziom wsparcia i status naborów. Dane ze źródeł urzędowych."
 >
-  <div class="container-edge pt-8">
+  <div class="container-edge pt-5">
     <Breadcrumbs items={[
       { name: 'Strona główna', url: '/' },
       { name: 'Dofinansowanie', url: '/dofinansowanie/' },
@@ -29,28 +29,20 @@ const steps = [
     ]} />
   </div>
 
-  <Section padding="default">
-    <div class="max-w-3xl">
-      <div class="eyebrow">Ścieżka regionalna</div>
-      <h1 class="mt-5 page-h1">
-        Dofinansowanie <span class="display-italic">województwo po województwie</span>.
-      </h1>
-      <p class="lead mt-6 text-[var(--color-ink-3)]">
+  <!-- Hero tej podstrony to mapa: pierwsze pytanie brzmi „w którym jesteś
+       województwie", więc odpowiedź na nie ma być pierwszą rzeczą na ekranie. -->
+  <Section padding="tight" id="mapa" class="hero-sec">
+    <div class="hero-head">
+      <div>
+        <div class="eyebrow">Ścieżka regionalna</div>
+        <h1 class="mt-4 page-h1">
+          Dofinansowanie <span class="display-italic">województwo po województwie</span>.
+        </h1>
+      </div>
+      <p class="hero-sub">
         Poza Krajowym Funduszem Szkoleniowym działa druga, niezależna ścieżka: środki europejskie
-        rozdzielane regionalnie. Nie ma tu jednego ogólnopolskiego programu — każde województwo ma
-        własnego operatora, własny regulamin i własny kalendarz naborów.
-      </p>
-    </div>
-  </Section>
-
-  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Wybierz województwo" id="mapa">
-    <div class="sec-head">
-      <h2 class="sec-h2">
-        Kliknij swój <span class="display-italic">region</span>.
-      </h2>
-      <p class="sec-intro">
-        Dane potwierdziliśmy u operatorów 25 lipca 2026 r. Wiążący pozostaje regulamin konkretnego
-        naboru — pułapy i limity zmieniają się między rundami.
+        rozdzielane regionalnie. Każde województwo ma własnego operatora, własny regulamin
+        i własny kalendarz naborów. Kliknij swój region.
       </p>
     </div>
 
@@ -122,9 +114,14 @@ const steps = [
         </div>
       </div>
     </div>
+
+    <p class="picker-src">
+      Dane potwierdziliśmy u operatorów 25 lipca 2026 r. Wiążący pozostaje regulamin konkretnego
+      naboru — pułapy i limity zmieniają się między rundami.
+    </p>
   </Section>
 
-  <Section padding="default" counter="02" eyebrow="Jak to działa">
+  <Section surface="paper-soft" padding="default" counter="01" eyebrow="Jak to działa">
     <div class="sec-head">
       <h2 class="sec-h2">
         Kolejność ma <span class="display-italic">znaczenie</span>.
@@ -151,7 +148,7 @@ const steps = [
     </div>
   </Section>
 
-  <Section surface="paper-soft" padding="tight">
+  <Section padding="tight">
     <div class="eyebrow">Źródła</div>
     <ul class="mt-4 space-y-1.5 text-sm">
       <li><a class="src" href={PARP_OPERATORS_URL} target="_blank" rel="noopener">PARP — dofinansowania w BUR i wykaz operatorów</a></li>
@@ -235,6 +232,28 @@ const steps = [
   }
   .sec-intro { color: var(--color-ink-3); font-size: 0.94rem; line-height: 1.62; }
 
+  /* Nagłówek hero — tytuł po lewej, wprowadzenie po prawej, żeby mapa
+     zaczynała się możliwie wysoko. */
+  .hero-head {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    align-items: end;
+  }
+  @media (min-width: 900px) {
+    .hero-head {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 3rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+  .hero-sub { color: var(--color-ink-3); font-size: 0.96rem; line-height: 1.62; }
+
+  /* Mapa ma zmieścić się na pierwszym ekranie, więc górny odstęp sekcji
+     jest mniejszy niż standardowy. */
+  .hero-sec { padding-block-start: 1.5rem; }
+  @media (min-width: 768px) { .hero-sec { padding-block-start: 2rem; } }
+
   /* Mapa + panel wybranego województwa */
   .picker-wrap {
     display: grid;
@@ -247,8 +266,15 @@ const steps = [
       gap: 3rem;
     }
   }
-  .picker-map { max-width: 34rem; margin-inline: auto; width: 100%; }
+  .picker-map { max-width: 30rem; margin-inline: auto; width: 100%; }
   .picker-panel { display: flex; flex-direction: column; gap: 0.6rem; }
+  .picker-src {
+    margin-top: 2rem;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--color-ink-4);
+    max-width: 60ch;
+  }
 
   .sel-lbl {
     font-size: 0.66rem;
