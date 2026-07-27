@@ -5,8 +5,8 @@ import Section from '../components/ui/Section.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import { SITE, TRUST_SIGNALS } from '../lib/site';
 import { AUDIENCES } from '../lib/advisor';
-import { getCatalog, getNearestOpenService, plainDate, formatNumeric, dateParts, seatsRange, lowestPrice, isRecruitmentOpen } from '../lib/bur';
-import { formatDateShort, formatPrice } from '../lib/format';
+import { getCatalog, getNearestOpenService, plainDate, formatNumeric, dateParts, lowestPrice, isRecruitmentOpen } from '../lib/bur';
+import { formatPrice } from '../lib/format';
 
 const faqs = (await getCollection('faqs')).sort((a, b) => a.data.order - b.data.order).slice(0, 5);
 
@@ -23,7 +23,6 @@ const nearestParts = nearestDate ? dateParts(nearestDate) : null;
 const nearestOffering = nearestEdition
   ? catalog.find((o) => o.terms.some((t) => t.id === nearestEdition.id))
   : undefined;
-const seats = seatsRange();
 const cheapest = lowestPrice();
 // Do bloku porównania kosztów bierzemy najtańsze realne szkolenie z katalogu,
 // żeby przykładowa kwota odpowiadała czemuś, co faktycznie można kupić.
@@ -49,7 +48,10 @@ const personas = [
 >
   <!-- ====================================================
        S1 — HERO
-       Editorial display headline, asymmetric grid, sticky meta
+       Dwie kolumny: obietnica po lewej, wybór typu podmiotu po prawej.
+       Selektor musi być widoczny bez przewijania — to pierwszy krok
+       ścieżki użytkownika, więc dzieli miejsce z nagłówkiem, a nie
+       chowa się pod nim.
        ==================================================== -->
   <section class="hero relative overflow-hidden">
     <!-- Decorative background composition -->
@@ -62,47 +64,65 @@ const personas = [
       </svg>
     </div>
 
-    <div class="container-edge relative pt-12 lg:pt-20 pb-16 lg:pb-32">
-      <!-- Top meta bar -->
-      <div class="flex items-center gap-3 text-[0.78rem] font-mono text-[var(--color-ink-4)] mb-10 reveal reveal-1">
-        <span class="tabular-nums">N<span class="text-[var(--color-accent)]">/</span>01</span>
-        <span class="rule-dotted flex-1 max-w-[6rem]"></span>
-        <span class="uppercase tracking-[0.18em] text-[0.7rem] font-semibold">Akademia AI · Edycja 2026</span>
-      </div>
+    <div class="container-edge relative pt-7 lg:pt-10 pb-10 lg:pb-14">
+      <div class="grid lg:grid-cols-12 gap-x-12 gap-y-7 lg:gap-y-9 items-start">
+        <!-- Obietnica — kolumny 1-7 -->
+        <div class="lg:col-span-7 reveal reveal-1">
+          <div class="hero-meta">
+            <span class="tabular-nums">N<span class="text-[var(--color-accent)]">/</span>01</span>
+            <span class="rule-dotted flex-1 max-w-[3.5rem]"></span>
+            <span class="hero-meta-label">Akademia AI · Edycja 2026</span>
+          </div>
 
-      <div class="grid lg:grid-cols-12 gap-x-8 gap-y-12 items-end">
-        <!-- Headline — column 1-9 -->
-        <div class="lg:col-span-9 reveal reveal-2">
           <h1 class="hero-h1">
-            Naucz się <span class="display-italic">AI w pracy biurowej</span>.<br class="hidden lg:inline" />
-            <span class="hero-h1-row">
-              Z dofinansowaniem do <span class="hero-pct">90%</span>.
-            </span>
+            Naucz się <span class="display-italic">AI w&nbsp;pracy biurowej</span>.<br />
+            Z&nbsp;dofinansowaniem do <span class="hero-pct">90%</span>.
           </h1>
 
-          <p class="lead mt-8 max-w-3xl reveal reveal-3">
-            Praktyczne szkolenia z <strong class="font-medium text-[var(--color-ink)]">ChatGPT, Gemini, Claude i NotebookLM</strong>
-            dla pracowników spoza IT.
-            Online live, kameralna grupa <span class="marker-orange">4–10 osób</span>, zaświadczenie z mapowaniem efektów na ramę DigComp 2.2.
+          <p class="hero-lead">
+            Praktyczne szkolenia z&nbsp;<strong>ChatGPT, Gemini, Claude i&nbsp;NotebookLM</strong>
+            dla pracowników spoza IT. Online live, zaświadczenie z&nbsp;mapowaniem
+            efektów uczenia się na ramę DigComp 2.2.
           </p>
 
-          <div class="mt-10 flex flex-wrap gap-3 reveal reveal-4">
-            <a href="#szkolenia" class="btn btn-primary btn-lg">
+          <div class="hero-actions">
+            <a href="#szkolenia" class="btn btn-primary">
               Zobacz szkolenia
               <svg class="w-4 h-4" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </a>
-          </div>
 
-          <!-- Selektor grupy — wejście do analizatora ścieżki finansowania -->
-          <div class="picker mt-12 reveal reveal-4">
-            <h2 class="picker-q">Kim jesteś? Sprawdź, gdzie złożyć wniosek.</h2>
+            {nearestEdition && nearestParts ? (
+              <a href={nearestOffering ? `/szkolenia/${nearestOffering.slug}/` : '/szkolenia/'} class="hero-next">
+                <span class="hero-next-dot" aria-hidden="true"></span>
+                <span>
+                  Najbliższa edycja <strong>{nearestParts.day}.{nearestParts.month}.{nearestParts.year}</strong>
+                  <span class="hero-next-open"> — zapisy otwarte</span>
+                </span>
+              </a>
+            ) : (
+              <a href="/kontakt/" class="hero-next">
+                <span>Ustalamy terminy kolejnych edycji — <strong>zapytaj o termin</strong></span>
+              </a>
+            )}
+          </div>
+        </div>
+
+        <!-- Selektor typu podmiotu — wejście do analizatora ścieżki finansowania -->
+        <aside class="lg:col-span-5 reveal reveal-2">
+          <div class="picker">
+            <h2 class="picker-q">Jakim jesteś podmiotem?</h2>
+            <p class="picker-sub">
+              Wybierz, a&nbsp;pokażemy, z&nbsp;czego możesz się finansować i&nbsp;gdzie złożyć wniosek.
+            </p>
             <div class="picker-grid">
               {AUDIENCES.map((a) => (
                 <a href={`/dofinansowanie/kalkulator/?kim=${a.value}`} class="picker-card">
-                  <span class="picker-label">{a.label}</span>
-                  <span class="picker-hint">{a.hint}</span>
+                  <span class="picker-text">
+                    <span class="picker-label">{a.label}</span>
+                    <span class="picker-hint">{a.hint}</span>
+                  </span>
                   <span class="picker-go" aria-hidden="true">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -112,67 +132,25 @@ const personas = [
               ))}
             </div>
             <p class="picker-note">
-              Pułap zależy od tego, kto wnioskuje: <strong>do 90%</strong> dla firm do 9 osób i podmiotów
-              bez pracowników, <strong>do 70%</strong> dla większych. Osoby prywatne mają odrębne ścieżki.
+              Pułap zależy od tego, kto wnioskuje: <strong>do 90%</strong> dla firm do 9&nbsp;osób
+              i&nbsp;podmiotów bez pracowników, <strong>do 70%</strong> dla większych.
+              Osoby prywatne mają odrębne ścieżki.
             </p>
-          </div>
-        </div>
-
-        <!-- Side card — column 10-12 -->
-        <aside class="lg:col-span-3 reveal reveal-5">
-          <div class="hero-card">
-            <div class="eyebrow !text-[var(--color-accent)] mb-3">Najbliższa edycja</div>
-            <div class="text-[2.75rem] leading-[1] font-display tracking-tight text-[var(--color-ink)]">
-              {nearestParts ? nearestParts.day : '—'}
-              <span class="text-[var(--color-accent)] display-italic text-[1.75rem] align-top">
-                {nearestParts ? `.${nearestParts.month}` : ''}
-              </span>
-            </div>
-            <div class="text-[0.78rem] uppercase tracking-[0.16em] text-[var(--color-ink-4)] mt-1 font-mono">
-              {nearestParts ? `${nearestParts.year} · ${nearestParts.weekday}` : 'termin w ustalaniu'}
-            </div>
-            <div class="rule-dotted my-4"></div>
-            {nearestEdition ? (
-              <>
-                <p class="text-sm text-[var(--color-ink-2)] leading-snug">
-                  <span class="display-italic text-[var(--color-ink)]">
-                    {nearestOffering?.title.slice(0, 58)}{nearestOffering && nearestOffering.title.length > 58 ? '…' : ''}
-                  </span>
-                  <br />Online live.
-                </p>
-                <div class="mt-3 flex items-center gap-2 text-[0.78rem]">
-                  <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-positive)]"></span>
-                  <span class="text-[var(--color-ink-3)]">Zapisy otwarte</span>
-                </div>
-              </>
-            ) : (
-              <p class="text-sm text-[var(--color-ink-2)] leading-snug">
-                Ustalamy terminy kolejnych edycji. Napisz, a zarezerwujemy dla Ciebie miejsce
-                i damy znać, gdy tylko otworzymy zapisy.
-              </p>
-            )}
-            <a href={nearestOffering ? `/szkolenia/${nearestOffering.slug}/` : '/szkolenia/'} class="mt-5 inline-flex items-center gap-1.5 text-sm text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors group">
-              <span class="border-b border-[var(--color-accent)] pb-0.5">Zobacz program</span>
-              <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
           </div>
         </aside>
       </div>
 
-      <!-- Trust strip — bottom of hero -->
-      <div class="hero-trust mt-16 lg:mt-24 reveal reveal-6">
-        <div class="rule-line mb-6"></div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-5">
-          {TRUST_SIGNALS.map((signal, i) => (
-            <div class="trust-item">
-              <span class="trust-no">{String(i + 1).padStart(2, '0')}</span>
+      <!-- Pasek zaufania — jedna linia, na dole hero -->
+      <div class="hero-trust reveal reveal-3">
+        <div class="rule-line mb-4"></div>
+        <ul class="trust-row">
+          {TRUST_SIGNALS.map((signal) => (
+            <li class="trust-item">
               <span class="trust-label">{signal.label}</span>
               <span class="trust-detail">{signal.detail}</span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   </section>
@@ -685,22 +663,39 @@ const personas = [
     opacity: 0.6;
   }
 
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-ink-4);
+    margin-bottom: 1.25rem;
+  }
+  .hero-meta-label {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.66rem;
+    font-weight: 600;
+  }
+
+  /* Nagłówek celowo mieści się w dwóch wierszach także na telefonie —
+     wcześniejszy rozmiar wypychał selektor podmiotu poniżej ekranu. */
   .hero-h1 {
     font-family: var(--font-display);
-    font-size: clamp(2.75rem, 8vw, 6.5rem);
-    line-height: 0.96;
-    letter-spacing: -0.035em;
+    font-size: clamp(1.95rem, 6.4vw, 2.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
     color: var(--color-ink);
     font-weight: 400;
+    text-wrap: balance;
   }
   @media (min-width: 1024px) {
-    .hero-h1 { font-size: clamp(4rem, 6.5vw, 6.75rem); }
-  }
-  .hero-h1-row { display: block; }
-  .big-number-inline {
-    font-family: var(--font-display);
-    font-weight: 800;
-    color: var(--color-accent);
+    .hero-h1 {
+      font-size: clamp(2.6rem, 3.6vw, 3.5rem);
+      line-height: 0.99;
+      letter-spacing: -0.035em;
+    }
   }
   .hero-pct {
     font-family: var(--font-display);
@@ -709,50 +704,91 @@ const personas = [
     font-feature-settings: 'tnum';
   }
 
-  .hero-card {
-    background: var(--color-card-raised);
-    border: 1px solid var(--color-rule);
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 24px 50px -32px rgba(21, 17, 13, 0.12);
-    position: relative;
+  .hero-lead {
+    margin-top: 0.9rem;
+    max-width: 34rem;
+    font-size: 0.94rem;
+    line-height: 1.52;
+    color: var(--color-ink-3);
   }
-  .hero-card::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: 1.5rem;
-    right: 1.5rem;
-    height: 2px;
-    background: var(--color-accent);
+  .hero-lead strong { font-weight: 500; color: var(--color-ink); }
+  @media (min-width: 1024px) {
+    .hero-lead { margin-top: 1.1rem; font-size: 1.05rem; line-height: 1.6; }
   }
 
-  .trust-item {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: baseline;
-    column-gap: 0.5rem;
-    row-gap: 0.1rem;
-    font-size: 0.78rem;
+  .hero-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
   }
-  .trust-no {
-    grid-row: 1 / 3;
-    font-family: var(--font-mono);
-    color: var(--color-ink-4);
-    font-size: 0.7rem;
-    line-height: 1;
-    align-self: flex-start;
+  @media (min-width: 1024px) {
+    .hero-actions { margin-top: 1.6rem; }
+  }
+  /* Na wąskim ekranie ta sama informacja stoi w pasku nad nagłówkiem strony,
+     więc tutaj tylko odsuwałaby selektor podmiotu poza pierwszy ekran. */
+  .hero-next { display: none; }
+  @media (min-width: 640px) {
+  .hero-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-ink-3);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+  }
+  .hero-next strong { color: var(--color-ink); font-weight: 500; }
+  .hero-next:hover { color: var(--color-ink); border-bottom-color: var(--color-accent); }
+  .hero-next-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: var(--color-positive);
+    flex-shrink: 0;
+  }
+  .hero-next-open { color: var(--color-ink-4); }
+
+  /* Pasek zaufania — jeden ciąg, oddzielony kropkami. Sześć kafli
+     w siatce zabierało ćwierć ekranu, nie wnosząc nic ponad tę treść. */
+  .hero-trust { margin-top: 2.25rem; }
+  .trust-row {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.5rem;
+  }
+  .trust-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    position: relative;
+  }
+  .trust-item + .trust-item::before {
+    content: '';
+    position: absolute;
+    left: -0.78rem;
+    top: 0.45rem;
+    width: 2px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--color-rule-strong);
   }
   .trust-label {
     color: var(--color-ink);
     font-weight: 500;
-    font-size: 0.85rem;
-    line-height: 1.2;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
   .trust-detail {
     color: var(--color-ink-4);
-    font-size: 0.72rem;
-    line-height: 1.3;
+    font-size: 0.74rem;
   }
 
   /* ============== Marquee ============== */
@@ -983,67 +1019,94 @@ const personas = [
     opacity: 0.85;
   }
 
-  /* Selektor grupy klienta w hero — wejscie do analizatora */
+  /* Selektor typu podmiotu w hero — wejście do analizatora.
+     Lista pionowa, bo w kolumnie obok nagłówka mieści się bez zwężania
+     etykiet, a strzałka siedzi w wierszu zamiast dokładać wysokości. */
+  .picker {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 10px;
+    padding: 1.35rem 1.4rem 1.25rem;
+    box-shadow: 0 24px 50px -34px rgba(21, 17, 13, 0.18);
+    position: relative;
+  }
+  .picker::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 1.4rem;
+    right: 1.4rem;
+    height: 2px;
+    background: var(--color-accent);
+  }
   .picker-q {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
-    letter-spacing: -0.01em;
+    font-size: 1.3rem;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
     color: var(--color-ink);
-    margin-bottom: 1rem;
+  }
+  .picker-sub {
+    margin-top: 0.3rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--color-ink-4);
   }
   .picker-grid {
     display: grid;
-    gap: 0.6rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
   }
-  @media (min-width: 900px) {
-    .picker-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* Na tablecie selektor jest pełnej szerokości — w jednej kolumnie kafle
+     byłyby niepotrzebnie rozciągnięte. */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .picker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   .picker-card {
-    position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 1rem 1.1rem 2.4rem;
-    background: var(--color-card-raised);
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+    padding: 0.7rem 0.85rem;
+    background: var(--color-card);
     border: 1px solid var(--color-rule);
-    border-radius: 8px;
+    border-radius: 7px;
     text-decoration: none;
-    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    transition: border-color 0.18s ease, background 0.18s ease;
   }
   .picker-card:hover {
     border-color: var(--color-accent);
-    transform: translateY(-2px);
-    box-shadow: 0 18px 32px -22px rgba(21, 17, 13, 0.28);
+    background: var(--color-accent-wash);
   }
   .picker-card:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
+  .picker-text { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
   .picker-label {
     font-weight: 500;
+    font-size: 0.92rem;
     color: var(--color-ink);
     line-height: 1.25;
   }
   .picker-hint {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     color: var(--color-ink-4);
-    line-height: 1.4;
+    line-height: 1.35;
   }
   .picker-go {
-    position: absolute;
-    left: 1.1rem;
-    bottom: 0.9rem;
     color: var(--color-accent);
+    flex-shrink: 0;
     transition: transform 0.18s ease;
   }
   .picker-card:hover .picker-go { transform: translateX(3px); }
   .picker-note {
     margin-top: 0.9rem;
-    font-size: 0.82rem;
-    line-height: 1.55;
+    padding-top: 0.85rem;
+    border-top: 1px dotted var(--color-rule-strong);
+    font-size: 0.76rem;
+    line-height: 1.5;
     color: var(--color-ink-4);
-    max-width: 46rem;
   }
   .picker-note strong { color: var(--color-ink-2); font-weight: 500; }
 </style>
