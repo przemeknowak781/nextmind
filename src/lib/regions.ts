@@ -187,10 +187,13 @@ export const REGIONS: Region[] = [
   {
     slug: 'lubuskie',
     name: 'lubuskie',
-    program: 'Lubuskie Bony Rozwojowe',
-    status: 'do-sprawdzenia',
-    note: 'Program adresowany do przedsiębiorców — strona operatora prowadzi wyłącznie ścieżki „Dla Przedsiębiorców" i „Dla Dostawców usług". Odrębnej ścieżki dla osób dorosłych uczących się z własnej inicjatywy nie potwierdziliśmy.',
-    url: 'https://www.lubuskiebony.pl/',
+    program: 'Usługi rozwojowe dla mieszkańców województwa lubuskiego (działanie FELB.06.08 Edukacja dorosłych)',
+    operator: 'Instytut ADN i ADN Akademia Biznesu',
+    coverage: '95% wartości usługi, 5% wkładu własnego',
+    limit: 'do 4 500 zł łącznie na uczestnika, także przy kilku usługach',
+    status: 'aktywny',
+    note: 'Nabory rundami — w 2026 r. w marcu, maju, lipcu, wrześniu i grudniu; termin każdej rundy operator ogłasza co najmniej 14 dni wcześniej. Preferencje dla mieszkańców obszarów wiejskich, osób 50+, o niskich kwalifikacjach i z niepełnosprawnościami. Projekt trwa do 31 grudnia 2027 r. Osobny program „Lubuskie Bony Rozwojowe" jest przeznaczony dla przedsiębiorców — to nie ta sama ścieżka.',
+    url: 'https://urlubuskie.pl/',
     verified: '2026-07-27',
   },
   {
