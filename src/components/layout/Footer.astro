@@ -1,7 +1,6 @@
 ---
 import { OPERATOR, SITE } from '../../lib/site';
-import { formatEditionNumeric } from '../../lib/editions';
-import { getNearestOpenService, plainDate } from '../../lib/bur';
+import { getNearestOpenService, plainDate, formatNumeric } from '../../lib/bur';
 import Logo from './Logo.astro';
 
 const year = new Date().getFullYear();
@@ -19,7 +18,7 @@ const nearestDate = plainDate(nearest?.startDate);
     <div class="container-edge py-14 md:py-20 grid gap-10 md:grid-cols-12 items-end">
       <div class="md:col-span-7">
         <div class="eyebrow !text-white/60">
-          {nearestDate ? `Najbliższe szkolenie • ${formatEditionNumeric(nearestDate)}` : 'Nowe terminy w przygotowaniu'}
+          {nearestDate ? `Najbliższe szkolenie • ${formatNumeric(nearestDate)}` : 'Nowe terminy w przygotowaniu'}
         </div>
         <h3 class="mt-4 text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.02] tracking-tight text-[var(--color-paper)]">
           Naucz się <span class="display-italic !text-[var(--color-accent-soft)]">tego, co działa</span>.<br />
@@ -69,9 +68,7 @@ const nearestDate = plainDate(nearest?.startDate);
     <div class="md:col-span-2">
       <div class="footer-heading">Szkolenia</div>
       <ul class="footer-list">
-        <li><a href="/szkolenia/ai-w-pracy-biurowej-podstawy/">Basic 1-day</a></li>
-        <li><a href="/szkolenia/ai-w-pracy-biurowej-level-2/">Level 2 1-day</a></li>
-        <li><a href="/szkolenia/ai-w-pracy-biurowej-program-100h/">Program 100h</a></li>
+        <li><a href="/szkolenia/">Katalog szkoleń</a></li>
         <li><a href="/terminy/">Wszystkie terminy</a></li>
         <li><a href="/firmy/">Dla firm</a></li>
       </ul>

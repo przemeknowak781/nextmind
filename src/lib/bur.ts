@@ -139,3 +139,137 @@ export function groupByMonth(services: BurService[]): MonthGroup[] {
       return { key, label: `${MIESIACE[Number(m) - 1]} ${y}`, services: list };
     });
 }
+
+/* ------------------------------------------------------------------ *
+ *  KATALOG OFERT
+ *
+ *  W BUR jedna oferta występuje wielokrotnie — raz na każdy termin.
+ *  Na stronie chcemy pokazać ofertę raz, z listą jej terminów, dlatego
+ *  grupujemy usługi po tytule.
+ * ------------------------------------------------------------------ */
+
+export interface Offering {
+  slug: string;
+  title: string;
+  priceNet: number | null;
+  priceGross: number | null;
+  seatsMin: number | null;
+  seatsMax: number | null;
+  /** Liczba dni zajęć wg harmonogramu. */
+  days: number;
+  /** Deklarowana liczba godzin, jeśli podana w BUR. */
+  hours: number | null;
+  /** Wszystkie nadchodzące terminy tej oferty. */
+  terms: BurService[];
+}
+
+const PL_MAP: Record<string, string> = {
+  ą: 'a', ć: 'c', ę: 'e', ł: 'l', ń: 'n', ó: 'o', ś: 's', ź: 'z', ż: 'z',
+};
+
+export function slugify(text: string, maxWords = 8): string {
+  const base = text
+    .toLowerCase()
+    .replace(/[ąćęłńóśźż]/g, (c) => PL_MAP[c] ?? c)
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w.length > 2)
+    .slice(0, maxWords)
+    .join('-');
+  return base || 'szkolenie';
+}
+
+/** Oferty posortowane wg najbliższego terminu. */
+export function getCatalog(): Offering[] {
+  const groups = new Map<string, BurService[]>();
+  for (const s of getUpcomingServices()) {
+    const key = (s.title ?? '').trim();
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(s);
+  }
+
+  const used = new Set<string>();
+  const out: Offering[] = [];
+
+  for (const [title, terms] of groups) {
+    let slug = slugify(title);
+    // Tytuły bywają bardzo podobne — pilnujemy unikalności adresu.
+    if (used.has(slug)) {
+      let i = 2;
+      while (used.has(`${slug}-${i}`)) i++;
+      slug = `${slug}-${i}`;
+    }
+    used.add(slug);
+
+    const first = terms[0];
+    out.push({
+      slug,
+      title,
+      priceNet: first.priceNetPerParticipant,
+      priceGross: first.priceGrossPerParticipant,
+      seatsMin: first.seatsMin,
+      seatsMax: first.seatsMax,
+      days: countDays(first),
+      hours: first.hoursTotal,
+      terms,
+    });
+  }
+
+  return out.sort((a, b) =>
+    String(a.terms[0]?.startDate).localeCompare(String(b.terms[0]?.startDate))
+  );
+}
+
+export function getOffering(slug: string): Offering | undefined {
+  return getCatalog().find((o) => o.slug === slug);
+}
+
+/** Zakres liczby uczestników w całym katalogu — do uczciwych deklaracji na stronie. */
+export function seatsRange(): { min: number; max: number } | null {
+  const cat = getCatalog();
+  const mins = cat.map((o) => o.seatsMin).filter((n): n is number => typeof n === 'number');
+  const maxs = cat.map((o) => o.seatsMax).filter((n): n is number => typeof n === 'number');
+  if (mins.length === 0 || maxs.length === 0) return null;
+  return { min: Math.min(...mins), max: Math.max(...maxs) };
+}
+
+/** Najniższa cena netto w katalogu — do komunikatów typu „już od…". */
+export function lowestPrice(): number | null {
+  const p = getCatalog().map((o) => o.priceNet).filter((n): n is number => typeof n === 'number');
+  return p.length ? Math.min(...p) : null;
+}
+
+/* ------------------------------------------------------------------ *
+ *  FORMATOWANIE DAT
+ *  Wszystkie daty pochodzą z API i są kotwiczone przez plainDate(),
+ *  dlatego formatujemy je w UTC — inaczej strefa builda przesunęłaby dzień.
+ * ------------------------------------------------------------------ */
+
+const OPTS = { timeZone: 'UTC' } as const;
+
+/** np. „środa, 4 lipca 2026" */
+export function formatLong(d: Date): string {
+  return d.toLocaleDateString('pl-PL', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', ...OPTS,
+  });
+}
+
+/** np. „04.07.2026" */
+export function formatNumeric(d: Date): string {
+  return d.toLocaleDateString('pl-PL', {
+    day: '2-digit', month: '2-digit', year: 'numeric', ...OPTS,
+  });
+}
+
+/** Dzień, miesiąc, rok i dzień tygodnia — dla kafla w hero. */
+export function dateParts(d: Date) {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return {
+    day: p(d.getUTCDate()),
+    month: p(d.getUTCMonth() + 1),
+    year: d.getUTCFullYear(),
+    weekday: d.toLocaleDateString('pl-PL', { weekday: 'long', ...OPTS }),
+  };
+}

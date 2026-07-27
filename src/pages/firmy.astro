@@ -4,15 +4,15 @@ import Section from '../components/ui/Section.astro';
 import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
 
 const offerings = [
-  { title: '1-day Basic dla zespołu', subtitle: 'Wprowadzenie do AI dla całego działu.', desc: 'Idealne dla zespołów, które dotąd nie używały AI systematycznie. Program dostosowany do branży klienta.', count: '8h × 1 dzień', size: '6–24 osoby' },
-  { title: '1-day Level 2 dla zespołu', subtitle: 'Custom GPT, Gem, Claude Project — własne asystenty firmowe.', desc: 'Dla zespołów z bazową znajomością AI. Wychodzicie z dnia z 3+ asystentami zbudowanymi pod Wasze procesy.', count: '8h × 1 dzień', size: '6–18 osób' },
+  { title: 'Szkolenie jednodniowe dla zespołu', subtitle: 'Wprowadzenie do AI dla całego działu.', desc: 'Dla zespołów, które dotąd nie używały AI systematycznie. Program dobieramy z naszego katalogu i dostosowujemy do branży klienta.', count: '1 dzień', size: 'wg wybranego szkolenia' },
+  { title: 'Szkolenie zaawansowane dla zespołu', subtitle: 'Własne asystenty i automatyzacje firmowe.', desc: 'Dla zespołów z bazową znajomością AI. Budujecie asystentów pod własne procesy — na bazie szkoleń z naszego katalogu.', count: '1–3 dni', size: 'wg wybranego szkolenia' },
   { title: '24h corporate', subtitle: 'Trzy dni pełnej immersji + projekt wdrożeniowy.', desc: 'Najgłębszy format dla firm, które chcą zrobić AI standardem operacyjnym. Zawiera mentoring po szkoleniu i analizę procesów.', count: '24h × 3 dni', size: '8–16 osób' },
 ];
 ---
 
 <BaseLayout
   title="Szkolenia AI zamknięte dla zespołów | Next Mind Academy dla firm"
-  description="Dedykowane szkolenia AI dla zespołów: 1-day, 24h corporate, mentoring. Dostosowanie do branży, zaświadczenie z mapowaniem na DigComp 2.2, dofinansowanie z KFS."
+  description="Dedykowane szkolenia AI dla zespołów — program dobierany z katalogu i dostosowany do branży. Dostosowanie do branży, zaświadczenie z mapowaniem na DigComp 2.2, dofinansowanie z KFS."
 >
   <div class="container-edge pt-8">
     <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Dla firm' }]} />
@@ -135,8 +135,8 @@ const offerings = [
               <label for="f-format" class="field-label">Preferowany format</label>
               <select id="f-format" name="format" class="field-select">
                 <option value="">Wybierz —</option>
-                <option value="basic-1d">1-day Basic dla zespołu</option>
-                <option value="l2-1d">1-day Level 2 dla zespołu</option>
+                <option value="jednodniowe">Szkolenie jednodniowe dla zespołu</option>
+                <option value="zaawansowane">Szkolenie zaawansowane dla zespołu</option>
                 <option value="24h">24h corporate</option>
                 <option value="other">Indywidualnie — opowiem w mailu</option>
               </select>

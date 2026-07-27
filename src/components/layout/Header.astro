@@ -1,8 +1,7 @@
 ---
 import { NAV } from '../../lib/site';
 import Logo from './Logo.astro';
-import { formatEditionLong, formatEditionNumeric } from '../../lib/editions';
-import { getNearestOpenService, plainDate } from '../../lib/bur';
+import { getNearestOpenService, plainDate, formatLong, formatNumeric } from '../../lib/bur';
 
 interface Props {
   hideBorder?: boolean;
@@ -30,11 +29,11 @@ function isActive(href: string) {
       {nearest && nearestDate ? (
         <>
           <span class="hidden sm:inline">
-            Najbliższe szkolenie — <strong class="font-medium">{formatEditionLong(nearestDate)}</strong>.
+            Najbliższe szkolenie — <strong class="font-medium">{formatLong(nearestDate)}</strong>.
              Zapisy otwarte.
           </span>
           <span class="sm:hidden">
-            Najbliższa edycja: {formatEditionNumeric(nearestDate)}
+            Najbliższe: {formatNumeric(nearestDate)}
           </span>
         </>
       ) : (

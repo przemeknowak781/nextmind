@@ -14,8 +14,18 @@ const PLN_INT = new Intl.NumberFormat('pl-PL', {
   maximumFractionDigits: 0,
 });
 
+/**
+ * Formatuje kwotę w złotych.
+ *
+ * Grosze pokazujemy zawsze, gdy występują — ceny w Bazie Usług Rozwojowych
+ * bywają niecałkowite (np. 894,31 zł), a zaokrąglanie ich w dół rozjeżdżałoby
+ * stronę z kartą usługi. `decimals: true` wymusza grosze także dla kwot
+ * całkowitych, `decimals: false` je ucina.
+ */
 export function formatPrice(amount: number, opts: { decimals?: boolean } = {}): string {
-  return opts.decimals ? PLN.format(amount) : PLN_INT.format(amount);
+  if (opts.decimals === true) return PLN.format(amount);
+  if (opts.decimals === false) return PLN_INT.format(amount);
+  return Number.isInteger(amount) ? PLN_INT.format(amount) : PLN.format(amount);
 }
 
 const DATE_LONG = new Intl.DateTimeFormat('pl-PL', {

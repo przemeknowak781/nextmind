@@ -5,7 +5,7 @@
     "categoryLabel": "Szkolenia",
     "order": 1,
     "question": "Czy szkolenie jest dla mnie, jeśli nie znam ChatGPT?",
-    "answer": "Tak — szkolenie Basic 1-day jest zaprojektowane dla osób bez doświadczenia z AI. Zaczynamy od podstaw, przechodzimy przez bezpieczne wdrożenie krok po kroku. Jeśli używałeś już ChatGPT przez 3+ miesięcy, lepszy będzie Level 2."
+    "answer": "Tak. W katalogu mamy szkolenia na różnych poziomach — od wprowadzenia dla osób, które nie używały AI systematycznie, po tematy zaawansowane. Poziom każdego szkolenia opisuje jego karta w Bazie Usług Rozwojowych; jeśli nie masz pewności, napisz — podpowiemy."
   },
   {
     "id": "faq-2",
@@ -13,7 +13,7 @@
     "categoryLabel": "Szkolenia",
     "order": 2,
     "question": "Czy potrzebuję płatnego konta ChatGPT, żeby uczestniczyć?",
-    "answer": "Nie — wystarczą darmowe konta OpenAI i Google. Pokazujemy też różnice między wersjami darmowymi a Plus, żebyś sam zdecydował, czy warto. Dla Level 2 Plus jest preferowany, ale można pracować bez niego."
+    "answer": "Nie — wystarczą darmowe konta OpenAI i Google. Pokazujemy też różnice między wersjami darmowymi a Plus, żebyś sam zdecydował, czy warto. Przy szkoleniach zaawansowanych plan płatny bywa wygodniejszy, ale nie jest warunkiem udziału."
   },
   {
     "id": "faq-3",

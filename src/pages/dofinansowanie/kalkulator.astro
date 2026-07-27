@@ -4,6 +4,7 @@ import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 import { AUDIENCES, analyze, type Audience, type Headcount } from '../../lib/advisor';
 import { REGIONS_SORTED, STATUS_LABELS, PARP_OPERATORS_URL } from '../../lib/regions';
+import { getCatalog } from '../../lib/bur';
 
 // Wyniki liczymy w czasie builda — logika zostaje w jednym miejscu (advisor.ts),
 // a przeglądarka dostaje gotową mapę odpowiedzi.
@@ -22,10 +23,23 @@ for (const a of AUDIENCES) {
   }
 }
 
+// Presety cen bierzemy z realnego katalogu — trzy różne progi cenowe,
+// żeby użytkownik mógł policzyć wkład dla szkolenia zbliżonego do swojego.
+const catalogPrices = [
+  ...new Set(
+    getCatalog()
+      .map((o) => o.priceNet)
+      .filter((p): p is number => typeof p === 'number')
+  ),
+].sort((a, b) => a - b);
+
 const PRICES = [
-  { label: 'Basic', value: 1490 },
-  { label: 'Level 2', value: 1990 },
-];
+  catalogPrices[0],
+  catalogPrices[Math.floor(catalogPrices.length / 2)],
+  catalogPrices[catalogPrices.length - 1],
+]
+  .filter((v, i, arr) => typeof v === 'number' && arr.indexOf(v) === i)
+  .map((value) => ({ label: `${Math.round(value)} zł`, value }));
 ---
 
 <BaseLayout

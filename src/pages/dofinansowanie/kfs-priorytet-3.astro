@@ -3,9 +3,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/ui/Section.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
 import { formatPrice } from '../../lib/format';
+import { lowestPrice } from '../../lib/bur';
 
-// Cena referencyjna szkolenia Basic — podstawa wyliczeń w tabeli.
-const BASE_PRICE = 1490;
+// Cena referencyjna do tabeli — najtańsze szkolenie z naszego katalogu w BUR,
+// żeby przykład dotyczył oferty, którą faktycznie można kupić.
+const BASE_PRICE = lowestPrice() ?? 0;
 
 // Pułapy z ustawy z 20 marca 2025 r. o rynku pracy i służbach zatrudnienia,
 // obowiązujące dla KFS od 1 stycznia 2026 r.

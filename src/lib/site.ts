@@ -9,7 +9,7 @@ export const SITE = {
   url: 'https://przemeknowak781.github.io/nextmind',
   defaultLocale: 'pl-PL',
   description:
-    'Praktyczne szkolenia z ChatGPT, Gemini, Claude i NotebookLM dla pracowników biurowych spoza IT. Online live, kameralna grupa 4–10 osób, zaświadczenie z mapowaniem na DigComp 2.2. Dofinansowanie z KFS i programów regionalnych.',
+    'Praktyczne szkolenia z ChatGPT, Gemini, Claude i NotebookLM dla pracowników biurowych spoza IT. Online live, zaświadczenie z mapowaniem na DigComp 2.2. Dofinansowanie z KFS i programów regionalnych.',
   email: 'kontakt@nextmindacademy.pl',
   ogImage: '/og/default.png',
 } as const;
@@ -49,9 +49,7 @@ export const NAV: {
       label: 'Szkolenia',
       href: '/szkolenia/',
       children: [
-        { label: 'Basic 1-day', href: '/szkolenia/ai-w-pracy-biurowej-podstawy/', summary: 'Dla osób bez doświadczenia z AI' },
-        { label: 'Level 2 1-day', href: '/szkolenia/ai-w-pracy-biurowej-level-2/', summary: 'Custom GPT, AI Studio, Zapier' },
-        { label: 'Program 100h', href: '/szkolenia/ai-w-pracy-biurowej-program-100h/', summary: 'Pełna transformacja Q3 2026' },
+        { label: 'Katalog szkoleń', href: '/szkolenia/', summary: 'Wszystkie tematy z terminami' },
         { label: 'Wszystkie terminy', href: '/terminy/', summary: 'Kalendarz najbliższych edycji' },
       ],
     },
@@ -87,7 +85,7 @@ export const TRUST_SIGNALS = [
   { label: 'Dostawca BUR', detail: 'Expert-Sales sp. z o.o.' },
   { label: 'DigComp 2.2', detail: 'Mapowanie efektów uczenia się' },
   { label: 'Walidacja dwumetodowa', detail: 'Test wiedzy + zadanie praktyczne' },
-  { label: 'Kameralna grupa', detail: '4–10 osób — uwaga dla każdego' },
+  { label: 'Małe grupy', detail: 'Wielkość zależna od szkolenia' },
   { label: 'Polski', detail: 'Trener mówi po polsku' },
   { label: 'Online live', detail: 'Bez nagrań na YouTube' },
 ] as const;
