@@ -89,7 +89,7 @@ export function courseSchema(opts: {
         instructor: {
           '@type': 'Person',
           name: opts.trainerName,
-          url: `${SITE.url}/trener/`,
+          url: `${SITE.url}/trenerzy/`,
         },
       }),
       ...(opts.startDate && { startDate: opts.startDate }),

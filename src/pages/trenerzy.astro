@@ -1,0 +1,532 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import { SITE, OPERATOR } from '../lib/site';
+
+// Zdjęcia leżą w public/images/trenerzy/. Sprawdzamy je w czasie builda, bo
+// dopóki pliku nie ma, <img> dawałby 404 i pustą ramkę — zamiast tego karta
+// pokazuje monogram z inicjałami i wygląda na skończoną.
+const PUBLIC_DIR = path.resolve('./public');
+const hasPhoto = (p?: string) => Boolean(p && fs.existsSync(path.join(PUBLIC_DIR, p)));
+
+const entries = (await getCollection('trainers')).sort(
+  (a, b) => a.data.order - b.data.order || a.data.name.localeCompare(b.data.name, 'pl')
+);
+
+// Treść MDX renderujemy tu, żeby sekcja „poznaj" istniała tylko dla osób,
+// które faktycznie mają napisane bio.
+const trainers = await Promise.all(
+  entries.map(async (entry) => {
+    const { Content } = await render(entry);
+    return {
+      ...entry.data,
+      Content,
+      hasBody: entry.body != null && entry.body.trim().length > 0,
+      photoOk: hasPhoto(entry.data.photo),
+      initials: entry.data.name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((w) => w[0])
+        .join(''),
+    };
+  })
+);
+
+const withProfile = trainers.filter((t) => t.hasBody || t.certifications.length > 0);
+
+const schemas = trainers.map((t) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: t.name,
+  jobTitle: t.title,
+  url: `${SITE.url}/trenerzy/#${t.slug}`,
+  worksFor: { '@type': 'Organization', name: OPERATOR.legalName },
+  ...(t.linkedin ? { sameAs: [t.linkedin] } : {}),
+  ...(t.certifications.length > 0
+    ? {
+        hasCredential: t.certifications.map((c) => ({
+          '@type': 'EducationalOccupationalCredential',
+          name: c.name,
+          recognizedBy: { '@type': 'Organization', name: c.issuer },
+        })),
+      }
+    : {}),
+}));
+---
+
+<BaseLayout
+  title="Trenerzy Next Mind Academy — kto prowadzi zajęcia"
+  description="Poznaj osoby, które prowadzą nasze szkolenia z AI i Microsoft 365. Imienne certyfikaty, obszary specjalizacji i wpis dostawcy w Bazie Usług Rozwojowych."
+  schemas={schemas}
+>
+  <div class="container-edge pt-5">
+    <Breadcrumbs items={[{ name: 'Strona główna', url: '/' }, { name: 'Trenerzy' }]} />
+  </div>
+
+  <Section padding="tight" class="hero-sec">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Zespół</div>
+        <h1 class="mt-4 page-h1">
+          Kto poprowadzi <span class="display-italic">Twoje szkolenie</span>.
+        </h1>
+        <p class="hero-sub">
+          Zajęcia prowadzą praktycy, nie odtwarzacze slajdów. Nie podajemy tu liczby godzin ani
+          uczestników — zamiast tego pokazujemy to, co możesz sprawdzić samodzielnie: imienne
+          certyfikaty, profil zawodowy i nasz wpis w rejestrze prowadzonym przez PARP.
+        </p>
+      </div>
+
+      <dl class="facts">
+        <div class="fact">
+          <dt>Dostawca w Bazie Usług Rozwojowych</dt>
+          <dd>
+            {OPERATOR.legalName} —
+            <a href={OPERATOR.burProviderUrl} target="_blank" rel="noopener" class="fact-link">zobacz profil</a>
+          </dd>
+        </div>
+        <div class="fact">
+          <dt>Efekty uczenia się</dt>
+          <dd>Mapowane na ramę DigComp 2.2</dd>
+        </div>
+        <div class="fact">
+          <dt>Walidacja</dt>
+          <dd>Dwumetodowa: test wiedzy i zadanie praktyczne</dd>
+        </div>
+      </dl>
+    </div>
+  </Section>
+
+  <Section surface="paper-soft" padding="default">
+    <ul class="team">
+      {trainers.map((t) => (
+        <li class="member" id={`karta-${t.slug}`}>
+          <div class="member-photo">
+            {t.photoOk ? (
+              <img src={t.photo} alt={`${t.name} — ${t.title}`} loading="lazy" decoding="async" />
+            ) : (
+              <span class="monogram" aria-hidden="true">{t.initials}</span>
+            )}
+          </div>
+
+          <div class="member-body">
+            <h2 class="member-name">{t.name}</h2>
+            <p class="member-role">{t.title}</p>
+
+            {t.shortBio && <p class="member-bio">{t.shortBio}</p>}
+
+            {t.focus.length > 0 && (
+              <ul class="tags">
+                {t.focus.map((f) => <li>{f}</li>)}
+              </ul>
+            )}
+
+            <div class="member-links">
+              {(t.hasBody || t.certifications.length > 0) && (
+                <a href={`#${t.slug}`} class="member-link">
+                  Poznaj bliżej
+                  <svg viewBox="0 0 16 16" fill="none" width="13" height="13" aria-hidden="true">
+                    <path d="M8 3v10M8 13l4-4M8 13l-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+              )}
+              {t.linkedin && (
+                <a href={t.linkedin} target="_blank" rel="noopener" class="member-link member-link-soft">
+                  LinkedIn ↗
+                </a>
+              )}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  {withProfile.map((t, i) => (
+    <Section
+      padding="default"
+      surface={i % 2 === 0 ? 'paper' : 'paper-soft'}
+      id={t.slug}
+      counter={String(i + 1).padStart(2, '0')}
+      eyebrow={t.title}
+    >
+      <div class="profile">
+        <div class="profile-side">
+          <div class="profile-photo">
+            {t.photoOk ? (
+              <img src={t.photo} alt={`${t.name} — ${t.title}`} loading="lazy" decoding="async" />
+            ) : (
+              <span class="monogram monogram-lg" aria-hidden="true">{t.initials}</span>
+            )}
+          </div>
+          {t.linkedin && (
+            <a href={t.linkedin} target="_blank" rel="noopener" class="profile-linkedin">
+              Profil na LinkedIn ↗
+            </a>
+          )}
+        </div>
+
+        <div class="profile-main">
+          <h2 class="profile-name">{t.name}</h2>
+
+          {t.hasBody && (
+            <div class="profile-text">
+              <t.Content />
+            </div>
+          )}
+
+          {t.certifications.length > 0 && (
+            <div class="certs">
+              <h3 class="certs-head">Certyfikaty</h3>
+              <ul class="certs-list">
+                {t.certifications.map((c) => (
+                  <li class="cert">
+                    <span class="cert-year">{c.year}</span>
+                    <span class="cert-body">
+                      <span class="cert-name">{c.name}</span>
+                      <span class="cert-issuer">{c.issuer}</span>
+                    </span>
+                    {c.url && (
+                      <a href={c.url} target="_blank" rel="noopener" class="cert-verify">Zweryfikuj ↗</a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </Section>
+  ))}
+
+  <Section padding="default" counter={String(withProfile.length + 1).padStart(2, '0')} eyebrow="Jak pracujemy">
+    <div class="sec-head">
+      <h2 class="sec-h2">Co dostajesz <span class="display-italic">niezależnie</span> od prowadzącego.</h2>
+      <p class="sec-intro">
+        Standard nie zależy od tego, kto akurat prowadzi Twoją grupę — wynika z wpisu do rejestru
+        i z karty usługi, którą widzisz przed zapisem.
+      </p>
+    </div>
+
+    <ul class="rules">
+      <li class="rule">
+        <h3 class="rule-t">Program przed zapisem</h3>
+        <p class="rule-d">
+          Harmonogram każdego terminu jest w karcie usługi w BUR — wiesz, co robimy w której godzinie,
+          zanim zapłacisz.
+        </p>
+      </li>
+      <li class="rule">
+        <h3 class="rule-t">Zajęcia na żywo</h3>
+        <p class="rule-d">
+          Online live z trenerem, nie nagrania. Pytania zadajesz w trakcie, na własnym przykładzie
+          z pracy.
+        </p>
+      </li>
+      <li class="rule">
+        <h3 class="rule-t">Walidacja dwumetodowa</h3>
+        <p class="rule-d">
+          Test wiedzy i zadanie praktyczne. Zaświadczenie z mapowaniem efektów uczenia się na ramę
+          DigComp 2.2.
+        </p>
+      </li>
+      <li class="rule">
+        <h3 class="rule-t">Rozliczenie z dofinansowania</h3>
+        <p class="rule-d">
+          Każde szkolenie jest w Bazie Usług Rozwojowych, więc kwalifikuje się do KFS albo programu
+          regionalnego.
+        </p>
+      </li>
+    </ul>
+  </Section>
+
+  <section class="surface-night">
+    <div class="container-edge py-16 md:py-20">
+      <div class="grid lg:grid-cols-12 gap-x-12 gap-y-6 items-center">
+        <div class="lg:col-span-8">
+          <h2 class="text-3xl md:text-4xl text-[var(--color-paper)] tracking-tight leading-tight">
+            Pracujmy <span class="display-italic text-[var(--color-marker)]">razem</span>.
+          </h2>
+          <p class="mt-4 text-white/70 leading-relaxed max-w-2xl">
+            Otwarte szkolenia w Bazie Usług Rozwojowych albo dedykowana edycja dla Twojego zespołu —
+            z tym samym standardem prowadzenia i tą samą walidacją.
+          </p>
+        </div>
+        <div class="lg:col-span-4 flex flex-wrap gap-3 lg:justify-end">
+          <a href="/szkolenia/" class="btn btn-accent btn-lg">Zobacz szkolenia</a>
+          <a href="/firmy/" class="btn btn-ghost btn-lg !border-white/20 !text-[var(--color-paper)] hover:!bg-white/10">
+            Szkolenie zamknięte
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-sec { padding-block-start: 1.5rem; }
+  @media (min-width: 768px) { .hero-sec { padding-block-start: 2rem; } }
+  .hero { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3rem; }
+  }
+  .hero-sub {
+    margin-top: 1.1rem;
+    max-width: 36rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
+    color: var(--color-ink-3);
+  }
+  .facts {
+    display: grid;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .fact { padding: 0.85rem 1.1rem; }
+  .fact + .fact { border-top: 1px solid var(--color-rule); }
+  .fact dt {
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: var(--color-ink-4);
+    font-weight: 600;
+  }
+  .fact dd { margin: 0.25rem 0 0; font-size: 0.9rem; line-height: 1.45; color: var(--color-ink-2); }
+  .fact-link {
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---------- Karty zespołu ---------- */
+  /* Karty mają stałą, wygodną szerokość i układają się od lewej. Przy dwóch
+     osobach rozciąganie ich na całą szerokość wyglądałoby jak brak treści,
+     a siatka 1fr zostawiała pustą kolumnę. */
+  .team {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 20rem));
+    justify-content: start;
+    align-items: start;
+  }
+  .member {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .member:hover {
+    border-color: var(--color-rule-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 24px 44px -32px rgba(21, 17, 13, 0.4);
+  }
+
+  .member-photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: linear-gradient(160deg, var(--color-paper-deep), var(--color-accent-wash));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .member-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* Monogram zamiast zdjęcia — dopóki plik nie trafi do public/images/trenerzy/. */
+  .monogram {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 3.5rem;
+    letter-spacing: -0.04em;
+    color: var(--color-accent);
+    opacity: 0.55;
+    user-select: none;
+  }
+  .monogram-lg { font-size: 5rem; }
+
+  .member-body { padding: 1.25rem 1.35rem 1.35rem; display: flex; flex-direction: column; flex: 1; }
+  .member-name {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--color-ink);
+  }
+  .member-role {
+    margin-top: 0.2rem;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    color: var(--color-accent-deep);
+  }
+  .member-bio {
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--color-ink-3);
+  }
+
+  .tags {
+    list-style: none;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .tags li {
+    font-size: 0.7rem;
+    color: var(--color-ink-3);
+    background: var(--color-paper-deep);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .member-links {
+    margin-top: auto;
+    padding-top: 1.1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 1.1rem;
+  }
+  .member-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: var(--color-accent-deep);
+    text-decoration: none;
+  }
+  .member-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .member-link-soft { color: var(--color-ink-4); font-weight: 400; }
+
+  /* ---------- Profil pojedynczej osoby ---------- */
+  .profile { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 900px) {
+    .profile { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 3rem; }
+  }
+  .profile-side { position: sticky; top: 7.5rem; }
+  @media (max-width: 899px) { .profile-side { position: static; } }
+  .profile-photo {
+    aspect-ratio: 4 / 5;
+    max-width: 20rem;
+    border-radius: 14px;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--color-paper-deep), var(--color-accent-wash));
+    border: 1px solid var(--color-rule);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .profile-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .profile-linkedin {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .profile-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-ink);
+  }
+  .profile-text {
+    margin-top: 1.1rem;
+    max-width: 42rem;
+    color: var(--color-ink-2);
+  }
+  .profile-text :global(p) { line-height: 1.7; margin-bottom: 1rem; }
+  .profile-text :global(p:last-child) { margin-bottom: 0; }
+
+  .certs { margin-top: 2.25rem; }
+  .certs-head {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    font-weight: 600;
+    color: var(--color-ink-4);
+    margin-bottom: 0.8rem;
+  }
+  .certs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+  @media (min-width: 700px) { .certs-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .cert {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    align-items: start;
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+  }
+  .cert-year {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    padding-top: 0.15rem;
+  }
+  .cert-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+  .cert-name { font-size: 0.9rem; font-weight: 500; color: var(--color-ink); line-height: 1.35; }
+  .cert-issuer { font-size: 0.76rem; color: var(--color-ink-4); }
+  .cert-verify {
+    grid-column: 2;
+    font-size: 0.76rem;
+    color: var(--color-accent-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---------- Zasady ---------- */
+  .sec-head { display: grid; gap: 1.25rem; margin-bottom: 2.5rem; align-items: end; }
+  @media (min-width: 900px) {
+    .sec-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3rem; margin-bottom: 3rem; }
+  }
+  .sec-h2 { font-size: clamp(1.65rem, 3.4vw, 2.35rem); line-height: 1.1; letter-spacing: -0.025em; }
+  .sec-intro { color: var(--color-ink-3); font-size: 0.94rem; line-height: 1.62; }
+
+  .rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  @media (min-width: 720px) { .rules { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1200px) { .rules { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .rule {
+    background: var(--color-card-raised);
+    border: 1px solid var(--color-rule);
+    border-top: 3px solid var(--color-accent);
+    border-radius: 10px;
+    padding: 1.25rem 1.35rem;
+  }
+  .rule-t {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    color: var(--color-ink);
+  }
+  .rule-d { margin-top: 0.5rem; font-size: 0.86rem; line-height: 1.6; color: var(--color-ink-3); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .member { transition: none; }
+    .member:hover { transform: none; }
+  }
+</style>

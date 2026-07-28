@@ -71,7 +71,7 @@ export const NAV: {
       ],
     },
     { label: 'Dla firm', href: '/firmy/' },
-    { label: 'Trener', href: '/trener/' },
+    { label: 'Trenerzy', href: '/trenerzy/' },
     { label: 'Blog', href: '/blog/' },
   ],
   secondary: [

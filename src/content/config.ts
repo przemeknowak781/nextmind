@@ -3,22 +3,30 @@ import { glob, file } from 'astro/loaders';
 
 const trainers = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/trainers' }),
+  // Świadomie nie ma tu pól na liczbę godzin, uczestników czy lat
+  // doświadczenia. Takich danych nie mamy skąd potwierdzić, a wpisane „na oko"
+  // są dokładnie tym rodzajem liczby, który podważa wiarygodność całej strony.
+  // Zaufanie budujemy na tym, co da się sprawdzić: wpis dostawcy w BUR,
+  // imienne certyfikaty i publiczny profil zawodowy.
   schema: z.object({
     slug: z.string(),
     name: z.string(),
     title: z.string(),
+    /** Zdjęcie w public/. Bez niego karta pokazuje monogram z inicjałami. */
     photo: z.string().optional(),
-    yearsOfExperience: z.number(),
-    hoursDelivered: z.number(),
-    participantsTrained: z.number(),
-    projectsDelivered: z.number().default(0),
-    shortBio: z.string(),
+    /** Kolejność na stronie zespołu — mniejsza liczba wyżej. */
+    order: z.number().default(50),
+    /** Jedno zdanie na kartę. Puste, dopóki nie mamy tekstu od trenera. */
+    shortBio: z.string().optional(),
+    /** Obszary, które prowadzi. */
+    focus: z.array(z.string()).default([]),
     certifications: z.array(z.object({
       name: z.string(),
       issuer: z.string(),
       year: z.number(),
+      /** Odnośnik do weryfikacji certyfikatu, jeśli wystawca go udostępnia. */
       url: z.string().url().optional(),
-    })),
+    })).default([]),
     publications: z.array(z.string()).default([]),
     linkedin: z.string().url().optional(),
   }),

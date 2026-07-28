@@ -19,6 +19,8 @@ export default defineConfig({
   // utrzymuje działanie starych linków (Astro generuje statyczną stronę z meta refresh).
   redirects: {
     '/dofinansowanie/psf-podmiotowy-system-finansowania/': '/dofinansowanie/wojewodztwa/',
+    // Profil jednego trenera zastąpiła strona zespołu.
+    '/trener/': '/trenerzy/',
     // Ręcznie opisywane kursy zastąpił katalog generowany z Bazy Usług Rozwojowych.
     '/szkolenia/ai-w-pracy-biurowej-podstawy/': '/szkolenia/',
     '/szkolenia/ai-w-pracy-biurowej-level-2/': '/szkolenia/',
