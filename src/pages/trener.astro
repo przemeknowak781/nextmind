@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
 import Section from '../components/ui/Section.astro';
 import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
 
@@ -13,7 +14,7 @@ const personSchema = {
   '@type': 'Person',
   name: t.name,
   jobTitle: t.title,
-  url: 'https://nextmindacademy.pl/trener/',
+  url: `${SITE.url}/trener/`,
   sameAs: t.linkedin ? [t.linkedin] : [],
 };
 ---

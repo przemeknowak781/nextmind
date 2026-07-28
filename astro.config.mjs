@@ -8,7 +8,7 @@ import tailwindcss from '@tailwindcss/vite';
 // różne cele: GitHub Pages serwuje ją z podkatalogu /nextmind, a hosting FTP
 // z katalogu głównego domeny. Domyślne wartości to konfiguracja GitHub Pages,
 // żeby lokalny `npm run build` zachowywał się jak dotąd.
-const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://przemeknowak781.github.io';
+const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://next-mind.pl';
 const SITE_BASE = process.env.SITE_BASE ?? '/nextmind';
 
 export default defineConfig({

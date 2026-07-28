@@ -10,9 +10,11 @@ name: Deploy na hosting FTP
 #   FTP_PASSWORD  — hasło FTP
 #
 # WYMAGANE ZMIENNE (ta sama zakładka, karta „Variables")
-#   SITE_ORIGIN   — adres domeny bez ukośnika na końcu, np. https://nextmindacademy.pl
-#   FTP_DIR       — katalog na serwerze, zwykle /public_html/ albo /  (z ukośnikiem na końcu)
+#   FTP_DIR       — katalog na serwerze. Na home.pl zwykle /public_html/
+#                   albo /domains/next-mind.pl/public_html/ (z ukośnikiem na końcu).
 #   FTP_PROTOCOL  — opcjonalnie: ftps (domyślnie) albo ftp, jeśli hosting nie ma TLS
+#   SITE_ORIGIN   — opcjonalnie. Domyślnie https://next-mind.pl; ustaw tylko wtedy,
+#                   gdy strona ma stanąć pod innym adresem.
 #
 # Dopóki sekret FTP_SERVER nie istnieje, workflow kończy się od razu i nic nie wysyła.
 
@@ -62,7 +64,7 @@ jobs:
         env:
           # Pusta baza = strona stoi w katalogu głównym, a nie w /nextmind.
           SITE_BASE: ''
-          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN || 'https://next-mind.pl' }}
           BUR_API_USER: ${{ secrets.BUR_API_USER }}
           BUR_API_KEY: ${{ secrets.BUR_API_KEY }}
           BUR_PROVIDER_ID: '199788'

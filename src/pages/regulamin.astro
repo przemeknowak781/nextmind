@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/ui/Section.astro';
 import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
-import { OPERATOR } from '../lib/site';
+import { OPERATOR, SITE } from '../lib/site';
 ---
 
 <BaseLayout
@@ -64,7 +64,7 @@ import { OPERATOR } from '../lib/site';
 
         <h2>§ 6. Reklamacje</h2>
         <ol>
-          <li>Reklamacje należy składać mailem na adres <a href="mailto:kontakt@nextmindacademy.pl">kontakt@nextmindacademy.pl</a>.</li>
+          <li>Reklamacje należy składać mailem na adres <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</li>
           <li>Termin rozpatrzenia reklamacji — 14 dni od daty otrzymania.</li>
           <li>Klient będący konsumentem może skorzystać z&nbsp;pozasądowych sposobów rozpatrywania reklamacji
               i&nbsp;dochodzenia roszczeń, m.in. przed stałym sądem polubownym przy wojewódzkim inspektorze Inspekcji

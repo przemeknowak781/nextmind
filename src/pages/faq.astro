@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
 import Section from '../components/ui/Section.astro';
 import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
 import Accordion from '../components/ui/Accordion.astro';
@@ -40,7 +41,7 @@ const schemas = [faqSchema(faqs.map((f) => ({ question: f.data.question, answer:
         </h1>
         <p class="lead mt-7 text-[var(--color-ink-3)] max-w-2xl">
           Cztery kategorie. Większość pytań pojawia się przed zapisem — niektóre po szkoleniu.
-          Czegoś brakuje? Napisz na <a href="mailto:kontakt@nextmindacademy.pl" class="ink-link">kontakt@nextmindacademy.pl</a>.
+          Czegoś brakuje? Napisz na <a href={`mailto:${SITE.email}`} class="ink-link">{SITE.email}</a>.
         </p>
       </div>
     </div>

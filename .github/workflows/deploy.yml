@@ -38,7 +38,11 @@ jobs:
       - name: Build site
         run: npm run build
         env:
+          # GitHub Pages serwuje stronę z podkatalogu i pod adresem github.io.
+          # Domyślne wartości w konfiguracji dotyczą produkcyjnej domeny
+          # next-mind.pl, więc tutaj podajemy jedno i drugie wprost.
           SITE_BASE: /nextmind
+          SITE_ORIGIN: https://przemeknowak781.github.io
           # Dane dostępowe do API BUR. Dodaj oba w
           # Settings → Secrets and variables → Actions:
           #   BUR_API_USER — nazwa użytkownika BUR
