@@ -1,5 +1,7 @@
 # build output
 dist/
+dist-domain/
+dist-ftp/
 .output/
 
 # generated types

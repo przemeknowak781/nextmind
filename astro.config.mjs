@@ -4,9 +4,16 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
+// Adres i katalog bazowy pochodzą ze środowiska, bo ta sama treść jedzie na dwa
+// różne cele: GitHub Pages serwuje ją z podkatalogu /nextmind, a hosting FTP
+// z katalogu głównego domeny. Domyślne wartości to konfiguracja GitHub Pages,
+// żeby lokalny `npm run build` zachowywał się jak dotąd.
+const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://przemeknowak781.github.io';
+const SITE_BASE = process.env.SITE_BASE ?? '/nextmind';
+
 export default defineConfig({
-  site: 'https://przemeknowak781.github.io',
-  base: '/nextmind',
+  site: SITE_ORIGIN,
+  base: SITE_BASE,
   trailingSlash: 'always',
   // Podstrona "PSF" została zastąpiona podziałem na województwa. Przekierowanie
   // utrzymuje działanie starych linków (Astro generuje statyczną stronę z meta refresh).

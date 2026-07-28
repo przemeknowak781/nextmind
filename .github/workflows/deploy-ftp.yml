@@ -1,0 +1,95 @@
+name: Deploy na hosting FTP
+
+# Ten sam build co na GitHub Pages, ale złożony pod katalog główny domeny
+# i wysłany na serwer FTP. Uruchamia się razem z Pages, więc oba cele mają
+# tę samą treść.
+#
+# WYMAGANE SEKRETY  (Settings → Secrets and variables → Actions → New repository secret)
+#   FTP_SERVER    — host, np. ftp.nazwa.pl  (bez ftp:// i bez ścieżki)
+#   FTP_USERNAME  — login FTP
+#   FTP_PASSWORD  — hasło FTP
+#
+# WYMAGANE ZMIENNE (ta sama zakładka, karta „Variables")
+#   SITE_ORIGIN   — adres domeny bez ukośnika na końcu, np. https://nextmindacademy.pl
+#   FTP_DIR       — katalog na serwerze, zwykle /public_html/ albo /  (z ukośnikiem na końcu)
+#   FTP_PROTOCOL  — opcjonalnie: ftps (domyślnie) albo ftp, jeśli hosting nie ma TLS
+#
+# Dopóki sekret FTP_SERVER nie istnieje, workflow kończy się od razu i nic nie wysyła.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '37 4 * * *'
+
+concurrency:
+  group: ftp-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sprawdź, czy hosting jest skonfigurowany
+        id: guard
+        run: |
+          if [ -z "${{ secrets.FTP_SERVER }}" ]; then
+            echo "Brak sekretu FTP_SERVER — pomijam wysyłkę na FTP."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.guard.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: steps.guard.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.guard.outputs.ready == 'true'
+        run: npm ci
+
+      - name: Build pod katalog główny domeny
+        if: steps.guard.outputs.ready == 'true'
+        run: npm run build
+        env:
+          # Pusta baza = strona stoi w katalogu głównym, a nie w /nextmind.
+          SITE_BASE: ''
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+          BUR_API_USER: ${{ secrets.BUR_API_USER }}
+          BUR_API_KEY: ${{ secrets.BUR_API_KEY }}
+          BUR_PROVIDER_ID: '199788'
+
+      - name: Sprawdź, czy build nie zawiera ścieżek /nextmind
+        if: steps.guard.outputs.ready == 'true'
+        run: |
+          # Build pod domenę nie ma prawa zawierać prefiksu GitHub Pages —
+          # gdyby zawierał, wszystkie odnośniki i style dałyby 404.
+          if grep -rl '"/nextmind' dist --include='*.html' | head -1 | grep -q .; then
+            echo "::error::W dist zostały ścieżki /nextmind — przerywam, żeby nie wysłać zepsutej strony."
+            grep -rl '"/nextmind' dist --include='*.html' | head -20
+            exit 1
+          fi
+          echo "OK — brak ścieżek /nextmind."
+
+      - name: Wyślij na FTP
+        if: steps.guard.outputs.ready == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          local-dir: ./dist/
+          server-dir: ${{ vars.FTP_DIR }}
+          # Akcja trzyma na serwerze plik ze stanem ostatniej wysyłki i wysyła
+          # tylko to, co się zmieniło. Pierwszy przebieg wyśle całość.
+          state-name: .ftp-deploy-sync-state.json
+          dangerous-clean-slate: false

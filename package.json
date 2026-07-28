@@ -9,6 +9,7 @@
     "start": "astro dev",
     "build": "node scripts/check-placeholders.mjs && node scripts/fetch-bur.mjs && astro check && astro build && node scripts/rewrite-base.mjs",
     "build:nocheck": "node scripts/fetch-bur.mjs && astro build && node scripts/rewrite-base.mjs",
+    "build:domain": "SITE_BASE= node scripts/check-placeholders.mjs && SITE_BASE= node scripts/fetch-bur.mjs && SITE_BASE= astro check && SITE_BASE= astro build --outDir ./dist-domain && SITE_BASE= DIST_DIR=./dist-domain node scripts/rewrite-base.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",

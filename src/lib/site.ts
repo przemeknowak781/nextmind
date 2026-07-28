@@ -1,12 +1,18 @@
 // Single source of truth for site-wide constants
 
+// Te same zmienne środowiskowe, co w astro.config.mjs — inaczej adresy
+// kanoniczne, og:image i schema.org wskazywałyby na GitHub Pages także wtedy,
+// gdy strona stoi na własnej domenie.
+const ORIGIN = process.env.SITE_ORIGIN || 'https://przemeknowak781.github.io';
+const BASE = (process.env.SITE_BASE ?? '/nextmind').replace(/\/$/, '');
+
 export const SITE = {
   name: 'Next Mind Academy',
   shortName: 'NMA',
   // Root origin (for canonical URLs — Astro.url.pathname already includes base)
-  origin: 'https://przemeknowak781.github.io',
+  origin: ORIGIN,
   // Full base URL (for schema.org content URLs and absolute references like og:image)
-  url: 'https://przemeknowak781.github.io/nextmind',
+  url: `${ORIGIN}${BASE}`,
   defaultLocale: 'pl-PL',
   description:
     'Praktyczne szkolenia z ChatGPT, Gemini, Claude i NotebookLM dla pracowników biurowych spoza IT. Online live, zaświadczenie z mapowaniem na DigComp 2.2. Dofinansowanie z KFS i programów regionalnych.',

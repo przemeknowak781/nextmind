@@ -8,7 +8,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const BASE = process.env.SITE_BASE || '/nextmind';
+// Uwaga na ??: przy deployu na własną domenę SITE_BASE jest pustym łańcuchem
+// i to poprawna wartość. Z || pusty łańcuch wpadałby w domyślne '/nextmind'
+// i skrypt dokleiłby prefiks GitHub Pages do adresów na produkcyjnej domenie.
+const BASE = process.env.SITE_BASE ?? '/nextmind';
 const DIST = process.env.DIST_DIR || './dist';
 
 const EXTERNAL_PREFIXES = ['//', 'http://', 'https://', 'mailto:', 'tel:', 'data:', '#', 'javascript:'];
