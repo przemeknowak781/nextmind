@@ -6,8 +6,8 @@ const trainers = defineCollection({
   // Świadomie nie ma tu pól na liczbę godzin, uczestników czy lat
   // doświadczenia. Takich danych nie mamy skąd potwierdzić, a wpisane „na oko"
   // są dokładnie tym rodzajem liczby, który podważa wiarygodność całej strony.
-  // Zaufanie budujemy na tym, co da się sprawdzić: wpis dostawcy w BUR,
-  // imienne certyfikaty i publiczny profil zawodowy.
+  // Zaufanie budujemy na tym, co da się sprawdzić: wpis dostawcy w BUR
+  // i publiczny profil zawodowy trenera.
   schema: z.object({
     slug: z.string(),
     name: z.string(),
@@ -20,12 +20,16 @@ const trainers = defineCollection({
     shortBio: z.string().optional(),
     /** Obszary, które prowadzi. */
     focus: z.array(z.string()).default([]),
+    /**
+     * Certyfikaty publikujemy tylko z odnośnikiem do weryfikacji u wystawcy —
+     * sama nazwa i rok to deklaracja, której czytelnik nie ma jak sprawdzić.
+     * Dlatego `url` jest wymagane, a nie opcjonalne.
+     */
     certifications: z.array(z.object({
       name: z.string(),
       issuer: z.string(),
       year: z.number(),
-      /** Odnośnik do weryfikacji certyfikatu, jeśli wystawca go udostępnia. */
-      url: z.string().url().optional(),
+      url: z.string().url(),
     })).default([]),
     publications: z.array(z.string()).default([]),
     linkedin: z.string().url().optional(),
